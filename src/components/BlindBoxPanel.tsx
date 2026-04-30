@@ -55,32 +55,40 @@ export function BlindBoxPanel({ onUsePattern, compact = false }: BlindBoxPanelPr
   }, []);
 
   return (
-    <div className={`bg-white rounded-lg shadow-[0_2px_10px_rgba(31,41,55,0.06)] border border-[#d5d0c4] ${compact ? "p-5 mb-0" : "p-6 mb-8"}`}>
+    <div className={`bg-paper-soft rounded-card border border-edge-sand ${compact ? "p-5" : "p-6 mb-8"}`}>
       <div className="flex items-start justify-between gap-4 mb-4">
         <div>
-          <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-md bg-[#eef6f5] text-[#1f5c57] text-xs font-semibold mb-2">
-            <Gift className="w-3.5 h-3.5" />
-            每日盲盒拼豆
+          <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-chip bg-honey-glow text-ink-warm text-xs font-semibold mb-2">
+            <Gift className="w-3.5 h-3.5" aria-hidden="true" />
+            每日盲盒
           </div>
-          <h3 className={`${compact ? "text-lg" : "text-xl"} font-semibold text-[#1f2937]`}>今日盲盒图案</h3>
-          <p className="text-xs text-gray-500 mt-1">每天随机 2 个，三天内不重复</p>
+          <h3
+            className={`${compact ? "text-lg" : "text-xl"} text-ink-warm`}
+            style={{ fontFamily: 'var(--font-headline)', fontWeight: 600 }}
+          >
+            今日盲盒图案
+          </h3>
+          <p className="text-xs text-ink-soft mt-1">每天随机 2 个，三天内不重复</p>
         </div>
-        <Sparkles className="w-6 h-6 text-[#1f5c57] flex-shrink-0" />
+        <Sparkles className="w-6 h-6 text-terracotta flex-shrink-0" aria-hidden="true" />
       </div>
 
       {loading ? (
-        <p className="text-sm text-gray-500 py-4 text-center">正在加载...</p>
+        <p className="text-sm text-ink-soft py-4 text-center">正在加载...</p>
       ) : patterns.length === 0 ? (
-        <p className="text-sm text-gray-500 py-4 text-center">暂无盲盒图案</p>
+        <p className="text-sm text-ink-soft py-4 text-center">暂无盲盒图案</p>
       ) : (
         <div className="space-y-3">
           {patterns.map(p => (
-            <div
+            <button
               key={p.id}
-              className="flex items-center gap-3 rounded-lg border border-[#d5d0c4] bg-[#f8f7f3] p-3 hover:border-[#1f5c57] hover:shadow-sm transition-all cursor-pointer group"
+              type="button"
+              className="w-full text-left flex items-center gap-3 rounded-surface border border-edge-sand bg-paper-bg p-3 transition-all hover:border-terracotta/60 hover:-translate-y-0.5 cursor-pointer group focus-visible:outline-2 focus-visible:outline-moss focus-visible:outline-offset-2"
               onClick={() => onUsePattern(p.grid.map(r => [...r]))}
+              onMouseEnter={(e) => { e.currentTarget.style.boxShadow = 'var(--shadow-bead)'; }}
+              onMouseLeave={(e) => { e.currentTarget.style.boxShadow = 'none'; }}
             >
-              <div className="flex-shrink-0 w-[60px] h-[60px] flex items-center justify-center bg-white rounded-lg overflow-hidden">
+              <div className="flex-shrink-0 w-[60px] h-[60px] flex items-center justify-center bg-paper-soft rounded-control overflow-hidden border border-edge-sand/60">
                 {p.previewUrl ? (
                   <img src={p.previewUrl} alt={p.name} className="max-w-[56px] max-h-[56px] object-contain" />
                 ) : (
@@ -88,16 +96,16 @@ export function BlindBoxPanel({ onUsePattern, compact = false }: BlindBoxPanelPr
                 )}
               </div>
               <div className="flex-1 min-w-0">
-                <p className="font-semibold text-sm text-gray-900">{p.name}</p>
-                <p className="text-xs text-gray-500 mt-0.5">{p.description}</p>
-                <p className="text-[10px] text-gray-400 mt-1">
-                  {p.grid[0]?.length ?? 0} x {p.grid.length}
+                <p className="font-semibold text-sm text-ink-warm truncate">{p.name}</p>
+                <p className="text-xs text-ink-soft mt-0.5 line-clamp-1">{p.description}</p>
+                <p className="text-[10px] text-ink-soft mt-1" style={{ fontFamily: 'var(--font-num)' }}>
+                  {p.grid[0]?.length ?? 0} × {p.grid.length}
                 </p>
               </div>
-              <span className="text-xs text-[#1f5c57] font-medium opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0">
-                使用 →
+              <span className="text-xs text-terracotta font-semibold opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0">
+                试试 →
               </span>
-            </div>
+            </button>
           ))}
         </div>
       )}

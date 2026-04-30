@@ -12,10 +12,11 @@ const DIFFICULTY_LABELS: Record<string, string> = {
   hard: '挑战',
 };
 
-const DIFFICULTY_COLORS: Record<string, string> = {
-  easy: 'bg-green-100 text-green-700',
-  medium: 'bg-amber-100 text-amber-700',
-  hard: 'bg-red-100 text-red-700',
+// 难度色对应到品牌色卡：moss=易、honey=中、terracotta=难
+const DIFFICULTY_DOT: Record<string, string> = {
+  easy: 'bg-moss',
+  medium: 'bg-honey',
+  hard: 'bg-terracotta',
 };
 
 // 缩略图组件
@@ -79,24 +80,34 @@ export function TrendingPatternsPanel({ onUsePattern }: TrendingPatternsPanelPro
     : patterns;
 
   return (
-    <section className="rounded-xl border border-[#d7d1c3] bg-white px-5 py-5">
-      <div className="flex items-center justify-between mb-3">
+    <section>
+      <div className="flex items-end justify-between mb-4 px-1">
         <div>
-          <h3 className="text-lg font-semibold text-[#1f2937]">网红图纸</h3>
-          <p className="text-xs text-[#9ca3af] mt-0.5">精选热门拼豆图纸，点击即可开始创作</p>
+          <h3
+            className="text-ink-warm leading-tight"
+            style={{ fontFamily: 'var(--font-headline)', fontSize: 'clamp(1.35rem, 2.2vw, 1.75rem)', fontWeight: 600 }}
+          >
+            今日图鉴
+          </h3>
+          <p className="text-sm text-ink-soft mt-1">挑一份现成的，点一下就开始拼。</p>
         </div>
-        <span className="text-xs text-[#9ca3af] bg-[#f3f1ec] px-2 py-1 rounded-full">{patterns.length} 个</span>
+        <span
+          className="text-xs text-ink-soft bg-paper-soft border border-edge-sand px-2.5 py-1 rounded-chip"
+          style={{ fontFamily: 'var(--font-num)' }}
+        >
+          {patterns.length} 份
+        </span>
       </div>
 
       {/* 标签筛选 */}
       {allTags.length > 0 && (
-        <div className="flex flex-wrap gap-2 mb-4">
+        <div className="flex flex-wrap gap-2 mb-4 px-1">
           <button
             onClick={() => setSelectedTag(null)}
-            className={`px-3 py-1 rounded-full text-xs border transition-colors ${
+            className={`px-3 py-1.5 rounded-chip text-xs font-semibold border transition-colors ${
               selectedTag === null
-                ? 'bg-[#1f5c57] text-white border-[#1f5c57]'
-                : 'bg-white text-[#374151] border-[#d7d1c3] hover:bg-[#f3f1ec]'
+                ? 'bg-terracotta text-paper-bg border-terracotta'
+                : 'bg-paper-soft text-ink-warm border-edge-sand hover:bg-paper-deep'
             }`}
           >
             全部
@@ -105,10 +116,10 @@ export function TrendingPatternsPanel({ onUsePattern }: TrendingPatternsPanelPro
             <button
               key={tag}
               onClick={() => setSelectedTag(tag)}
-              className={`px-3 py-1 rounded-full text-xs border transition-colors ${
+              className={`px-3 py-1.5 rounded-chip text-xs font-semibold border transition-colors ${
                 selectedTag === tag
-                  ? 'bg-[#1f5c57] text-white border-[#1f5c57]'
-                  : 'bg-white text-[#374151] border-[#d7d1c3] hover:bg-[#f3f1ec]'
+                  ? 'bg-terracotta text-paper-bg border-terracotta'
+                  : 'bg-paper-soft text-ink-warm border-edge-sand hover:bg-paper-deep'
               }`}
             >
               {tag}
@@ -118,32 +129,41 @@ export function TrendingPatternsPanel({ onUsePattern }: TrendingPatternsPanelPro
       )}
 
       {/* 图纸卡片 */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-4">
         {filtered.map(p => (
-          <div
+          <button
             key={p.id}
-            className="rounded-xl border border-[#d7d1c3] p-3 hover:shadow-lg hover:border-[#1f5c57] transition-all cursor-pointer group"
             onClick={() => onUsePattern(p.grid)}
+            className="group text-left rounded-surface bg-paper-soft border border-edge-sand p-3 transition-all hover:-translate-y-0.5 hover:bg-paper-bg cursor-pointer focus-visible:outline-2 focus-visible:outline-moss focus-visible:outline-offset-2"
+            style={{ boxShadow: 'none' }}
+            onMouseEnter={(e) => { e.currentTarget.style.boxShadow = 'var(--shadow-card)'; }}
+            onMouseLeave={(e) => { e.currentTarget.style.boxShadow = 'none'; }}
           >
-            <div className="flex items-center justify-center bg-[#f9f8f5] rounded-lg p-2 mb-2 min-h-[120px]">
+            <div className="relative flex items-center justify-center bg-paper-bg rounded-control p-2 mb-2.5 min-h-[120px] border border-edge-sand/60">
               {p.previewImage ? (
                 <img src={p.previewImage} alt={p.name} className="max-h-[110px] max-w-full object-contain" />
               ) : (
                 <PatternThumbnail grid={p.grid} size={100} />
               )}
+              <span
+                className="absolute -top-2 -right-2 w-7 h-7 rounded-full bg-honey text-ink-warm text-base font-bold flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                aria-hidden="true"
+                style={{ boxShadow: 'var(--shadow-bead)' }}
+              >
+                +
+              </span>
             </div>
-            <p className="font-medium text-sm text-[#1f2937] truncate">{p.name}</p>
-            <div className="flex items-center gap-1.5 mt-1">
-              <span className={`text-[10px] px-1.5 py-0.5 rounded-full font-medium ${DIFFICULTY_COLORS[p.difficulty]}`}>
+            <p className="font-semibold text-sm text-ink-warm truncate">{p.name}</p>
+            <div className="flex items-center gap-2 mt-1.5">
+              <span className="inline-flex items-center gap-1 text-[10px] text-ink-soft">
+                <span className={`w-2 h-2 rounded-full ${DIFFICULTY_DOT[p.difficulty]}`} aria-hidden="true" />
                 {DIFFICULTY_LABELS[p.difficulty]}
               </span>
-              <span className="text-[10px] text-[#9ca3af]">{p.gridWidth}x{p.gridHeight}</span>
-              <span className="text-[10px] text-[#9ca3af]">{p.beadCount}颗</span>
+              <span className="text-[10px] text-ink-soft" style={{ fontFamily: 'var(--font-num)' }}>
+                {p.gridWidth}×{p.gridHeight} · {p.beadCount}颗
+              </span>
             </div>
-            <div className="mt-2 text-center opacity-0 group-hover:opacity-100 transition-opacity">
-              <span className="text-xs text-[#1f5c57] font-medium bg-[#eef6f5] px-3 py-1 rounded-full">开始创作</span>
-            </div>
-          </div>
+          </button>
         ))}
       </div>
     </section>

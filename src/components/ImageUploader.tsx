@@ -278,20 +278,13 @@ export function ImageUploader({ onImageProcessed, onCreateBlank }: ImageUploader
   };
 
   return (
-    <div className="max-w-4xl mx-auto">
-      <div className="text-center mb-12">
-        <h2 className="text-4xl font-semibold mb-3 text-[#1f2937] tracking-tight">
-          开始模拟拼豆创作
-        </h2>
-        <p className="text-[#5b6470] text-lg">
-          上传图片自动转换为拼豆图纸，或创建空白画布自由创作
-        </p>
-      </div>
-
+    <div className="w-full">
       {/* 主上传区域 */}
       <div
-        className={`bg-white rounded-lg shadow-[0_2px_10px_rgba(31,41,55,0.06)] p-12 border border-dashed transition-all cursor-pointer hover:shadow-[0_6px_18px_rgba(31,41,55,0.10)] mb-6 ${
-          isDragging ? 'border-[#1f5c57] bg-[#eef6f5]' : 'border-[#d8d2c6]'
+        className={`relative rounded-card border-2 border-dashed p-10 sm:p-12 transition-all cursor-pointer mb-4 bg-paper-soft ${
+          isDragging
+            ? 'border-terracotta bg-paper-deep'
+            : 'border-edge-sand hover:border-terracotta/60 hover:bg-paper-bg'
         }`}
         onDragOver={(e) => {
           e.preventDefault();
@@ -308,27 +301,35 @@ export function ImageUploader({ onImageProcessed, onCreateBlank }: ImageUploader
           onChange={handleFileSelect}
           className="hidden"
         />
-        
+
         <div className="flex flex-col items-center justify-center text-center">
-          <div className="w-16 h-16 bg-[#1f5c57] rounded-md flex items-center justify-center mb-6">
-            <Upload className="w-8 h-8 text-white" />
+          <div
+            className="w-16 h-16 rounded-full bg-terracotta flex items-center justify-center mb-5"
+            style={{ boxShadow: 'var(--shadow-bead)' }}
+            aria-hidden="true"
+          >
+            <Upload className="w-7 h-7 text-paper-bg" />
           </div>
-          
+
           {isProcessing ? (
             <>
-              <h3 className="text-2xl font-semibold mb-2">正在处理图片...</h3>
-              <div className="w-64 h-2 bg-gray-200 rounded-full overflow-hidden mt-4">
-                <div className="h-full bg-[#1f5c57] animate-pulse"></div>
+              <h3 className="text-2xl text-ink-warm mb-2" style={{ fontFamily: 'var(--font-headline)', fontWeight: 600 }}>
+                正在处理图片...
+              </h3>
+              <div className="w-64 h-2 bg-paper-deep rounded-full overflow-hidden mt-4">
+                <div className="h-full bg-terracotta animate-pulse" />
               </div>
             </>
           ) : (
             <>
-              <h3 className="text-2xl font-semibold mb-3">上传图片</h3>
-              <p className="text-gray-500 mb-4 text-lg">
-                拖拽图片到这里或点击上传
+              <h3 className="text-2xl text-ink-warm mb-2" style={{ fontFamily: 'var(--font-headline)', fontWeight: 600 }}>
+                上传你的图
+              </h3>
+              <p className="text-ink-soft text-base sm:text-lg leading-relaxed">
+                拖到这里，或点一下选张图。
               </p>
-              <p className="text-sm text-gray-400">
-                支持 JPG、PNG、GIF 等格式
+              <p className="text-xs text-ink-soft mt-2 opacity-70" style={{ fontFamily: 'var(--font-num)' }}>
+                JPG · PNG · GIF
               </p>
             </>
           )}
@@ -339,10 +340,10 @@ export function ImageUploader({ onImageProcessed, onCreateBlank }: ImageUploader
       <div className="text-center">
         <button
           onClick={() => setShowBlankModal(true)}
-          className="inline-flex items-center gap-2 text-gray-600 hover:text-[#1f5c57] transition-colors"
+          className="inline-flex items-center gap-2 text-sm text-ink-soft hover:text-terracotta transition-colors px-3 py-2 rounded-control focus-visible:outline-2 focus-visible:outline-moss focus-visible:outline-offset-2"
         >
-          <Grid className="w-4 h-4" />
-          <span className="text-sm">或创建空白画布自由创作</span>
+          <Grid className="w-4 h-4" aria-hidden="true" />
+          <span>或者，从一张空白画布开始自己拼</span>
         </button>
       </div>
 

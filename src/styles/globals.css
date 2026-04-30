@@ -1,84 +1,108 @@
 @custom-variant dark (&:is(.dark *));
 
+/*
+  Token system per DESIGN.md ("Warm Terracotta Studio Wall").
+  All values are OKLCH-canonical; hex equivalents kept in DESIGN.md prose.
+  No #fff or #000 anywhere — everything is gently tinted toward bead-warm hues.
+*/
 :root {
-  --font-size: 16px;
-  --background: #ffffff;
-  --foreground: oklch(0.145 0 0);
-  --card: #ffffff;
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: #030213;
-  --primary-foreground: oklch(1 0 0);
-  --secondary: oklch(0.95 0.0058 264.53);
-  --secondary-foreground: #030213;
-  --muted: #ececf0;
-  --muted-foreground: #717182;
-  --accent: #e9ebef;
-  --accent-foreground: #030213;
-  --destructive: #d4183d;
-  --destructive-foreground: #ffffff;
-  --border: rgba(0, 0, 0, 0.1);
-  --input: transparent;
-  --input-background: #f3f3f5;
-  --switch-background: #cbced4;
-  --font-weight-medium: 500;
-  --font-weight-normal: 400;
-  --ring: oklch(0.708 0 0);
-  --chart-1: oklch(0.646 0.222 41.116);
-  --chart-2: oklch(0.6 0.118 184.704);
-  --chart-3: oklch(0.398 0.07 227.392);
-  --chart-4: oklch(0.828 0.189 84.429);
-  --chart-5: oklch(0.769 0.188 70.08);
-  --radius: 0.625rem;
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: #030213;
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
-}
+  /* Brand palette — paper, terracotta, moss, honey, ink */
+  --bead-paper-bg: oklch(0.965 0.018 84);
+  --bead-paper-soft: oklch(0.95 0.022 84);
+  --bead-paper-deep: oklch(0.92 0.025 84);
+  --bead-terracotta: oklch(0.62 0.165 38);
+  --bead-terracotta-deep: oklch(0.5 0.155 35);
+  --bead-moss: oklch(0.45 0.085 165);
+  --bead-moss-deep: oklch(0.32 0.075 165);
+  --bead-honey: oklch(0.82 0.155 85);
+  --bead-honey-glow: oklch(0.88 0.135 85);
+  --bead-ink: oklch(0.28 0.025 70);
+  --bead-ink-soft: oklch(0.5 0.018 70);
+  --bead-edge: oklch(0.86 0.015 70);
+  --bead-shadow: oklch(0.78 0.012 70);
+  --bead-alert: oklch(0.55 0.18 18);
 
-.dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.145 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.145 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.985 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.396 0.141 25.723);
-  --destructive-foreground: oklch(0.637 0.237 25.331);
-  --border: oklch(0.269 0 0);
-  --input: oklch(0.269 0 0);
-  --ring: oklch(0.439 0 0);
-  --font-weight-medium: 500;
+  /* Warm shadow base — used by all elevation tokens */
+  --bead-shadow-rgba: 168, 130, 90;
+
+  /* Elevation vocabulary (DESIGN.md §4) */
+  --shadow-lift-bead: 0 2px 0 var(--bead-shadow), 0 6px 16px -4px rgba(168, 130, 90, 0.18);
+  --shadow-lift-card: 0 8px 24px -8px rgba(168, 130, 90, 0.22), 0 2px 6px -2px rgba(168, 130, 90, 0.12);
+  --shadow-inset-paper: inset 0 1px 2px rgba(168, 130, 90, 0.10);
+
+  /* Radius scale (DESIGN.md §5) */
+  --radius-bead: 9999px;
+  --radius-card: 20px;
+  --radius-surface: 16px;
+  --radius-control: 12px;
+  --radius-chip: 10px;
+
+  /* shadcn/radix compatibility — map shadcn token names onto our palette
+     so primitive components inherit the brand without rewrites. */
+  --background: var(--bead-paper-bg);
+  --foreground: var(--bead-ink);
+  --card: var(--bead-paper-soft);
+  --card-foreground: var(--bead-ink);
+  --popover: var(--bead-paper-soft);
+  --popover-foreground: var(--bead-ink);
+  --primary: var(--bead-terracotta);
+  --primary-foreground: var(--bead-paper-bg);
+  --secondary: var(--bead-paper-deep);
+  --secondary-foreground: var(--bead-ink);
+  --muted: var(--bead-paper-deep);
+  --muted-foreground: var(--bead-ink-soft);
+  --accent: var(--bead-honey-glow);
+  --accent-foreground: var(--bead-ink);
+  --destructive: var(--bead-alert);
+  --destructive-foreground: var(--bead-paper-bg);
+  --border: var(--bead-edge);
+  --input: var(--bead-edge);
+  --input-background: var(--bead-paper-bg);
+  --switch-background: var(--bead-shadow);
+  --ring: var(--bead-moss);
+
+  --font-size: 16px;
   --font-weight-normal: 400;
-  --chart-1: oklch(0.488 0.243 264.376);
-  --chart-2: oklch(0.696 0.17 162.48);
-  --chart-3: oklch(0.769 0.188 70.08);
-  --chart-4: oklch(0.627 0.265 303.9);
-  --chart-5: oklch(0.645 0.246 16.439);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(0.269 0 0);
-  --sidebar-ring: oklch(0.439 0 0);
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+
+  /* Chart colors — bead palette, not generic SaaS rainbow */
+  --chart-1: var(--bead-terracotta);
+  --chart-2: var(--bead-moss);
+  --chart-3: var(--bead-honey);
+  --chart-4: oklch(0.55 0.12 245);
+  --chart-5: oklch(0.65 0.13 320);
+
+  --radius: var(--radius-control);
+
+  --sidebar: var(--bead-paper-soft);
+  --sidebar-foreground: var(--bead-ink);
+  --sidebar-primary: var(--bead-terracotta);
+  --sidebar-primary-foreground: var(--bead-paper-bg);
+  --sidebar-accent: var(--bead-paper-deep);
+  --sidebar-accent-foreground: var(--bead-ink);
+  --sidebar-border: var(--bead-edge);
+  --sidebar-ring: var(--bead-moss);
 }
 
 @theme inline {
+  /* Brand color tokens — usable as bg-bead-paper-bg / text-ink-warm etc. */
+  --color-paper-bg: var(--bead-paper-bg);
+  --color-paper-soft: var(--bead-paper-soft);
+  --color-paper-deep: var(--bead-paper-deep);
+  --color-terracotta: var(--bead-terracotta);
+  --color-terracotta-deep: var(--bead-terracotta-deep);
+  --color-moss: var(--bead-moss);
+  --color-moss-deep: var(--bead-moss-deep);
+  --color-honey: var(--bead-honey);
+  --color-honey-glow: var(--bead-honey-glow);
+  --color-ink-warm: var(--bead-ink);
+  --color-ink-soft: var(--bead-ink-soft);
+  --color-edge-sand: var(--bead-edge);
+  --color-bead-shadow: var(--bead-shadow);
+  --color-alert-rose: var(--bead-alert);
+
+  /* shadcn-aliased tokens — preserve standard shadcn class API */
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
@@ -105,10 +129,7 @@
   --color-chart-3: var(--chart-3);
   --color-chart-4: var(--chart-4);
   --color-chart-5: var(--chart-5);
-  --radius-sm: calc(var(--radius) - 4px);
-  --radius-md: calc(var(--radius) - 2px);
-  --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) + 4px);
+
   --color-sidebar: var(--sidebar);
   --color-sidebar-foreground: var(--sidebar-foreground);
   --color-sidebar-primary: var(--sidebar-primary);
@@ -117,6 +138,23 @@
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
+
+  /* Radius scale */
+  --radius-sm: 8px;
+  --radius-md: var(--radius-control);
+  --radius-lg: var(--radius-surface);
+  --radius-xl: var(--radius-card);
+
+  /* Font families */
+  --font-display: 'ZCOOL KuaiLe', 'Fredoka', 'Noto Sans SC', 'PingFang SC', sans-serif;
+  --font-headline: 'Fredoka', 'Noto Sans SC', 'PingFang SC', sans-serif;
+  --font-body: 'Noto Sans SC', 'Nunito', 'PingFang SC', 'Hiragino Sans GB', sans-serif;
+  --font-num: 'Nunito', ui-monospace, monospace;
+
+  /* Elevation tokens exposed as Tailwind shadow utilities */
+  --shadow-bead: var(--shadow-lift-bead);
+  --shadow-card: var(--shadow-lift-card);
+  --shadow-paper: var(--shadow-inset-paper);
 }
 
 @layer base {
@@ -125,39 +163,43 @@
   }
 
   body {
-    @apply bg-background text-foreground;
+    @apply bg-paper-bg text-ink-warm;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
 }
 
-/**
- * Base typography. This is not applied to elements which have an ancestor with a Tailwind text class.
- */
+/*
+  Base typography — applied where no Tailwind text class wins.
+  Uses font tokens from @theme so display/headline get the right family automatically.
+*/
 @layer base {
   :where(:not(:has([class*=' text-']), :not(:has([class^='text-'])))) {
     h1 {
+      font-family: var(--font-display);
       font-size: var(--text-2xl);
-      font-weight: var(--font-weight-medium);
-      line-height: 1.5;
+      font-weight: var(--font-weight-normal);
+      line-height: 1.15;
+      letter-spacing: -0.005em;
     }
 
     h2 {
+      font-family: var(--font-headline);
       font-size: var(--text-xl);
-      font-weight: var(--font-weight-medium);
-      line-height: 1.5;
+      font-weight: var(--font-weight-semibold);
+      line-height: 1.25;
     }
 
     h3 {
       font-size: var(--text-lg);
-      font-weight: var(--font-weight-medium);
-      line-height: 1.5;
+      font-weight: var(--font-weight-semibold);
+      line-height: 1.4;
     }
 
     h4 {
       font-size: var(--text-base);
-      font-weight: var(--font-weight-medium);
-      line-height: 1.5;
+      font-weight: var(--font-weight-semibold);
+      line-height: 1.4;
     }
 
     label {

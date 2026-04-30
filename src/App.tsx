@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { Library } from 'lucide-react';
 import { ImageUploader } from './components/ImageUploader';
 import { BeadCanvas } from './components/BeadCanvas';
 import { BeadPattern } from './components/BeadPattern';
@@ -8,6 +9,23 @@ import { GalleryView } from './components/GalleryView';
 import { getGallery } from './utils/galleryUtils';
 import { beadColors } from './data/beadColors';
 import type { BeadColor, BeadGrid, ColorSystem } from './types';
+
+// 2×2 拼豆颗粒方阵 logo——四颗真实色卡
+function BeadLogoMark({ className = 'w-10 h-10' }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 40 40" className={className} aria-hidden="true">
+      <circle cx="11" cy="11" r="7.5" fill="var(--bead-terracotta)" />
+      <circle cx="29" cy="11" r="7.5" fill="var(--bead-moss)" />
+      <circle cx="11" cy="29" r="7.5" fill="var(--bead-honey)" />
+      <circle cx="29" cy="29" r="7.5" fill="var(--bead-ink)" />
+      {/* 微微塑料反光 */}
+      <circle cx="9" cy="9" r="1.6" fill="rgba(255,255,255,0.55)" />
+      <circle cx="27" cy="9" r="1.6" fill="rgba(255,255,255,0.55)" />
+      <circle cx="9" cy="27" r="1.6" fill="rgba(255,255,255,0.55)" />
+      <circle cx="27" cy="27" r="1.6" fill="rgba(255,255,255,0.55)" />
+    </svg>
+  );
+}
 
 export type { BeadColor, BeadGrid, ColorSystem };
 export { beadColors };
@@ -141,7 +159,7 @@ function App() {
   };
 
   return (
-    <div className="min-h-screen bg-[#f3f1ec] relative overflow-x-hidden">
+    <div className="min-h-screen bg-paper-bg text-ink-warm relative overflow-x-hidden">
       {showGallery && (
         <GalleryView
           onClose={() => {
@@ -151,31 +169,32 @@ function App() {
         />
       )}
       {/* Header */}
-      <header className="relative z-10 bg-[#f3f1ec] border-b border-[#d7d1c3]">
+      <header className="relative z-10 bg-paper-bg border-b border-edge-sand">
         <div className="max-w-7xl mx-auto px-4 py-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-[#1f5c57] rounded-md flex items-center justify-center">
-                <svg className="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24">
-                  <circle cx="8" cy="8" r="2" />
-                  <circle cx="16" cy="8" r="2" />
-                  <circle cx="8" cy="16" r="2" />
-                  <circle cx="16" cy="16" r="2" />
-                </svg>
-              </div>
-              <h1 className="text-lg sm:text-2xl font-semibold text-[#1f2937] tracking-tight">
+              <BeadLogoMark className="w-10 h-10" />
+              <h1
+                className="text-2xl sm:text-3xl text-ink-warm leading-none"
+                style={{ fontFamily: 'var(--font-display)' }}
+              >
                 拼豆模拟器
               </h1>
             </div>
             <div className="flex items-center gap-2">
               <button
                 onClick={() => { setShowGallery(true); }}
-                className="relative px-4 py-2 bg-white border border-[#d5d0c4] rounded-lg hover:bg-[#f3f1eb] transition-colors flex items-center gap-2"
+                className="relative inline-flex items-center gap-2 px-3.5 py-2 bg-paper-soft border border-edge-sand rounded-control text-ink-warm hover:bg-paper-deep transition-colors"
+                aria-label="打开作品馆"
               >
-                <span>🏛️</span>
-                <span className="hidden sm:inline text-sm font-medium">作品馆</span>
+                <Library className="w-4 h-4 text-terracotta" aria-hidden="true" />
+                <span className="hidden sm:inline text-sm font-semibold">作品馆</span>
                 {galleryCount > 0 && (
-                  <span className="absolute -top-1.5 -right-1.5 w-5 h-5 bg-[#1f5c57] text-white text-[10px] font-bold rounded-full flex items-center justify-center">
+                  <span
+                    className="absolute -top-1.5 -right-1.5 min-w-[20px] h-5 px-1 bg-honey text-ink-warm text-[10px] font-bold rounded-full flex items-center justify-center"
+                    style={{ fontFamily: 'var(--font-num)' }}
+                    aria-label={`已收藏 ${galleryCount} 个作品`}
+                  >
                     {galleryCount > 99 ? '99+' : galleryCount}
                   </span>
                 )}
@@ -183,7 +202,7 @@ function App() {
               {mode !== 'upload' && (
                 <button
                   onClick={handleBackToUpload}
-                  className="px-4 py-2 bg-white border border-[#d5d0c4] rounded-lg hover:bg-[#f3f1eb] transition-colors"
+                  className="px-3.5 py-2 bg-paper-soft border border-edge-sand rounded-control text-sm font-semibold text-ink-warm hover:bg-paper-deep transition-colors"
                 >
                   返回首页
                 </button>
@@ -194,28 +213,35 @@ function App() {
       </header>
 
       {/* Main Content */}
-      <main className="relative z-10 max-w-[1240px] mx-auto px-3 py-4 sm:px-6 sm:py-8 lg:px-8">
+      <main className="relative z-10 max-w-[1240px] mx-auto px-3 py-6 sm:px-6 sm:py-10 lg:px-8">
         {mode === 'upload' && (
-          <div className="space-y-5">
-            <section className="rounded-lg border border-[#d7d1c3] bg-white px-5 py-4">
-              <p className="text-xs uppercase tracking-[0.14em] text-[#1f5c57] font-semibold">Bead Studio</p>
-              <h2 className="text-xl sm:text-[30px] leading-tight font-semibold text-[#1f2937] mt-1">上传图片或抽取盲盒，开始今天的拼豆作品</h2>
+          <div className="space-y-8">
+            <section className="px-1 pt-2 pb-1">
+              <h2
+                className="text-ink-warm leading-[1.1]"
+                style={{
+                  fontFamily: 'var(--font-display)',
+                  fontSize: 'clamp(2rem, 5.5vw, 3.25rem)',
+                }}
+              >
+                今天想拼点什么？
+              </h2>
+              <p className="text-base sm:text-lg text-ink-soft mt-3 max-w-[34em] leading-[1.65]">
+                上传一张图、抽个盲盒，或者从下面挑一份图鉴——都从这里开始。
+              </p>
             </section>
             <TrendingPatternsPanel onUsePattern={handleUseBlindBox} />
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-            <section className="lg:col-span-8">
-              <ImageUploader
-                onImageProcessed={handleImageProcessed}
-                onCreateBlank={handleCreateBlank}
-              />
-            </section>
-            <aside className="lg:col-span-4 lg:sticky lg:top-6">
-              <p className="text-sm text-[#5b6470] mb-3 px-1">
-                每日随机挑战入口：不需要下滑，在这里直接抽盲盒。
-              </p>
-              <BlindBoxPanel onUsePattern={handleUseBlindBox} compact />
-            </aside>
-          </div>
+              <section className="lg:col-span-8">
+                <ImageUploader
+                  onImageProcessed={handleImageProcessed}
+                  onCreateBlank={handleCreateBlank}
+                />
+              </section>
+              <aside className="lg:col-span-4 lg:sticky lg:top-6">
+                <BlindBoxPanel onUsePattern={handleUseBlindBox} compact />
+              </aside>
+            </div>
           </div>
         )}
 
