@@ -1,0 +1,30 @@
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;600;700;800&display=swap');
+@import 'tailwindcss' source(none);
+@source './**/*.{js,ts,jsx,tsx}';
+@import 'tw-animate-css';
+@import './styles/globals.css';
+
+/* 单色完成 Toast 动画 */
+@keyframes colorDoneToast {
+  0%   { opacity: 0; transform: translateX(-50%) translateY(16px) scale(0.88); }
+  12%  { opacity: 1; transform: translateX(-50%) translateY(-4px) scale(1.06); }
+  20%  { transform: translateX(-50%) translateY(0)  scale(1); }
+  72%  { opacity: 1; transform: translateX(-50%) translateY(0)  scale(1); }
+  100% { opacity: 0; transform: translateX(-50%) translateY(-12px) scale(0.95); }
+}
+
+/* 彩屑飞散动画 */
+@keyframes confettiPop {
+  0%   { opacity: 0;   transform: rotate(var(--a, 0deg)) translateY(0px)   scale(0); }
+  30%  { opacity: 1;   transform: rotate(var(--a, 0deg)) translateY(-32px) scale(1.2); }
+  100% { opacity: 0;   transform: rotate(var(--a, 0deg)) translateY(-52px) scale(0.8); }
+}
+
+@layer base {
+  html, body, #root { min-height: 100vh; height: 100%; margin: 0; }
+  body { font-family: 'Noto Sans SC', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif; }
+  /* 消除手机按钮 300ms 点击延迟，提升触摸响应 */
+  button, a, [role="button"] { touch-action: manipulation; }
+  /* 防止长按弹出系统菜单（在画布区域已单独设置） */
+  img { -webkit-user-drag: none; user-select: none; }
+}

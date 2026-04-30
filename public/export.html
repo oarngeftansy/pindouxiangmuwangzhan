@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+<head><title>Export Data</title></head>
+<body>
+<script>
+  var data = JSON.stringify({
+    trending: JSON.parse(localStorage.getItem('trending_patterns_v1') || '[]'),
+    blindbox: JSON.parse(localStorage.getItem('custom_blindbox_patterns_v1') || '[]')
+  });
+  var blob = new Blob([data], {type: 'application/json'});
+  var a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'default-patterns.json';
+  document.body.appendChild(a);
+  a.click();
+  document.body.innerHTML = '<h2>Done! File downloaded.</h2><p>You can close this page.</p>';
+</script>
+</body>
+</html>
