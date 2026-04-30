@@ -10,7 +10,6 @@ import {
   Sparkles,
   Image as ImageIcon,
   Flame,
-  Maximize2,
   Square,
 } from "lucide-react";
 import { useState, useRef, useEffect, useMemo } from "react";
@@ -68,17 +67,10 @@ export function BeadCanvas({
   const [isIroning, setIsIroning] = useState(false); // 熨烫动画状态
   const [ironProgress, setIronProgress] = useState(0); // 熨烫进度
   const [ironPosition, setIronPosition] = useState({ x: 0, y: 0 }); // 熨斗位置
-  const [ironingMode, setIroningMode] = useState<'full' | 'partial'>('full'); // 全部熨烫或局部熨烫
   const [ironedResult, setIronedResult] = useState<string | null>(null); // 熨烫结果预览
   const [showIronPreview, setShowIronPreview] = useState(false); // 显示熨烫预览
   const [removeBackground, setRemoveBackground] = useState(false); // 是否去除背景
   // (removed matchFuzzyColor - no longer needed for glitter method)
-  const [selectedIronBeads, setSelectedIronBeads] = useState<Set<string>>(new Set()); // 选中要熨烫的豆子 "x,y"
-  const [selectedIronColors, setSelectedIronColors] = useState<Set<string>>(new Set()); // 选中要熨烫的颜色
-  const [showPartialIronSetup, setShowPartialIronSetup] = useState(false); // 显示局部熨烫设置
-  const [partialIronArea, setPartialIronArea] = useState<{start: {x: number, y: number}, end: {x: number, y: number}} | null>(null); // 局部熨烫选区
-  const [selectionStart, setSelectionStart] = useState<{x: number, y: number} | null>(null); // 选择起始点
-  const [isSelectingArea, setIsSelectingArea] = useState(false); // 是否正在选择区域
 
   // 高清渲染
   const [showHDModal, setShowHDModal] = useState(false); // 高清渲染模态框
@@ -555,7 +547,6 @@ export function BeadCanvas({
     setIsIroning(true);
     setIronProgress(0);
     setIronPosition({ x: 0, y: 0 });
-    setShowPartialIronSetup(false);
 
     const totalRows = workingGrid.length;
     const totalCols = workingGrid[0].length;
@@ -584,7 +575,6 @@ export function BeadCanvas({
     const ironedImageUrl = await generateIronedImage(workingGrid, {
       method: ironingMethod,
       removeBackground,
-      partialBeads: ironingMode === "partial" ? selectedIronBeads : undefined,
     });
 
     // 显示预览而不是直接下载
@@ -1537,37 +1527,6 @@ export function BeadCanvas({
                 不同的熨烫方式会产生不同的视觉效果
               </p>
 
-              {/* 熨烫模式选择 */}
-              <div className="mb-6 p-4 bg-blue-50 rounded-xl border border-blue-200">
-                <h3 className="font-bold mb-3 text-gray-800">熨烫范围</h3>
-                <div className="flex gap-3">
-                  <button
-                    onClick={() => setIroningMode('full')}
-                    className={`flex-1 p-4 rounded-xl border-2 transition-all ${
-                      ironingMode === 'full'
-                        ? 'border-blue-500 bg-blue-100 shadow-md'
-                        : 'border-gray-200 bg-white hover:border-blue-300'
-                    }`}
-                  >
-                    <Maximize2 className="w-6 h-6 mx-auto mb-2" />
-                    <div className="font-bold">全部熨烫</div>
-                    <div className="text-xs text-gray-600 mt-1">熨烫整个作品</div>
-                  </button>
-                  <button
-                    onClick={() => setIroningMode('partial')}
-                    className={`flex-1 p-4 rounded-xl border-2 transition-all ${
-                      ironingMode === 'partial'
-                        ? 'border-blue-500 bg-blue-100 shadow-md'
-                        : 'border-gray-200 bg-white hover:border-blue-300'
-                    }`}
-                  >
-                    <Square className="w-6 h-6 mx-auto mb-2" />
-                    <div className="font-bold">局部熨烫</div>
-                    <div className="text-xs text-gray-600 mt-1">框选区域熨烫</div>
-                  </button>
-                </div>
-              </div>
-
               {/* 去除背景选项 */}
               <div className="mb-6 p-4 bg-purple-50 rounded-xl border border-purple-200">
                 <label className="flex items-center gap-3 cursor-pointer">
@@ -1661,14 +1620,11 @@ export function BeadCanvas({
                   取消
                 </button>
                 <button
-                  onClick={ironingMode === 'partial' ? () => {
-                    setShowIroningModal(false);
-                    setShowPartialIronSetup(true);
-                  } : handleIroning}
+                  onClick={handleIroning}
                   className="flex-1 px-6 py-3 bg-gradient-to-r from-orange-500 via-red-500 to-pink-500 text-white rounded-xl hover:opacity-90 transition-opacity font-semibold flex items-center justify-center gap-2"
                 >
                   <Flame className="w-5 h-5" />
-                  {ironingMode === 'partial' ? '选择区域' : '开始熨烫'}
+                  开始熨烫
                 </button>
               </div>
             </div>
@@ -1759,111 +1715,6 @@ export function BeadCanvas({
         </div>
       )}
 
-      {/* 局部熨烫区域选择模态框 */}
-      {showPartialIronSetup && (
-        <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-3xl shadow-2xl p-8 max-w-4xl w-full relative">
-            <div className="mb-6">
-              <h2 className="text-lg sm:text-2xl font-bold text-center mb-2">选择局部熨烫区域</h2>
-              <p className="text-center text-gray-600">在画布上拖动鼠标框选需要熨烫的区域</p>
-            </div>
-
-            <div className="bg-gray-100 rounded-2xl p-6 mb-6 overflow-auto max-h-[500px]">
-              <div className="inline-block">
-                <div
-                  className="grid gap-0 bg-white rounded-lg overflow-hidden shadow-inner border-2 border-blue-400 relative"
-                  style={{
-                    gridTemplateColumns: `repeat(${workingGrid[0].length}, 20px)`,
-                    cursor: isSelectingArea ? 'crosshair' : 'default',
-                  }}
-                  onMouseDown={(e) => {
-                    const rect = e.currentTarget.getBoundingClientRect();
-                    const x = Math.floor((e.clientX - rect.left) / 20);
-                    const y = Math.floor((e.clientY - rect.top) / 20);
-                    setSelectionStart({ x, y });
-                    setIsSelectingArea(true);
-                  }}
-                  onMouseMove={(e) => {
-                    if (!isSelectingArea || !selectionStart) return;
-                    const rect = e.currentTarget.getBoundingClientRect();
-                    const x = Math.floor((e.clientX - rect.left) / 20);
-                    const y = Math.floor((e.clientY - rect.top) / 20);
-                    setPartialIronArea({ start: selectionStart, end: { x, y } });
-                  }}
-                  onMouseUp={() => {
-                    setIsSelectingArea(false);
-                  }}
-                >
-                  {workingGrid.map((row, y) =>
-                    row.map((color, x) => {
-                      const inSelection = partialIronArea && (
-                        x >= Math.min(partialIronArea.start.x, partialIronArea.end.x) &&
-                        x <= Math.max(partialIronArea.start.x, partialIronArea.end.x) &&
-                        y >= Math.min(partialIronArea.start.y, partialIronArea.end.y) &&
-                        y <= Math.max(partialIronArea.start.y, partialIronArea.end.y)
-                      );
-
-                      return (
-                        <div
-                          key={`select-${x}-${y}`}
-                          className={`border border-gray-300 transition-all ${
-                            inSelection ? 'ring-2 ring-orange-500 ring-inset bg-orange-100' : ''
-                          }`}
-                          style={{
-                            width: 20,
-                            height: 20,
-                            backgroundColor: color || '#FAFAFA',
-                          }}
-                        >
-                          {color && (
-                            <div
-                              className="w-full h-full rounded-full m-0.5"
-                              style={{
-                                backgroundColor: color,
-                                opacity: inSelection ? 0.8 : 1,
-                              }}
-                            />
-                          )}
-                        </div>
-                      );
-                    })
-                  )}
-                </div>
-              </div>
-            </div>
-
-            <div className="flex gap-3">
-              <button
-                onClick={() => {
-                  setShowPartialIronSetup(false);
-                  setPartialIronArea(null);
-                  setSelectionStart(null);
-                  setShowIroningModal(true);
-                }}
-                className="flex-1 px-6 py-3 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition-colors font-semibold"
-              >
-                返回
-              </button>
-              <button
-                onClick={() => {
-                  if (!partialIronArea) {
-                    alert('请先框选区域');
-                    return;
-                  }
-                  setShowPartialIronSetup(false);
-                  handleIroning();
-                }}
-                disabled={!partialIronArea}
-                className="flex-1 px-6 py-3 bg-gradient-to-r from-orange-500 via-red-500 to-pink-500 text-white rounded-xl hover:opacity-90 transition-opacity font-semibold flex items-center justify-center gap-2 disabled:opacity-50"
-              >
-                <Flame className="w-5 h-5" />
-                确认并开始熨烫
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
       {/* 熨烫预览模态框 */}
       {showIronPreview && ironedResult && (
         <div className="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50 p-4">
@@ -1871,7 +1722,7 @@ export function BeadCanvas({
             <div className="mb-6">
               <h2 className="text-lg sm:text-2xl font-bold text-center mb-2">熨烫效果预览</h2>
               <p className="text-center text-gray-600">
-                {IRONING_METHODS[ironingMethod].name} · {removeBackground ? '透明背景' : '白色背景'} · {ironingMode === 'partial' ? '局部熨烫' : '全部熨烫'}
+                {IRONING_METHODS[ironingMethod].name} · {removeBackground ? '透明背景' : '白色背景'}
               </p>
             </div>
 
@@ -1894,8 +1745,6 @@ export function BeadCanvas({
                 onClick={() => {
                   setShowIronPreview(false);
                   setIronedResult(null);
-                  setSelectedIronBeads(new Set());
-                  setSelectedIronColors(new Set());
                 }}
                 className="flex-1 px-4 py-3 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition-colors font-semibold"
               >
@@ -1928,7 +1777,7 @@ export function BeadCanvas({
                   const methodNames: Record<string, string> = {
                     paper: '铜版纸烫', towel: '毛巾烫', direct: '直烫', glitter: '格里特烫',
                   };
-                  link.download = `拼豆作品-${methodNames[ironingMethod]}${removeBackground ? '-透明' : ''}${ironingMode === 'partial' ? '-局部' : ''}.png`;
+                  link.download = `拼豆作品-${methodNames[ironingMethod]}${removeBackground ? '-透明' : ''}.png`;
                   link.href = ironedResult!;
                   link.click();
                 }}

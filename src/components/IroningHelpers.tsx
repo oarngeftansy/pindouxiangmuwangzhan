@@ -30,7 +30,7 @@ export async function generateIronedImage(
   canvas.width = workingGrid[0].length * cellSize;
   canvas.height = workingGrid.length * cellSize;
 
-  // 先填充所有颜色 - 完全无缝隙
+  // 紧密填充各色块——pixel art 底，颜色清晰无糊
   workingGrid.forEach((row, y) => {
     row.forEach((color, x) => {
       if (!color) return;
@@ -39,7 +39,7 @@ export async function generateIronedImage(
       const shouldIron = !options.partialBeads || options.partialBeads.has(beadKey);
 
       if (!shouldIron) {
-        // 未熨烫区域：绘制圆形豆子
+        // 未熨烫区域：圆形豆子保留
         const centerX = x * cellSize + cellSize / 2;
         const centerY = y * cellSize + cellSize / 2;
         const radius = cellSize / 2 - 8;
@@ -92,8 +92,8 @@ export async function generateIronedImage(
             centerX + cellSize * (0.5 - halfGw), centerY,
             centerX + cellSize * (0.5 + halfGw), centerY
           );
+          // 全程平滑过渡——左色到右色一气呵成，无中点骤变
           gradient.addColorStop(0, color);
-          gradient.addColorStop(0.5, rightColor);
           gradient.addColorStop(1, rightColor);
 
           ctx.fillStyle = gradient;
@@ -118,7 +118,6 @@ export async function generateIronedImage(
             centerX, centerY + cellSize * (0.5 + halfGw)
           );
           gradient.addColorStop(0, color);
-          gradient.addColorStop(0.5, bottomColor);
           gradient.addColorStop(1, bottomColor);
 
           ctx.fillStyle = gradient;
@@ -327,33 +326,22 @@ export async function generateIronedImage(
     });
   });
 
-  // 边缘平滑
+  // 方形 mask：每颗有色豆子方形 fillRect，紧密拼接——pixel art 风的锯齿外缘
+  // 真实烫熔的拼豆外缘就是方形锯齿，不要圆角化
   const maskCanvas = document.createElement('canvas');
   maskCanvas.width = canvas.width;
   maskCanvas.height = canvas.height;
   const maskCtx = maskCanvas.getContext('2d')!;
-  const maskRadius = cellSize * 0.5 * params.maskRadiusRatio;
   workingGrid.forEach((row, y) => {
     row.forEach((color, x) => {
       if (!color) return;
-      const cx = x * cellSize + cellSize / 2;
-      const cy = y * cellSize + cellSize / 2;
       maskCtx.fillStyle = 'black';
-      maskCtx.beginPath();
-      maskCtx.arc(cx, cy, maskRadius, 0, Math.PI * 2);
-      maskCtx.fill();
+      maskCtx.fillRect(x * cellSize, y * cellSize, cellSize, cellSize);
     });
   });
 
-  const blurCanvas = document.createElement('canvas');
-  blurCanvas.width = canvas.width;
-  blurCanvas.height = canvas.height;
-  const blurCtx = blurCanvas.getContext('2d')!;
-  blurCtx.filter = `blur(${Math.max(2, cellSize * params.edgeBlurRatio)}px)`;
-  blurCtx.drawImage(maskCanvas, 0, 0);
-
   ctx.globalCompositeOperation = 'destination-in';
-  ctx.drawImage(blurCanvas, 0, 0);
+  ctx.drawImage(maskCanvas, 0, 0);
   ctx.globalCompositeOperation = 'source-over';
 
   if (!options.removeBackground) {

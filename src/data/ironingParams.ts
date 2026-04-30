@@ -53,50 +53,57 @@ export interface IroningParams {
 
 export const DEFAULT_IRONING_PARAMS: IroningParams = {
   cellSize: 80,
-  fusionGradientWidth: 0.4,
-  maskRadiusRatio: 1.08,
-  edgeBlurRatio: 0.08,
+  // 关闭：颜色融合渐变会让画面变模糊。颜色清晰；融合感由"按色 goo filter"提供
+  fusionGradientWidth: 0,
+  // 方形 mask 实现下不再用此字段；保留字段以兼容旧 dev 工具配置
+  maskRadiusRatio: 1.45,
+  // 关闭边缘模糊——这是导致"四种烫法都糊成一样"的元凶
+  edgeBlurRatio: 0,
 
+  // 纹理参数：所有按 cell 中心的 alpha 大幅削弱
+  // 原因：真实烫熔的同色大区域看不到豆子位置，强按 cell 的纹理会暴露分隔
+  // 只保留"轻微表面质感"，不暴露 cell 中心
   paper: {
     holeRadius: 0.05,
-    holeAlpha: 0.08,
-    shineAlpha: 0.15,
-    shineRadius: 0.4,
-    shineOffset: 0.2,
+    holeAlpha: 0.04,        // 孔洞极弱——细看才能感觉到，不暴露 cell 位置
+    shineAlpha: 0.06,       // 中心高光极弱
+    shineRadius: 0.42,
+    shineOffset: 0.22,
   },
 
   towel: {
     weaveSpacing: 3,
     weaveWidth: 1.5,
-    weaveAlpha: 0.04,
+    weaveAlpha: 0.05,       // 编织纹弱化
     crossSpacing: 6,
     crossAlpha: 0.06,
-    matteAlpha: 0.03,
-    edgeAlpha: 0.03,
+    matteAlpha: 0.04,
+    edgeAlpha: 0.02,
   },
 
   direct: {
-    shineAlpha: 0.35,
-    shineMidAlpha: 0.12,
-    shineEdgeAlpha: 0.02,
+    shineAlpha: 0.10,       // 中心高光弱化（避免按 cell 中心点暴露豆子）
+    shineMidAlpha: 0.05,
+    shineEdgeAlpha: 0.01,
     shadowAlpha: 0.02,
     shineOffset: 0.25,
   },
 
   glitter: {
-    sparkleCount: 25,
+    sparkleCount: 22,       // 闪片密度略降
     sparkleMinSize: 1,
-    sparkleMaxSize: 3,
-    sparkleAlpha: 0.7,
-    baseShineAlpha: 0.12,
-    rainbowIntensity: 0.3,
-    highlightAlpha: 0.2,
-    crossSparkleCount: 5,
+    sparkleMaxSize: 2.5,
+    sparkleAlpha: 0.55,
+    baseShineAlpha: 0.06,   // 底层光泽弱化（不按 cell 中心展示）
+    rainbowIntensity: 0.35,
+    highlightAlpha: 0.10,
+    crossSparkleCount: 4,
     crossSparkleSize: 6,
   },
 };
 
-const STORAGE_KEY = 'ironing_params_v1';
+// v3: 弱化按 cell 纹理 + 方形外缘（参考真实烫熔实物效果，不要 squircle 大圆角）
+const STORAGE_KEY = 'ironing_params_v3';
 
 export function loadIroningParams(): IroningParams {
   try {
