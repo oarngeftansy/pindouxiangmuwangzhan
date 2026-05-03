@@ -11,7 +11,8 @@
     if (existing && JSON.parse(existing).length > 0) return; // 已有数据，跳过
 
     try {
-      const res = await fetch('/data/default-patterns.json');
+      // 用 Vite 注入的 BASE_URL 适配子路径部署（github.io 在 /pindouxiangmuwangzhan/ 下）
+      const res = await fetch(`${import.meta.env.BASE_URL}data/default-patterns.json`);
       if (!res.ok) return;
       const data = await res.json();
       if (data.trending?.length) {
