@@ -8,7 +8,14 @@
       "Bash(npm run:*)",
       "Skill(impeccable)",
       "Bash(git add *)",
-      "Bash(git commit -m ' *)"
+      "Bash(git commit -m ' *)",
+      "Bash(git config *)",
+      "Bash(git commit *)",
+      "Bash(git remote *)",
+      "Bash(git push *)",
+      "Bash(xxd \"C:/Users/Sethice/AppData/Local/Temp/claude/E--downloads-temp-pindouxiangmuwangzhan/e1a291d6-7125-496f-903d-aae50632f009/tasks/b8gpb7f5i.output\")",
+      "Bash(git fetch *)",
+      "Bash(echo \"exit: $?\")"
     ]
   }
 }

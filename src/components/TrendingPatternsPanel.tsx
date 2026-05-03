@@ -153,8 +153,7 @@ export function TrendingPatternsPanel({ onUsePattern }: TrendingPatternsPanelPro
                 +
               </span>
             </div>
-            <p className="font-semibold text-sm text-ink-warm truncate">{p.name}</p>
-            <div className="flex items-center gap-2 mt-1.5">
+            <div className="flex items-center gap-2">
               <span className="inline-flex items-center gap-1 text-[10px] text-ink-soft">
                 <span className={`w-2 h-2 rounded-full ${DIFFICULTY_DOT[p.difficulty]}`} aria-hidden="true" />
                 {DIFFICULTY_LABELS[p.difficulty]}

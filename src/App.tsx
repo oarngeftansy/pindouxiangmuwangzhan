@@ -249,7 +249,7 @@ function App() {
                 </aside>
               </div>
             ) : (
-              <section className="max-w-[820px] mx-auto w-full">
+              <section className="w-full">
                 <ImageUploader
                   onImageProcessed={handleImageProcessed}
                   onCreateBlank={handleCreateBlank}

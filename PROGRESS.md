@@ -55,6 +55,21 @@ npm run dev                # 看终端输出的本地端口（通常 5173）
 
 ## 2. 修改历史（按 commit 倒序）
 
+### 2026-05-03 首页两端对齐 + 移除图鉴卡片标题
+
+承接上一节"隐藏盲盒入口"留下的副作用：uploader 被刻意压在 `max-w-[820px] mx-auto`，与上方撑满 1240 内宽的 TrendingPanel 两端对不齐，视觉上像两段没归位的栏目。同时用户反馈"未命名图纸"占位文字让她要逐张命名才整齐——多余负担。
+
+| 改动 | 说明 |
+|---|---|
+| `App.tsx` | uploader section 的 `max-w-[820px] mx-auto w-full` → `w-full`，与 TrendingPanel 同宽，左右两端对齐 main 内边 |
+| `TrendingPatternsPanel.tsx` | 删除卡片下方的 `<p>{p.name}</p>` 标题；`alt={p.name}` 保留（屏幕阅读器仍能读出语义）；meta 行同步去掉 `mt-1.5`（标题没了不需要再撑开一段间距） |
+
+**为什么不再坚持 820px**：上次留 820 是为了让"BlindBox 隐藏前后 uploader 宽度像素一致"——保护过渡平滑。但这是临时约束，跟新目标"两段对齐"冲突时该让位。Trending 的"色卡墙富足感"是 PRODUCT.md 第 3 条原则核心，不能为对齐让 trending 收窄；让 uploader 拉宽是更便宜的代价（dashed 框变宽，内部内容 `items-center` 居中不变形）。
+
+**为什么删卡片名而不是给个更好的占位**：用户用图鉴的心智是"看图选一份现成的就开拼"，名字不是决策信息——难度色点 + 尺寸/颗数才是。视觉上少一行文字，卡片更接近"画廊瓷砖"而不是"商品标签"，符合 brand 母题。
+
+修改文件：`src/App.tsx`、`src/components/TrendingPatternsPanel.tsx`、`PROGRESS.md`
+
 ### 2026-05-03 隐藏每日盲盒入口（暂时关闭，可一键恢复）
 
 用户决定先把首页右侧的「每日盲盒」面板暂时下线，未来某天会重启用。
