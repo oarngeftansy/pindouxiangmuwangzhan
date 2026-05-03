@@ -55,6 +55,25 @@ npm run dev                # 看终端输出的本地端口（通常 5173）
 
 ## 2. 修改历史（按 commit 倒序）
 
+### 2026-05-03 隐藏每日盲盒入口（暂时关闭，可一键恢复）
+
+用户决定先把首页右侧的「每日盲盒」面板暂时下线，未来某天会重启用。
+
+| 改动 | 说明 |
+|---|---|
+| `App.tsx` | 模块顶层加 `const SHOW_BLIND_BOX_PANEL = false`——一个开关收口；翻 `true` 即可整段恢复 |
+| Hero 副标题 | 用 `SHOW_BLIND_BOX_PANEL ? ... : ...` 三元，flag = false 时去掉「抽个盲盒」，避免文案对不上 |
+| 布局 | flag = false 时，原 12 列 grid（uploader 8/4）替换为单 `<section>` + `max-w-[820px] mx-auto w-full`——820 = 1240×8/12，刻意对齐原 col-span-8 的实际宽度，避免视觉错位 |
+| 保留物 | `BlindBoxPanel` import、`handleUseBlindBox`（TrendingPatternsPanel 还在用）都保留，未删——以便重启用时 0 改动恢复 |
+
+**为什么不直接删而是 flag**：用户明确说「下次想再启用的时候再放出来」。flag 让重启用从"翻代码 + 找 commit + cherry-pick"降级到"改一行 false 为 true"。CLAUDE.md 通用规则说不喜欢 feature flag，但本场景是用户显式要求的"暂时停用"用例，flag 合理。
+
+**为什么 max-w-[820px] 不用 max-w-3xl/4xl**：3xl=768 比原 col-span-8 实际宽窄了 ~60px，会感觉 uploader 缩水了；4xl=896 又超过原宽。820 是数学对齐——保证用户切换前后看到的 uploader 宽度像素一致，只是"右边那块走了"。
+
+**Polish 自审（impeccable polish）通过**：没引入侧条/渐变文字/glassmorphism/嵌套卡，trending 仍承担富足感主力，居中收束读为"展示台"不是"空屏"。
+
+修改文件：`src/App.tsx`、`PROGRESS.md`
+
 ### `3c2c475` — 2026-04-30 熨烫渲染重做（用户提供实物图后的最终方案）
 
 **关键决策**：参考用户提供的真实烫熔实物照片，反推算法。

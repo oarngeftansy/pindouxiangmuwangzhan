@@ -31,6 +31,9 @@ export type { BeadColor, BeadGrid, ColorSystem };
 export { beadColors };
 
 
+// 暂时隐藏每日盲盒入口；将来重启用时改回 true，副标题与右侧栏会一起恢复。
+const SHOW_BLIND_BOX_PANEL = false;
+
 function App() {
   const DRAFT_STORAGE_KEY = 'bead_draft_v1';
   const [mode, setMode] = useState<'upload' | 'pattern' | 'canvas'>('upload');
@@ -227,21 +230,32 @@ function App() {
                 今天想拼点什么？
               </h2>
               <p className="text-base sm:text-lg text-ink-soft mt-3 max-w-[34em] leading-[1.65]">
-                上传一张图、抽个盲盒，或者从下面挑一份图鉴——都从这里开始。
+                {SHOW_BLIND_BOX_PANEL
+                  ? '上传一张图、抽个盲盒，或者从下面挑一份图鉴——都从这里开始。'
+                  : '上传一张图，或者从下面挑一份图鉴——都从这里开始。'}
               </p>
             </section>
             <TrendingPatternsPanel onUsePattern={handleUseBlindBox} />
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-              <section className="lg:col-span-8">
+            {SHOW_BLIND_BOX_PANEL ? (
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+                <section className="lg:col-span-8">
+                  <ImageUploader
+                    onImageProcessed={handleImageProcessed}
+                    onCreateBlank={handleCreateBlank}
+                  />
+                </section>
+                <aside className="lg:col-span-4 lg:sticky lg:top-6">
+                  <BlindBoxPanel onUsePattern={handleUseBlindBox} compact />
+                </aside>
+              </div>
+            ) : (
+              <section className="max-w-[820px] mx-auto w-full">
                 <ImageUploader
                   onImageProcessed={handleImageProcessed}
                   onCreateBlank={handleCreateBlank}
                 />
               </section>
-              <aside className="lg:col-span-4 lg:sticky lg:top-6">
-                <BlindBoxPanel onUsePattern={handleUseBlindBox} compact />
-              </aside>
-            </div>
+            )}
           </div>
         )}
 
