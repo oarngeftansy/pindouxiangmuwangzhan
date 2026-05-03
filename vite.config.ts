@@ -5,6 +5,9 @@
   import path from 'path';
 
   export default defineConfig({
+    // 由环境变量控制：本地 dev 默认 '/'；GitHub Actions 部署到 Pages 子路径时
+    // 由 workflow 注入 PAGES_BASE='/pindouxiangmuwangzhan/'。换自定义域名后 unset 即可。
+    base: process.env.PAGES_BASE || '/',
     plugins: [react(), tailwindcss()],
     resolve: {
       extensions: ['.js', '.jsx', '.ts', '.tsx', '.json'],
