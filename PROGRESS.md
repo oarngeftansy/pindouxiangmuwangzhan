@@ -55,6 +55,56 @@ npm run dev                # 看终端输出的本地端口（通常 5173）
 
 ## 2. 修改历史（按 commit 倒序）
 
+### 2026-05-03 移动端适配 阶段 2：BeadPattern brand 重做 + 移动适配 + 修 hover-only bug
+
+承接阶段 1，对图纸预览页（`BeadPattern.tsx`，705 行）做完整改造。这一页之前**完全没碰过**——既没跟 brand 重构，也几乎没移动适配。一次过。
+
+**Brand token 大替换**（按违规类型）：
+
+| 违规 | 替换为 |
+|---|---|
+| `bg-white` `bg-gray-50/100/200/300` | `bg-paper-soft` / `bg-paper-bg` / `bg-paper-deep` 三阶 |
+| `text-gray-500/600/700` | `text-ink-soft` / `text-ink-warm` |
+| `border-gray-200/300` | `border-edge-sand` |
+| `shadow-xl` `shadow-2xl` `shadow-inner` | 删除（DESIGN：flat by default）；CTA 加 `--shadow-lift-bead` 暖阴影 |
+| `text-purple-600` `bg-purple-500/600` `ring-purple-500` | `text-moss` / `bg-moss` / `ring-moss`（**紫色根本不在 DESIGN 调色板**） |
+| `bg-blue-500` "自适应原图" | `bg-paper-bg border-edge-sand text-ink-warm`（ghost） |
+| `bg-gradient-to-r from-purple-500 to-pink-500` 主 CTA | `bg-terracotta` 实心（gradient fill banned；pink 也不在调色板） |
+| `bg-blue-50 border-blue-200 text-blue-800` 提示卡 | `bg-honey-glow/40 border-honey/40 text-ink-warm`（信息性提示用 honey 系暖暗示） |
+| `bg-black text-white` tooltip | `bg-ink-warm text-paper-bg` |
+| `color: "#000000"` / `color: "#000"` 内联 | `color: var(--bead-ink)` |
+| `font-mono` 色号/数字 | `style={{ fontFamily: 'var(--font-num)' }}`（Nunito tabular） |
+| `💡` emoji | Lucide `Info` |
+| `rounded-2xl` `rounded-xl` `rounded-lg` 杂用 | `rounded-card` (20) / `rounded-surface` (16) / `rounded-control` (12) / `rounded-chip` (10) 按语义分配 |
+
+**修 hover-only tooltip bug**（最重要的功能修复）：
+
+- 之前：色号 tooltip 只用 `:hover` 触发——**手机根本看不到**。代码里有"点击格子可查看色号"提示文案，但**实际没实现 onClick**——之前是个真 bug
+- 现在：加 `selectedBead: { x, y } | null` state，`onClick` 切换；tooltip 显示条件 = `isSelected || hover`（桌面 hover 体验保留）
+- 加 `aria-label`（屏幕阅读器现在能读出"第 N 行 M 列，色号 XXX"）
+- 提示文案随设备分支：触摸 → "轻触任意格子可查看色号，再点一下取消"；桌面 → "鼠标悬停或点击..."
+
+**移动适配**：
+
+- 色号系统选择 `grid-cols-5` → `grid-cols-3 sm:grid-cols-5`（5 列在 320px 屏严重挤）
+- 尺寸调整区拆两行：第一行宽×高×颗数；第二行两个按钮 `flex-1 sm:flex-initial`（手机各占半宽）；原图尺寸单独显示
+- 网格透明度滑块加 `py-3` 包裹 → 24px 触摸 hitbox（Apple HIG 推荐）
+- 数字 input `py-2` → `py-3 text-base`（44pt 触摸 + 防 iOS 自动缩放）
+- 设置展开按钮：纯文字 link → 带 chevron + min 44×44 触摸
+- 主图区加 `touch-pan-x touch-pan-y`（明确允许触摸滚动）
+- Material 列表卡片加 `min-w-0 truncate`（长色号防溢出）
+- 主 CTA 加 `min-h-[52px]` + `outline-2 outline-moss outline-offset-2`（focus 可见）
+
+**没动的**：
+- `downloadPattern()` 内 canvas 的 `#FFFFFF #333333 #BBBBBB #666666` 颜色——那是输出 PNG 的打印样式，不是 UI（白底打印能用，灰线易识别）
+- `maxDisplaySize = window.innerWidth - 64` 模块初始化计算，不响应 resize——修要加 useEffect+ResizeObserver，是单独工作，先 ship
+
+**为什么提示卡用 honey-glow 不用 moss**：
+- DESIGN.md 说 honey "稀缺性就是它的意义" ≤5%，但**信息性提示卡**正是它的合法用法（喜悦/友好暗示，区别于 moss 的"功能性强调"）。一屏只一处提示，不破规则
+- moss 这里已经用在了"展开/收起"按钮 + 色号系统选中态，再叠会过载
+
+修改文件：`src/components/BeadPattern.tsx`、`PROGRESS.md`
+
 ### 2026-05-03 移动端适配 阶段 1：首页 + uploader（手机锚底 modal / 触摸 ≥44px）
 
 按 `/impeccable adapt` 流程，先 shape brief → 用户确认 C 路线（分阶段）→ craft 阶段 1。范围限定在**已完成 brand 重构的表面**（首页 + uploader），产品页（BeadPattern / BeadCanvas / GalleryView）的 brand 跟新留给阶段 2/3 配合做。

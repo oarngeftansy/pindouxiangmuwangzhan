@@ -1,5 +1,8 @@
 import {
+  ChevronDown,
+  ChevronUp,
   Download,
+  Info,
   Play,
   RefreshCw,
   Settings2,
@@ -55,6 +58,8 @@ export function BeadPattern({
   const [showSettings, setShowSettings] = useState(false);
   const [gridOpacity, setGridOpacity] = useState(1); // 线条不透明度
   const [minColorCount, setMinColorCount] = useState(1); // 最小颜色数量，用于过滤杂色
+  // 选中的格子（点击查看色号；触摸设备的 hover 替代方案，桌面 hover 仍生效）
+  const [selectedBead, setSelectedBead] = useState<{ x: number; y: number } | null>(null);
 
   const getColorCount = () => {
     const colorMap = new Map<string, number>();
@@ -345,28 +350,34 @@ export function BeadPattern({
   return (
     <div className="max-w-7xl mx-auto">
       {/* 图纸设置面板 */}
-      <div className="bg-white rounded-2xl shadow-xl p-4 sm:p-6 mb-4 sm:mb-6">
+      <div className="bg-paper-soft border border-edge-sand rounded-card p-4 sm:p-6 mb-4 sm:mb-6">
         <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-bold flex items-center gap-2">
-            <Settings2 className="w-5 h-5 text-purple-600" />
+          <h3 className="text-lg font-semibold flex items-center gap-2 text-ink-warm">
+            <Settings2 className="w-5 h-5 text-moss" />
             图纸设置
           </h3>
           <button
             onClick={() => setShowSettings(!showSettings)}
-            className="text-sm text-purple-600 hover:text-purple-700"
+            className="inline-flex items-center justify-center gap-1 min-h-[44px] min-w-[44px] px-3 rounded-control text-sm font-semibold text-moss hover:bg-paper-deep transition-colors"
+            aria-label={showSettings ? "收起图纸设置" : "展开图纸设置"}
           >
-            {showSettings ? "收起" : "展开"}
+            <span>{showSettings ? "收起" : "展开"}</span>
+            {showSettings ? (
+              <ChevronUp className="w-4 h-4" aria-hidden="true" />
+            ) : (
+              <ChevronDown className="w-4 h-4" aria-hidden="true" />
+            )}
           </button>
         </div>
 
         {showSettings && (
-          <div className="space-y-6 pt-4 border-t">
+          <div className="space-y-6 pt-4 border-t border-edge-sand">
             {/* 色号系统 */}
             <div>
-              <label className="block text-sm font-medium mb-2">
+              <label className="block text-sm font-semibold mb-2 text-ink-warm">
                 色号系统
               </label>
-              <div className="grid grid-cols-5 gap-2">
+              <div className="grid grid-cols-3 sm:grid-cols-5 gap-2">
                 {[
                   {
                     value: "mard" as ColorSystem,
@@ -392,10 +403,10 @@ export function BeadPattern({
                   <button
                     key={system.value}
                     onClick={() => setColorSystem(system.value)}
-                    className={`px-3 py-2 rounded-lg text-sm font-medium transition-all ${
+                    className={`px-3 py-2.5 rounded-control text-sm font-semibold transition-colors ${
                       colorSystem === system.value
-                        ? "bg-purple-600 text-white shadow-md"
-                        : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                        ? "bg-moss text-paper-bg border border-moss"
+                        : "bg-paper-bg text-ink-warm border border-edge-sand hover:bg-paper-deep"
                     }`}
                   >
                     {system.label}
@@ -407,12 +418,13 @@ export function BeadPattern({
             {/* 尺寸调整 */}
             {originalImage && onGridResize && (
               <div>
-                <label className="block text-sm font-medium mb-3">
+                <label className="block text-sm font-semibold mb-3 text-ink-warm">
                   画板尺寸调整
                 </label>
-                <div className="flex items-center gap-3 flex-wrap">
+                {/* 第一行：宽 × 高 + 颗数 */}
+                <div className="flex items-center gap-3 flex-wrap mb-3">
                   <div className="flex items-center gap-2">
-                    <label className="text-sm text-gray-600">
+                    <label className="text-sm text-ink-soft">
                       宽:
                     </label>
                     <input
@@ -425,14 +437,14 @@ export function BeadPattern({
                           parseInt(e.target.value) || 40,
                         )
                       }
-                      className="w-20 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                      className="w-20 px-3 py-3 border border-edge-sand rounded-control bg-paper-bg text-ink-warm text-base focus:outline-none focus:ring-2 focus:ring-moss focus:border-moss"
                     />
                   </div>
 
-                  <span className="text-gray-400">×</span>
+                  <span className="text-ink-soft" aria-hidden="true">×</span>
 
                   <div className="flex items-center gap-2">
-                    <label className="text-sm text-gray-600">
+                    <label className="text-sm text-ink-soft">
                       高:
                     </label>
                     <input
@@ -445,21 +457,25 @@ export function BeadPattern({
                           parseInt(e.target.value) || 40,
                         )
                       }
-                      className="w-20 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                      className="w-20 px-3 py-3 border border-edge-sand rounded-control bg-paper-bg text-ink-warm text-base focus:outline-none focus:ring-2 focus:ring-moss focus:border-moss"
                     />
                   </div>
 
-                  <div className="text-sm text-gray-500">
+                  <div className="text-sm text-ink-soft" style={{ fontFamily: 'var(--font-num)' }}>
                     = {customWidth * customHeight} 颗
                   </div>
+                </div>
 
+                {/* 第二行：两个按钮，手机各占半宽 */}
+                <div className="flex flex-wrap gap-3 mb-2">
                   <button
                     onClick={handleAdaptToOriginal}
                     disabled={isResizing}
-                    className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors flex items-center gap-2 disabled:opacity-50"
+                    className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-2 min-h-[44px] px-4 py-2 bg-paper-bg border border-edge-sand text-ink-warm rounded-control text-sm font-semibold hover:bg-paper-deep transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     <RefreshCw
                       className={`w-4 h-4 ${isResizing ? "animate-spin" : ""}`}
+                      aria-hidden="true"
                     />
                     自适应原图
                   </button>
@@ -471,38 +487,42 @@ export function BeadPattern({
                       (customWidth === beadGrid[0].length &&
                         customHeight === beadGrid.length)
                     }
-                    className="px-4 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="flex-1 sm:flex-initial inline-flex items-center justify-center min-h-[44px] px-4 py-2 bg-moss text-paper-bg rounded-control text-sm font-semibold hover:bg-moss-deep transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {isResizing ? "处理中..." : "应用尺寸"}
                   </button>
+                </div>
 
-                  <div className="text-xs text-gray-500">
-                    原图: {originalImage.naturalWidth} ×{" "}
-                    {originalImage.naturalHeight} px
-                  </div>
+                <div className="text-xs text-ink-soft" style={{ fontFamily: 'var(--font-num)' }}>
+                  原图: {originalImage.naturalWidth} × {originalImage.naturalHeight} px
                 </div>
               </div>
             )}
 
             {/* 网格线不透明度 */}
             <div>
-              <label className="block text-sm font-medium mb-3">
+              <label className="block text-sm font-semibold mb-3 text-ink-warm">
                 网格线不透明度
               </label>
               <div className="flex items-center gap-4">
-                <input
-                  type="range"
-                  min="0"
-                  max="1"
-                  step="0.05"
-                  value={gridOpacity}
-                  onChange={(e) => setGridOpacity(parseFloat(e.target.value))}
-                  className="flex-1 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
-                  style={{
-                    background: `linear-gradient(to right, rgb(147 51 234) 0%, rgb(147 51 234) ${gridOpacity * 100}%, rgb(229 231 235) ${gridOpacity * 100}%, rgb(229 231 235) 100%)`
-                  }}
-                />
-                <span className="text-sm font-medium text-gray-700 w-12 text-right">
+                {/* py-3 包裹给 2px 滑轨提供 ≥24px 的触摸 hitbox */}
+                <div className="flex-1 py-3">
+                  <input
+                    type="range"
+                    min="0"
+                    max="1"
+                    step="0.05"
+                    value={gridOpacity}
+                    onChange={(e) => setGridOpacity(parseFloat(e.target.value))}
+                    className="w-full h-2 rounded-bead appearance-none cursor-pointer"
+                    style={{
+                      // 用 moss-pine 替代紫；轨道色用 paper-deep
+                      background: `linear-gradient(to right, var(--bead-moss) 0%, var(--bead-moss) ${gridOpacity * 100}%, var(--bead-paper-deep) ${gridOpacity * 100}%, var(--bead-paper-deep) 100%)`
+                    }}
+                    aria-label="网格线不透明度"
+                  />
+                </div>
+                <span className="text-sm font-semibold text-ink-warm w-12 text-right" style={{ fontFamily: 'var(--font-num)' }}>
                   {Math.round(gridOpacity * 100)}%
                 </span>
               </div>
@@ -510,7 +530,7 @@ export function BeadPattern({
 
             {/* 最小颜色数量 */}
             <div>
-              <label className="block text-sm font-medium mb-3">
+              <label className="block text-sm font-semibold mb-3 text-ink-warm">
                 过滤杂色（最小颜色数量）
               </label>
               <div className="flex items-center gap-4">
@@ -520,13 +540,13 @@ export function BeadPattern({
                   max="100"
                   value={minColorCount}
                   onChange={(e) => setMinColorCount(parseInt(e.target.value) || 1)}
-                  className="w-20 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                  className="w-20 px-3 py-3 border border-edge-sand rounded-control bg-paper-bg text-ink-warm text-base focus:outline-none focus:ring-2 focus:ring-moss focus:border-moss"
                 />
-                <span className="text-sm text-gray-600">
+                <span className="text-sm text-ink-soft">
                   颗以下的颜色将被隐藏
                 </span>
               </div>
-              <p className="text-xs text-gray-500 mt-2">
+              <p className="text-xs text-ink-soft mt-2">
                 提示：设置更大的值可以过滤掉材料清单中的杂色
               </p>
             </div>
@@ -534,22 +554,22 @@ export function BeadPattern({
         )}
       </div>
 
-      <div className="bg-white rounded-2xl shadow-xl p-4 sm:p-8">
+      <div className="bg-paper-soft border border-edge-sand rounded-card p-4 sm:p-8">
         <div className="flex flex-col md:flex-row gap-4 sm:gap-8">
           {/* 图纸预览 */}
           <div className="flex-1">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-2xl font-bold">拼豆图纸</h2>
-              <div className="text-sm text-gray-500">
-                尺寸: {beadGrid[0].length} × {beadGrid.length} = 共需{" "}
-                {Array.from(colorCount.values()).reduce((a, b) => a + b, 0)} 颗拼豆
+            <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
+              <h2 className="text-2xl font-semibold text-ink-warm" style={{ fontFamily: 'var(--font-headline)' }}>拼豆图纸</h2>
+              <div className="text-sm text-ink-soft" style={{ fontFamily: 'var(--font-num)' }}>
+                {beadGrid[0].length} × {beadGrid.length} · 共需{" "}
+                {Array.from(colorCount.values()).reduce((a, b) => a + b, 0)} 颗
               </div>
             </div>
 
-            <div className="bg-gray-50 rounded-xl p-6 overflow-auto">
+            <div className="bg-paper-deep rounded-surface p-3 sm:p-6 overflow-auto touch-pan-x touch-pan-y">
               <div className="inline-block">
                 <div
-                  className="grid gap-0 bg-white rounded-lg overflow-hidden shadow-inner border border-gray-300"
+                  className="grid gap-0 bg-paper-bg rounded-control overflow-hidden border border-edge-sand"
                   style={{
                     gridTemplateColumns: `repeat(${beadGrid[0].length}, ${beadSize}px)`,
                     width: "fit-content",
@@ -560,6 +580,8 @@ export function BeadPattern({
                       const colorCode = color
                         ? getColorCode(color)
                         : "";
+                      const isSelected =
+                        selectedBead?.x === x && selectedBead?.y === y;
                       return (
                         <div
                           key={`${x}-${y}`}
@@ -567,27 +589,40 @@ export function BeadPattern({
                           style={{
                             width: beadSize,
                             height: beadSize,
-                            backgroundColor: color || "#FAFAFA",
-                            border: `0.15px solid rgba(130, 130, 130, ${gridOpacity})`,
+                            backgroundColor: color || "var(--bead-paper-bg)",
+                            border: `0.15px solid rgba(58, 52, 42, ${gridOpacity * 0.5})`,
                           }}
+                          onClick={() => {
+                            if (!color) return;
+                            setSelectedBead(
+                              isSelected ? null : { x, y },
+                            );
+                          }}
+                          aria-label={color ? `第 ${y + 1} 行 ${x + 1} 列，色号 ${colorCode}` : undefined}
                         >
                           {color && (
                             <>
                               <div
-                                className="absolute inset-0 rounded-full m-1"
+                                className="absolute inset-0 rounded-full m-1 pointer-events-none"
                                 style={{
                                   backgroundColor: color,
+                                  // 暖色调 inset 模拟塑料反光
                                   boxShadow:
-                                    "inset 0 1px 3px rgba(0,0,0,0.2)",
+                                    "inset 0 1px 3px rgba(58, 52, 42, 0.2)",
                                 }}
                               />
                               {beadSize > 15 && (
                                 <span
-                                  className="relative z-10 font-mono font-bold select-none opacity-0 group-hover:opacity-100 transition-opacity"
+                                  className={`relative z-10 font-bold select-none transition-opacity pointer-events-none ${
+                                    isSelected
+                                      ? "opacity-100"
+                                      : "opacity-0 group-hover:opacity-100"
+                                  }`}
                                   style={{
-                                    color: "#000000",
+                                    color: "var(--bead-ink)",
+                                    fontFamily: "var(--font-num)",
                                     textShadow:
-                                      "0 0 3px rgba(255,255,255,1), 0 0 5px rgba(255,255,255,0.8)",
+                                      "0 0 3px var(--bead-paper-bg), 0 0 5px rgba(246, 239, 226, 0.8)",
                                     fontSize: Math.max(
                                       beadSize * 0.35,
                                       10,
@@ -598,7 +633,14 @@ export function BeadPattern({
                                 </span>
                               )}
                               {beadSize <= 15 && (
-                                <div className="absolute z-50 -top-8 left-1/2 transform -translate-x-1/2 bg-black text-white px-2 py-1 rounded text-xs whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+                                <div
+                                  className={`absolute z-50 -top-8 left-1/2 transform -translate-x-1/2 bg-ink-warm text-paper-bg px-2 py-1 rounded-chip text-xs whitespace-nowrap transition-opacity pointer-events-none ${
+                                    isSelected
+                                      ? "opacity-100"
+                                      : "opacity-0 group-hover:opacity-100"
+                                  }`}
+                                  style={{ fontFamily: "var(--font-num)" }}
+                                >
                                   {colorCode}
                                 </div>
                               )}
@@ -615,20 +657,20 @@ export function BeadPattern({
 
           {/* 颜色统计和操作 */}
           <div className="md:w-64 lg:w-80">
-            <h3 className="text-xl font-bold mb-4">
+            <h3 className="text-xl font-semibold mb-4 text-ink-warm" style={{ fontFamily: 'var(--font-headline)' }}>
               所需材料清单
             </h3>
-            <div className="bg-gray-50 rounded-xl p-4 mb-6">
-              <div className="text-sm text-gray-600 mb-3 flex justify-between">
+            <div className="bg-paper-bg border border-edge-sand rounded-surface p-4 mb-6">
+              <div className="text-sm text-ink-soft mb-3 flex justify-between" style={{ fontFamily: 'var(--font-num)' }}>
                 <span>
-                  总计:{" "}
+                  总计{" "}
                   {Array.from(colorCount.values()).reduce(
                     (a, b) => a + b,
                     0,
                   )}{" "}
                   颗
                 </span>
-                <span>颜色: {Array.from(colorCount.entries()).filter(([_, count]) => count >= minColorCount).length} 种</span>
+                <span>{Array.from(colorCount.entries()).filter(([_, count]) => count >= minColorCount).length} 种色</span>
               </div>
               <div className="space-y-2 max-h-96 overflow-y-auto">
                 {Array.from(colorCount.entries())
@@ -639,11 +681,11 @@ export function BeadPattern({
                     return (
                       <div
                         key={colorHex}
-                        className="flex items-center justify-between bg-white rounded-lg p-3 shadow-sm"
+                        className="flex items-center justify-between bg-paper-soft rounded-control p-3 border border-edge-sand"
                       >
-                        <div className="flex items-center gap-3">
+                        <div className="flex items-center gap-3 min-w-0">
                           <div
-                            className="w-10 h-10 rounded-full border-2 border-gray-200 shadow-sm flex items-center justify-center"
+                            className="w-10 h-10 rounded-full border border-edge-sand flex items-center justify-center shrink-0"
                             style={{
                               backgroundColor: colorHex,
                             }}
@@ -651,19 +693,20 @@ export function BeadPattern({
                             <span
                               className="text-xs font-bold"
                               style={{
-                                color: "#000",
+                                color: "var(--bead-ink)",
+                                fontFamily: "var(--font-num)",
                                 textShadow:
-                                  "0 0 2px rgba(255,255,255,0.8)",
+                                  "0 0 2px var(--bead-paper-bg)",
                               }}
                             >
                               {code}
                             </span>
                           </div>
-                          <div className="font-mono text-sm font-semibold">
+                          <div className="text-sm font-semibold text-ink-warm truncate" style={{ fontFamily: 'var(--font-num)' }}>
                             {code}
                           </div>
                         </div>
-                        <span className="text-sm font-bold text-gray-700">
+                        <span className="text-sm font-bold text-ink-warm shrink-0" style={{ fontFamily: 'var(--font-num)' }}>
                           {count}
                         </span>
                       </div>
@@ -676,26 +719,28 @@ export function BeadPattern({
             <div className="space-y-3">
               <button
                 onClick={onStartDIY}
-                className="w-full px-6 py-4 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-xl font-semibold hover:opacity-90 transition-opacity flex items-center justify-center gap-2"
+                className="w-full inline-flex items-center justify-center gap-2 min-h-[52px] px-6 py-4 bg-terracotta text-paper-bg rounded-control text-base font-semibold hover:bg-terracotta-deep transition-colors focus-visible:outline-2 focus-visible:outline-moss focus-visible:outline-offset-2"
+                style={{ boxShadow: 'var(--shadow-lift-bead)' }}
               >
-                <Play className="w-5 h-5" />
+                <Play className="w-5 h-5" aria-hidden="true" />
                 开始拼豆DIY
               </button>
 
               <button
                 onClick={downloadPattern}
-                className="w-full px-6 py-4 bg-white border-2 border-gray-300 rounded-xl font-semibold hover:bg-gray-50 transition-colors flex items-center justify-center gap-2"
+                className="w-full inline-flex items-center justify-center gap-2 min-h-[52px] px-6 py-4 bg-paper-bg border border-edge-sand text-ink-warm rounded-control text-base font-semibold hover:bg-paper-deep transition-colors focus-visible:outline-2 focus-visible:outline-moss focus-visible:outline-offset-2"
               >
-                <Download className="w-5 h-5" />
+                <Download className="w-5 h-5" aria-hidden="true" />
                 下载图纸
               </button>
             </div>
 
-            <div className="mt-6 p-4 bg-blue-50 rounded-xl border border-blue-200">
-              <p className="text-sm text-blue-800">
+            <div className="mt-6 p-4 bg-honey-glow/40 rounded-surface border border-honey/40 flex items-start gap-2.5">
+              <Info className="w-4 h-4 text-ink-warm shrink-0 mt-0.5" aria-hidden="true" />
+              <p className="text-sm text-ink-warm leading-relaxed">
                 {typeof window !== 'undefined' && 'ontouchstart' in window
-                  ? '💡 提示：点击格子可查看色号'
-                  : '💡 提示：鼠标悬停在格子上可查看色号'}
+                  ? '轻触任意格子可查看色号，再点一下取消。'
+                  : '鼠标悬停或点击任意格子可查看色号。'}
               </p>
             </div>
           </div>
