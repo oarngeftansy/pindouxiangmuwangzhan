@@ -281,7 +281,7 @@ export function ImageUploader({ onImageProcessed, onCreateBlank }: ImageUploader
     <div className="w-full">
       {/* 主上传区域 */}
       <div
-        className={`relative rounded-card border-2 border-dashed p-10 sm:p-12 transition-all cursor-pointer mb-4 bg-paper-soft ${
+        className={`relative rounded-card border-2 border-dashed p-6 sm:p-12 transition-all cursor-pointer mb-4 bg-paper-soft ${
           isDragging
             ? 'border-terracotta bg-paper-deep'
             : 'border-edge-sand hover:border-terracotta/60 hover:bg-paper-bg'
@@ -304,11 +304,11 @@ export function ImageUploader({ onImageProcessed, onCreateBlank }: ImageUploader
 
         <div className="flex flex-col items-center justify-center text-center">
           <div
-            className="w-16 h-16 rounded-full bg-terracotta flex items-center justify-center mb-5"
+            className="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-terracotta flex items-center justify-center mb-4 sm:mb-5"
             style={{ boxShadow: 'var(--shadow-bead)' }}
             aria-hidden="true"
           >
-            <Upload className="w-7 h-7 text-paper-bg" />
+            <Upload className="w-6 h-6 sm:w-7 sm:h-7 text-paper-bg" />
           </div>
 
           {isProcessing ? (
@@ -349,8 +349,10 @@ export function ImageUploader({ onImageProcessed, onCreateBlank }: ImageUploader
 
       {/* 图片处理配置模态框 */}
       {showImageConfig && pendingFile && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl shadow-2xl p-4 sm:p-8 max-w-lg w-full max-h-[90vh] overflow-y-auto">
+        <div className="fixed inset-0 bg-black/50 flex items-end sm:items-center justify-center z-50 sm:p-4">
+          <div className="relative bg-white rounded-t-2xl sm:rounded-2xl shadow-2xl p-4 sm:p-8 max-w-lg w-full max-h-[92vh] sm:max-h-[90vh] overflow-y-auto animate-in slide-in-from-bottom duration-200 sm:slide-in-from-bottom-0 sm:zoom-in-95">
+            {/* 手机端顶部 drag handle 视觉提示 */}
+            <div className="sm:hidden absolute top-2 left-1/2 -translate-x-1/2 w-10 h-1 rounded-full bg-gray-300" aria-hidden="true" />
             <div className="flex items-center gap-3 mb-6">
               <Settings className="w-6 h-6 text-[#1f5c57]" />
               <h3 className="text-2xl font-bold">图片转换设置</h3>
@@ -454,7 +456,7 @@ export function ImageUploader({ onImageProcessed, onCreateBlank }: ImageUploader
                           setGridWidth(Math.max(10, Math.min(120, num)));
                         }
                       }}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#1f5c57] focus:border-transparent"
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#1f5c57] focus:border-transparent text-base"
                     />
                   </div>
                   <div>
@@ -484,7 +486,7 @@ export function ImageUploader({ onImageProcessed, onCreateBlank }: ImageUploader
                           setGridHeight(Math.max(10, Math.min(120, num)));
                         }
                       }}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#1f5c57] focus:border-transparent"
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#1f5c57] focus:border-transparent text-base"
                     />
                   </div>
                 </div>
@@ -566,8 +568,9 @@ export function ImageUploader({ onImageProcessed, onCreateBlank }: ImageUploader
 
       {/* 空白画布设置模态框 */}
       {showBlankModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl shadow-2xl p-4 sm:p-8 max-w-md w-full">
+        <div className="fixed inset-0 bg-black/50 flex items-end sm:items-center justify-center z-50 sm:p-4">
+          <div className="relative bg-white rounded-t-2xl sm:rounded-2xl shadow-2xl p-4 sm:p-8 max-w-md w-full max-h-[92vh] sm:max-h-none overflow-y-auto animate-in slide-in-from-bottom duration-200 sm:slide-in-from-bottom-0 sm:zoom-in-95">
+            <div className="sm:hidden absolute top-2 left-1/2 -translate-x-1/2 w-10 h-1 rounded-full bg-gray-300" aria-hidden="true" />
             <h3 className="text-2xl font-bold mb-6">创建空白画布</h3>
             
             <div className="space-y-6 mb-6">

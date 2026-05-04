@@ -55,6 +55,31 @@ npm run dev                # 看终端输出的本地端口（通常 5173）
 
 ## 2. 修改历史（按 commit 倒序）
 
+### 2026-05-03 移动端适配 阶段 1：首页 + uploader（手机锚底 modal / 触摸 ≥44px）
+
+按 `/impeccable adapt` 流程，先 shape brief → 用户确认 C 路线（分阶段）→ craft 阶段 1。范围限定在**已完成 brand 重构的表面**（首页 + uploader），产品页（BeadPattern / BeadCanvas / GalleryView）的 brand 跟新留给阶段 2/3 配合做。
+
+**断点策略修正**：用户明确反对"iPad 当大手机"——sub-`sm:`(< 640px) 才是手机重点；iPad 不论横竖屏（`sm:`/`md:`/`lg:`）维持桌面观感。当前 trending 已经是 `2 / sm:3 / md:4 / lg:5` 列阶梯，iPad 自然走 4-5 列，未额外干预。
+
+| 改动 | 说明 |
+|---|---|
+| `App.tsx` header | 整体 padding `py-4` → `py-3 sm:py-4`；logo+标题用 `min-w-0 truncate` 防止挤压；标题 `text-2xl` → `text-xl sm:text-3xl`（手机字号收一档） |
+| `App.tsx` 作品馆/返回首页按钮 | 新增 `min-h-[44px] min-w-[44px]` 触摸目标保底；icon 在 mobile 放大到 `w-5 h-5`（PRD：触摸目标 ≥44pt） |
+| `App.tsx` "返回首页" | 加 `ArrowLeft` icon（之前是纯文字按钮），mobile 上变 icon-only（保留 aria-label "返回首页"），与"作品馆"按钮一致的 collapse 模式 |
+| `App.tsx` `<main>` | `px-3` → `px-4`（手机标准 16px gutter，3 太挤） |
+| `TrendingPatternsPanel.tsx` | 卡片图区 `min-h-[120px]` → `min-h-[96px] sm:min-h-[120px]`；预览图 `max-h-[110px]` → `max-h-[88px] sm:max-h-[110px]`（手机 2 列下卡片宽 ~155px，原高度 120 太重） |
+| `ImageUploader.tsx` 主区 | dashed dropzone `p-10 sm:p-12` → `p-6 sm:p-12`（手机省 32px 高度）；圆形上传按钮 `w-16 h-16` → `w-14 h-14 sm:w-16 sm:h-16`，icon 同步缩 |
+| `ImageUploader.tsx` 两个 modal | 中央居中 → **手机底部锚定 + slide-up**：`items-center` → `items-end sm:items-center`，圆角 `rounded-2xl` → `rounded-t-2xl sm:rounded-2xl`，高度上限 `max-h-[90vh]` → `max-h-[92vh]`，加 `animate-in slide-in-from-bottom duration-200`（tw-animate-css 已引），顶部 4px drag handle 视觉提示。本质是手撸的"穷人 sheet"——比上 vaul 省了 token 兼容/包体的开销 |
+| `ImageUploader.tsx` 数字输入框 | gridWidth/gridHeight 输入 `py-2` → `py-3 text-base`（44px 触摸目标 + 防 iOS 自动放大表单） |
+
+**为什么不引入 vaul Drawer**：brief 原本提议用 vaul，但读了 `ui/drawer.tsx` 后发现它依赖 `bg-background` `bg-muted` `text-foreground` `text-muted-foreground` 这套 shadcn 默认 token——本项目没定义（DESIGN.md 走的是 paper-cream 系），直接用会变透明/错色。手撸 Tailwind 锚底方案在视觉上 95% 等价，且零外部依赖。如果阶段 2 要给产品页做更复杂的 sheet 交互（比如 BeadCanvas 调色板抽屉），那时再考虑给 drawer.tsx 做品牌 token 适配。
+
+**为什么不动产品页**：BeadPattern / GalleryView / ColorPalette 仍是旧 shadcn token（`bg-white shadow-2xl text-blue-500 bg-gray-200 border-[#1f5c57]`...），既不 brand 也不 mobile。但**布局调整 + 颜色改造耦合**——单做布局会浪费功夫，因为颜色改造时布局还要重排。所以这两层留到下个 shape 一起做。
+
+**iOS 输入框自动放大注意点**：iOS Safari 对 `font-size < 16px` 的 input 会自动放大页面（调用键盘时）。我把 modal 内的数字输入设成 `text-base`（16px）规避了这个坑。
+
+修改文件：`src/App.tsx`、`src/components/TrendingPatternsPanel.tsx`、`src/components/ImageUploader.tsx`、`PROGRESS.md`
+
 ### 2026-05-03 首页两端对齐 + 移除图鉴卡片标题
 
 承接上一节"隐藏盲盒入口"留下的副作用：uploader 被刻意压在 `max-w-[820px] mx-auto`，与上方撑满 1240 内宽的 TrendingPanel 两端对不齐，视觉上像两段没归位的栏目。同时用户反馈"未命名图纸"占位文字让她要逐张命名才整齐——多余负担。

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Library } from 'lucide-react';
+import { Library, ArrowLeft } from 'lucide-react';
 import { ImageUploader } from './components/ImageUploader';
 import { BeadCanvas } from './components/BeadCanvas';
 import { BeadPattern } from './components/BeadPattern';
@@ -173,24 +173,24 @@ function App() {
       )}
       {/* Header */}
       <header className="relative z-10 bg-paper-bg border-b border-edge-sand">
-        <div className="max-w-7xl mx-auto px-4 py-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <BeadLogoMark className="w-10 h-10" />
+        <div className="max-w-7xl mx-auto px-4 py-3 sm:py-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between gap-2">
+            <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+              <BeadLogoMark className="w-9 h-9 sm:w-10 sm:h-10 shrink-0" />
               <h1
-                className="text-2xl sm:text-3xl text-ink-warm leading-none"
+                className="text-xl sm:text-3xl text-ink-warm leading-none truncate"
                 style={{ fontFamily: 'var(--font-display)' }}
               >
                 拼豆模拟器
               </h1>
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 shrink-0">
               <button
                 onClick={() => { setShowGallery(true); }}
-                className="relative inline-flex items-center gap-2 px-3.5 py-2 bg-paper-soft border border-edge-sand rounded-control text-ink-warm hover:bg-paper-deep transition-colors"
+                className="relative inline-flex items-center justify-center gap-2 min-h-[44px] min-w-[44px] sm:min-w-0 px-3 sm:px-3.5 py-2 bg-paper-soft border border-edge-sand rounded-control text-ink-warm hover:bg-paper-deep transition-colors"
                 aria-label="打开作品馆"
               >
-                <Library className="w-4 h-4 text-terracotta" aria-hidden="true" />
+                <Library className="w-5 h-5 sm:w-4 sm:h-4 text-terracotta" aria-hidden="true" />
                 <span className="hidden sm:inline text-sm font-semibold">作品馆</span>
                 {galleryCount > 0 && (
                   <span
@@ -205,9 +205,11 @@ function App() {
               {mode !== 'upload' && (
                 <button
                   onClick={handleBackToUpload}
-                  className="px-3.5 py-2 bg-paper-soft border border-edge-sand rounded-control text-sm font-semibold text-ink-warm hover:bg-paper-deep transition-colors"
+                  className="inline-flex items-center justify-center gap-1.5 min-h-[44px] min-w-[44px] sm:min-w-0 px-3 sm:px-3.5 py-2 bg-paper-soft border border-edge-sand rounded-control text-sm font-semibold text-ink-warm hover:bg-paper-deep transition-colors"
+                  aria-label="返回首页"
                 >
-                  返回首页
+                  <ArrowLeft className="w-5 h-5 sm:w-4 sm:h-4" aria-hidden="true" />
+                  <span className="hidden sm:inline">返回首页</span>
                 </button>
               )}
             </div>
@@ -216,7 +218,7 @@ function App() {
       </header>
 
       {/* Main Content */}
-      <main className="relative z-10 max-w-[1240px] mx-auto px-3 py-6 sm:px-6 sm:py-10 lg:px-8">
+      <main className="relative z-10 max-w-[1240px] mx-auto px-4 py-6 sm:px-6 sm:py-10 lg:px-8">
         {mode === 'upload' && (
           <div className="space-y-8">
             <section className="px-1 pt-2 pb-1">

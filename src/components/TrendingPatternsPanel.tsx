@@ -139,9 +139,9 @@ export function TrendingPatternsPanel({ onUsePattern }: TrendingPatternsPanelPro
             onMouseEnter={(e) => { e.currentTarget.style.boxShadow = 'var(--shadow-card)'; }}
             onMouseLeave={(e) => { e.currentTarget.style.boxShadow = 'none'; }}
           >
-            <div className="relative flex items-center justify-center bg-paper-bg rounded-control p-2 mb-2.5 min-h-[120px] border border-edge-sand/60">
+            <div className="relative flex items-center justify-center bg-paper-bg rounded-control p-2 mb-2.5 min-h-[96px] sm:min-h-[120px] border border-edge-sand/60">
               {p.previewImage ? (
-                <img src={p.previewImage} alt={p.name} className="max-h-[110px] max-w-full object-contain" />
+                <img src={p.previewImage} alt={p.name} className="max-h-[88px] sm:max-h-[110px] max-w-full object-contain" />
               ) : (
                 <PatternThumbnail grid={p.grid} size={100} />
               )}
