@@ -1,16 +1,25 @@
 import {
-  Paintbrush,
-  Eraser,
+  Check,
   Download,
-  ZoomIn,
-  ZoomOut,
-  Grid as GridIcon,
+  Eraser,
   Eye,
   EyeOff,
-  Sparkles,
-  Image as ImageIcon,
+  FileText,
   Flame,
+  Grid as GridIcon,
+  Image as ImageIcon,
+  Layers,
+  Library,
+  Paintbrush,
+  PartyPopper,
+  Snowflake,
+  Sparkles,
   Square,
+  Thermometer,
+  X,
+  Zap,
+  ZoomIn,
+  ZoomOut,
 } from "lucide-react";
 import { useState, useRef, useEffect, useMemo } from "react";
 import { BeadGrid, BeadColor, ColorSystem } from "../App";
@@ -1434,196 +1443,174 @@ export function BeadCanvas({
 
       {/* 完成提示模态框 */}
       {showCompletionModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-3xl shadow-2xl p-6 sm:p-10 max-w-md w-full text-center relative overflow-hidden">
-            {/* 庆祝背景动画 */}
-            <div className="absolute inset-0 bg-gradient-to-br from-purple-100 via-pink-100 to-yellow-100 opacity-50" />
+        <div
+          className="fixed inset-0 z-50 flex items-end sm:items-center justify-center sm:p-4"
+          style={{ backgroundColor: 'rgba(58, 52, 42, 0.6)' }}
+        >
+          <div className="relative bg-paper-soft border border-edge-sand rounded-t-card sm:rounded-card p-6 sm:p-10 max-w-md w-full text-center max-h-[92vh] sm:max-h-none overflow-y-auto animate-in slide-in-from-bottom duration-200 sm:slide-in-from-bottom-0 sm:zoom-in-95">
+            {/* 手机端 drag handle */}
+            <div className="sm:hidden absolute top-2 left-1/2 -translate-x-1/2 w-10 h-1 rounded-bead bg-edge-sand" aria-hidden="true" />
 
-            <div className="relative z-10">
-              {/* 庆祝图标 */}
-              <div className="mb-6 flex justify-center">
-                <div className="w-24 h-24 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center animate-bounce">
-                  <Sparkles className="w-12 h-12 text-white" />
-                </div>
-              </div>
-
-              <h2 className="text-xl sm:text-3xl font-bold mb-4 bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
-                🎉 恭喜完成！
-              </h2>
-              <p className="text-gray-600 mb-2">
-                您已成功完成所有{" "}
-                {Array.from(colorCount.values()).reduce(
-                  (a, b) => a + b,
-                  0,
-                )}{" "}
-                颗拼豆！
-              </p>
-              <p className="text-sm text-gray-500 mb-8">
-                使用了 {colorCount.size} 种颜色
-              </p>
-
-              <div className="flex flex-wrap gap-3 mb-4">
-                <button
-                  onClick={renderHighResolution}
-                  disabled={isRendering}
-                  className="flex-1 px-4 py-3 bg-gradient-to-r from-blue-500 to-cyan-500 text-white rounded-xl hover:opacity-90 transition-opacity flex items-center justify-center gap-2 disabled:opacity-50"
-                >
-                  {isRendering ? (
-                    <><Sparkles className="w-5 h-5 animate-spin" />渲染中...</>
-                  ) : (
-                    <><Sparkles className="w-5 h-5" />导出高清</>
-                  )}
-                </button>
-                <button
-                  onClick={() => {
-                    // 用高清渲染结果加入作品馆
-                    setShowCompletionModal(false);
-                    setShowHDModal(true);
-                  }}
-                  disabled={savedToGallery}
-                  className="flex-1 px-4 py-3 bg-gradient-to-r from-[#1f5c57] to-[#2d7a74] text-white rounded-xl hover:opacity-90 transition-opacity flex items-center justify-center gap-2 disabled:opacity-70"
-                >
-                  {savedToGallery ? '✓ 已加入' : '🏛️ 作品馆'}
-                </button>
-                <button
-                  onClick={downloadCanvas}
-                  className="flex-1 px-4 py-3 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-xl hover:opacity-90 transition-opacity flex items-center justify-center gap-2"
-                >
-                  <Download className="w-5 h-5" />
-                  下载
-                </button>
-              </div>
-
-              <button
-                onClick={() => setShowCompletionModal(false)}
-                className="text-gray-500 hover:text-gray-700 text-sm"
+            {/* 庆祝图标 */}
+            <div className="mb-6 flex justify-center">
+              <div
+                className="w-20 h-20 sm:w-24 sm:h-24 bg-honey rounded-bead flex items-center justify-center animate-bounce"
+                style={{ boxShadow: 'var(--shadow-lift-bead)' }}
+                aria-hidden="true"
               >
-                关闭
+                <PartyPopper className="w-10 h-10 sm:w-12 sm:h-12 text-ink-warm" />
+              </div>
+            </div>
+
+            <h2 className="text-2xl sm:text-3xl font-semibold mb-3 text-ink-warm" style={{ fontFamily: 'var(--font-display)' }}>
+              恭喜完成！
+            </h2>
+            <p className="text-ink-warm mb-1">
+              您已成功完成所有{" "}
+              <span style={{ fontFamily: 'var(--font-num)' }}>
+                {Array.from(colorCount.values()).reduce((a, b) => a + b, 0)}
+              </span>{" "}
+              颗拼豆
+            </p>
+            <p className="text-sm text-ink-soft mb-8">
+              使用了 <span style={{ fontFamily: 'var(--font-num)' }}>{colorCount.size}</span> 种颜色
+            </p>
+
+            <div className="flex flex-col sm:flex-row gap-3 mb-4">
+              <button
+                onClick={renderHighResolution}
+                disabled={isRendering}
+                className="flex-1 inline-flex items-center justify-center gap-2 min-h-[48px] px-4 py-3 bg-paper-bg border border-edge-sand text-ink-warm rounded-control font-semibold hover:bg-paper-deep transition-colors disabled:opacity-50 disabled:cursor-not-allowed focus-visible:outline-2 focus-visible:outline-moss focus-visible:outline-offset-2"
+              >
+                {isRendering ? (
+                  <><Sparkles className="w-5 h-5 animate-spin" aria-hidden="true" />渲染中…</>
+                ) : (
+                  <><Sparkles className="w-5 h-5" aria-hidden="true" />导出高清</>
+                )}
+              </button>
+              <button
+                onClick={() => {
+                  setShowCompletionModal(false);
+                  setShowHDModal(true);
+                }}
+                disabled={savedToGallery}
+                className="flex-1 inline-flex items-center justify-center gap-2 min-h-[48px] px-4 py-3 bg-paper-bg border border-edge-sand text-ink-warm rounded-control font-semibold hover:bg-paper-deep transition-colors disabled:opacity-50 disabled:cursor-not-allowed focus-visible:outline-2 focus-visible:outline-moss focus-visible:outline-offset-2"
+              >
+                {savedToGallery ? (
+                  <><Check className="w-5 h-5 text-moss" aria-hidden="true" />已加入</>
+                ) : (
+                  <><Library className="w-5 h-5" aria-hidden="true" />作品馆</>
+                )}
+              </button>
+              <button
+                onClick={downloadCanvas}
+                className="flex-1 inline-flex items-center justify-center gap-2 min-h-[48px] px-4 py-3 bg-terracotta text-paper-bg rounded-control font-semibold hover:bg-terracotta-deep transition-colors focus-visible:outline-2 focus-visible:outline-moss focus-visible:outline-offset-2"
+                style={{ boxShadow: 'var(--shadow-lift-bead)' }}
+              >
+                <Download className="w-5 h-5" aria-hidden="true" />
+                下载
               </button>
             </div>
+
+            <button
+              onClick={() => setShowCompletionModal(false)}
+              className="text-ink-soft hover:text-ink-warm text-sm transition-colors"
+            >
+              关闭
+            </button>
           </div>
         </div>
       )}
 
       {/* 熨烫选择模态框 */}
       {showIroningModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-3xl shadow-2xl max-w-2xl w-full relative overflow-hidden max-h-[90vh] flex flex-col">
-            {/* 装饰背景 */}
-            <div className="absolute inset-0 bg-gradient-to-br from-orange-50 via-red-50 to-pink-50 opacity-50" />
+        <div
+          className="fixed inset-0 z-50 flex items-end sm:items-center justify-center sm:p-4"
+          style={{ backgroundColor: 'rgba(58, 52, 42, 0.6)' }}
+        >
+          <div className="relative bg-paper-soft border border-edge-sand rounded-t-card sm:rounded-card max-w-2xl w-full overflow-hidden max-h-[92vh] sm:max-h-[90vh] flex flex-col animate-in slide-in-from-bottom duration-200 sm:slide-in-from-bottom-0 sm:zoom-in-95">
+            {/* 手机端 drag handle */}
+            <div className="sm:hidden absolute top-2 left-1/2 -translate-x-1/2 w-10 h-1 rounded-bead bg-edge-sand z-10" aria-hidden="true" />
 
-            {/* 滚动内容区域 */}
-            <div className="relative z-10 overflow-y-auto p-4 sm:p-8">
+            <div className="overflow-y-auto p-4 sm:p-8">
               <div className="flex items-center justify-center mb-6">
-                <div className="w-16 h-16 bg-gradient-to-br from-orange-500 to-red-500 rounded-full flex items-center justify-center">
-                  <Flame className="w-8 h-8 text-white" />
+                <div
+                  className="w-14 h-14 sm:w-16 sm:h-16 bg-terracotta rounded-bead flex items-center justify-center"
+                  style={{ boxShadow: 'var(--shadow-lift-bead)' }}
+                  aria-hidden="true"
+                >
+                  <Flame className="w-7 h-7 sm:w-8 sm:h-8 text-paper-bg" />
                 </div>
               </div>
 
-              <h2 className="text-xl sm:text-3xl font-bold text-center mb-2 bg-gradient-to-r from-orange-600 to-red-600 bg-clip-text text-transparent">
+              <h2 className="text-2xl sm:text-3xl font-semibold text-center mb-2 text-ink-warm" style={{ fontFamily: 'var(--font-display)' }}>
                 选择熨烫方式
               </h2>
-              <p className="text-center text-gray-600 mb-6">
+              <p className="text-center text-ink-soft mb-6 leading-relaxed">
                 不同的熨烫方式会产生不同的视觉效果
               </p>
 
               {/* 去除背景选项 */}
-              <div className="mb-6 p-4 bg-purple-50 rounded-xl border border-purple-200">
-                <label className="flex items-center gap-3 cursor-pointer">
+              <div className="mb-6 p-4 bg-paper-bg border border-edge-sand rounded-surface">
+                <label className="flex items-center gap-3 cursor-pointer min-h-[44px]">
                   <input
                     type="checkbox"
                     checked={removeBackground}
                     onChange={(e) => setRemoveBackground(e.target.checked)}
-                    className="w-5 h-5 rounded border-gray-300"
+                    className="w-5 h-5 rounded border-edge-sand accent-moss shrink-0"
                   />
                   <div>
-                    <div className="font-bold text-gray-800">去除背景</div>
-                    <div className="text-xs text-gray-600">导出透明背景图片，只保留主体图案</div>
+                    <div className="font-semibold text-ink-warm">去除背景</div>
+                    <div className="text-xs text-ink-soft mt-0.5">导出透明背景图片，只保留主体图案</div>
                   </div>
                 </label>
               </div>
 
               {/* 熨烫方式选择 */}
-              <div className="grid grid-cols-2 gap-4 mb-6">
-                {/* 铜版纸烫 */}
-                <button
-                  onClick={() => setIroningMethod('paper')}
-                  className={`p-6 rounded-2xl border-2 transition-all ${
-                    ironingMethod === 'paper'
-                      ? 'border-orange-500 bg-orange-50 shadow-lg'
-                      : 'border-gray-200 hover:border-orange-300 hover:bg-orange-50/50'
-                  }`}
-                >
-                  <div className="text-4xl mb-3">📄</div>
-                  <h3 className="font-bold text-lg mb-2">铜版纸烫</h3>
-                  <p className="text-sm text-gray-600">
-                    最常见烫法，表面平整光滑，保留轻微孔洞，立体感适中
-                  </p>
-                </button>
-
-                {/* 毛巾烫 */}
-                <button
-                  onClick={() => setIroningMethod('towel')}
-                  className={`p-6 rounded-2xl border-2 transition-all ${
-                    ironingMethod === 'towel'
-                      ? 'border-orange-500 bg-orange-50 shadow-lg'
-                      : 'border-gray-200 hover:border-orange-300 hover:bg-orange-50/50'
-                  }`}
-                >
-                  <div className="text-4xl mb-3">🧺</div>
-                  <h3 className="font-bold text-lg mb-2">毛巾烫</h3>
-                  <p className="text-sm text-gray-600">
-                    表面非常平滑，细微绒面质感，孔洞几乎不可见，哑光效果
-                  </p>
-                </button>
-
-                {/* 直烫 */}
-                <button
-                  onClick={() => setIroningMethod('direct')}
-                  className={`p-6 rounded-2xl border-2 transition-all ${
-                    ironingMethod === 'direct'
-                      ? 'border-orange-500 bg-orange-50 shadow-lg'
-                      : 'border-gray-200 hover:border-orange-300 hover:bg-orange-50/50'
-                  }`}
-                >
-                  <div className="text-4xl mb-3">✨</div>
-                  <h3 className="font-bold text-lg mb-2">直烫</h3>
-                  <p className="text-sm text-gray-600">
-                    无烫纸直接熨烫，表面光滑有光泽，孔洞基本消失，最平整
-                  </p>
-                </button>
-
-                {/* 格里特烫 */}
-                <button
-                  onClick={() => setIroningMethod('glitter')}
-                  className={`p-6 rounded-2xl border-2 transition-all ${
-                    ironingMethod === 'glitter'
-                      ? 'border-orange-500 bg-orange-50 shadow-lg'
-                      : 'border-gray-200 hover:border-orange-300 hover:bg-orange-50/50'
-                  }`}
-                >
-                  <div className="text-4xl mb-3">💎</div>
-                  <h3 className="font-bold text-lg mb-2">格里特烫</h3>
-                  <p className="text-sm text-gray-600">
-                    使用闪光烫纸，表面带有细密闪片，折射彩虹光泽，华丽闪耀
-                  </p>
-                </button>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 mb-6">
+                {([
+                  { key: 'paper', label: '铜版纸烫', desc: '最常见烫法，表面平整光滑，保留轻微孔洞，立体感适中', Icon: FileText },
+                  { key: 'towel', label: '毛巾烫', desc: '表面非常平滑，细微绒面质感，孔洞几乎不可见，哑光效果', Icon: Layers },
+                  { key: 'direct', label: '直烫', desc: '无烫纸直接熨烫，表面光滑有光泽，孔洞基本消失，最平整', Icon: Zap },
+                  { key: 'glitter', label: '格里特烫', desc: '使用闪光烫纸，表面带有细密闪片，折射彩虹光泽，华丽闪耀', Icon: Sparkles },
+                ] as const).map(({ key, label, desc, Icon }) => {
+                  const selected = ironingMethod === key;
+                  return (
+                    <button
+                      key={key}
+                      onClick={() => setIroningMethod(key)}
+                      className={`text-left p-4 sm:p-6 rounded-surface border-2 transition-colors focus-visible:outline-2 focus-visible:outline-moss focus-visible:outline-offset-2 ${
+                        selected
+                          ? 'border-terracotta bg-paper-deep'
+                          : 'border-edge-sand bg-paper-bg hover:bg-paper-deep'
+                      }`}
+                      aria-pressed={selected}
+                    >
+                      <Icon
+                        className={`w-7 h-7 mb-3 ${selected ? 'text-terracotta' : 'text-ink-soft'}`}
+                        aria-hidden="true"
+                      />
+                      <h3 className="font-semibold text-base mb-1.5 text-ink-warm">{label}</h3>
+                      <p className="text-sm text-ink-soft leading-relaxed">{desc}</p>
+                    </button>
+                  );
+                })}
               </div>
-
 
               {/* 按钮组 */}
               <div className="flex gap-3 mt-6">
                 <button
                   onClick={() => setShowIroningModal(false)}
-                  className="flex-1 px-6 py-3 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition-colors font-semibold"
+                  className="flex-1 inline-flex items-center justify-center min-h-[48px] px-6 py-3 bg-paper-bg border border-edge-sand text-ink-warm rounded-control font-semibold hover:bg-paper-deep transition-colors focus-visible:outline-2 focus-visible:outline-moss focus-visible:outline-offset-2"
                 >
                   取消
                 </button>
                 <button
                   onClick={handleIroning}
-                  className="flex-1 px-6 py-3 bg-gradient-to-r from-orange-500 via-red-500 to-pink-500 text-white rounded-xl hover:opacity-90 transition-opacity font-semibold flex items-center justify-center gap-2"
+                  className="flex-1 inline-flex items-center justify-center gap-2 min-h-[48px] px-6 py-3 bg-terracotta text-paper-bg rounded-control font-semibold hover:bg-terracotta-deep transition-colors focus-visible:outline-2 focus-visible:outline-moss focus-visible:outline-offset-2"
+                  style={{ boxShadow: 'var(--shadow-lift-bead)' }}
                 >
-                  <Flame className="w-5 h-5" />
+                  <Flame className="w-5 h-5" aria-hidden="true" />
                   开始熨烫
                 </button>
               </div>
@@ -1634,82 +1621,97 @@ export function BeadCanvas({
 
       {/* 高清渲染模态框 */}
       {showHDModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-3xl shadow-2xl max-w-xl w-full p-4 sm:p-8 relative max-h-[90vh] overflow-y-auto">
-            {/* 装饰背景 */}
-            <div className="absolute inset-0 bg-gradient-to-br from-blue-50 via-cyan-50 to-blue-50 opacity-50 rounded-3xl" />
-            
-            <div className="relative z-10">
-              <div className="flex items-center justify-center mb-6">
-                <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-full flex items-center justify-center">
-                  <Sparkles className="w-8 h-8 text-white" />
-                </div>
+        <div
+          className="fixed inset-0 z-50 flex items-end sm:items-center justify-center sm:p-4"
+          style={{ backgroundColor: 'rgba(58, 52, 42, 0.6)' }}
+        >
+          <div className="relative bg-paper-soft border border-edge-sand rounded-t-card sm:rounded-card max-w-xl w-full p-4 sm:p-8 max-h-[92vh] sm:max-h-[90vh] overflow-y-auto animate-in slide-in-from-bottom duration-200 sm:slide-in-from-bottom-0 sm:zoom-in-95">
+            {/* 手机端 drag handle */}
+            <div className="sm:hidden absolute top-2 left-1/2 -translate-x-1/2 w-10 h-1 rounded-bead bg-edge-sand" aria-hidden="true" />
+
+            <div className="flex items-center justify-center mb-6">
+              <div
+                className="w-14 h-14 sm:w-16 sm:h-16 bg-moss rounded-bead flex items-center justify-center"
+                style={{ boxShadow: 'var(--shadow-lift-bead)' }}
+                aria-hidden="true"
+              >
+                <Sparkles className="w-7 h-7 sm:w-8 sm:h-8 text-paper-bg" />
               </div>
+            </div>
 
-              <h2 className="text-xl sm:text-3xl font-bold text-center mb-2 bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent">
-                高清渲染设置
-              </h2>
-              <p className="text-center text-gray-600 mb-8">
-                导出高质量的拼豆作品图片
-              </p>
+            <h2 className="text-2xl sm:text-3xl font-semibold text-center mb-2 text-ink-warm" style={{ fontFamily: 'var(--font-display)' }}>
+              高清渲染设置
+            </h2>
+            <p className="text-center text-ink-soft mb-8 leading-relaxed">
+              导出高质量的拼豆作品图片
+            </p>
 
-              {/* 渲染倍数选择 */}
-              <div className="mb-6">
-                <label className="block text-sm font-bold mb-3 text-gray-800">
-                  渲染倍数
-                </label>
-                <div className="grid grid-cols-3 gap-3">
-                  {[2, 4, 8].map(scale => (
+            {/* 渲染倍数选择 */}
+            <div className="mb-6">
+              <label className="block text-sm font-semibold mb-3 text-ink-warm">
+                渲染倍数
+              </label>
+              <div className="grid grid-cols-3 gap-3">
+                {[2, 4, 8].map(scale => {
+                  const selected = hdScale === scale;
+                  return (
                     <button
                       key={scale}
                       onClick={() => setHdScale(scale)}
-                      className={`p-4 rounded-xl border-2 transition-all ${
-                        hdScale === scale
-                          ? 'border-blue-500 bg-blue-50 shadow-md'
-                          : 'border-gray-200 hover:border-blue-300 hover:bg-blue-50/50'
+                      className={`p-3 sm:p-4 rounded-control border-2 transition-colors focus-visible:outline-2 focus-visible:outline-moss focus-visible:outline-offset-2 ${
+                        selected
+                          ? 'border-moss bg-paper-deep'
+                          : 'border-edge-sand bg-paper-bg hover:bg-paper-deep'
                       }`}
+                      aria-pressed={selected}
                     >
-                      <div className="text-2xl font-bold text-gray-800">{scale}x</div>
-                      <div className="text-xs text-gray-600 mt-1">
+                      <div
+                        className={`text-2xl font-bold ${selected ? 'text-moss' : 'text-ink-warm'}`}
+                        style={{ fontFamily: 'var(--font-num)' }}
+                      >
+                        {scale}x
+                      </div>
+                      <div className="text-xs text-ink-soft mt-1" style={{ fontFamily: 'var(--font-num)' }}>
                         {workingGrid[0].length * 40 * scale} × {workingGrid.length * 40 * scale}px
                       </div>
                     </button>
-                  ))}
-                  </div>
+                  );
+                })}
               </div>
+            </div>
 
-              {/* 去除背景��项 */}
-              <div className="mb-6 p-4 bg-gray-50 rounded-xl">
-                <label className="flex items-center gap-3 cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={hdRemoveBackground}
-                    onChange={(e) => setHdRemoveBackground(e.target.checked)}
-                    className="w-5 h-5 rounded border-gray-300"
-                  />
-                  <div>
-                    <div className="font-bold text-gray-800">去除背景</div>
-                    <div className="text-xs text-gray-600">导出透明背景的PNG图片</div>
-                  </div>
-                </label>
-              </div>
+            {/* 去除背景选项 */}
+            <div className="mb-6 p-4 bg-paper-bg border border-edge-sand rounded-surface">
+              <label className="flex items-center gap-3 cursor-pointer min-h-[44px]">
+                <input
+                  type="checkbox"
+                  checked={hdRemoveBackground}
+                  onChange={(e) => setHdRemoveBackground(e.target.checked)}
+                  className="w-5 h-5 rounded border-edge-sand accent-moss shrink-0"
+                />
+                <div>
+                  <div className="font-semibold text-ink-warm">去除背景</div>
+                  <div className="text-xs text-ink-soft mt-0.5">导出透明背景的 PNG 图片</div>
+                </div>
+              </label>
+            </div>
 
-              {/* 按钮 */}
-              <div className="flex gap-3">
-                <button
-                  onClick={() => setShowHDModal(false)}
-                  className="flex-1 px-6 py-3 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition-colors font-semibold"
-                >
-                  取消
-                </button>
-                <button
-                  onClick={handleHDRender}
-                  className="flex-1 px-6 py-3 bg-gradient-to-r from-blue-500 to-cyan-500 text-white rounded-xl hover:opacity-90 transition-opacity font-semibold flex items-center justify-center gap-2"
-                >
-                  <Sparkles className="w-5 h-5" />
-                  开始渲染
-                </button>
-              </div>
+            {/* 按钮 */}
+            <div className="flex gap-3">
+              <button
+                onClick={() => setShowHDModal(false)}
+                className="flex-1 inline-flex items-center justify-center min-h-[48px] px-6 py-3 bg-paper-bg border border-edge-sand text-ink-warm rounded-control font-semibold hover:bg-paper-deep transition-colors focus-visible:outline-2 focus-visible:outline-moss focus-visible:outline-offset-2"
+              >
+                取消
+              </button>
+              <button
+                onClick={handleHDRender}
+                className="flex-1 inline-flex items-center justify-center gap-2 min-h-[48px] px-6 py-3 bg-terracotta text-paper-bg rounded-control font-semibold hover:bg-terracotta-deep transition-colors focus-visible:outline-2 focus-visible:outline-moss focus-visible:outline-offset-2"
+                style={{ boxShadow: 'var(--shadow-lift-bead)' }}
+              >
+                <Sparkles className="w-5 h-5" aria-hidden="true" />
+                开始渲染
+              </button>
             </div>
           </div>
         </div>
@@ -1717,27 +1719,31 @@ export function BeadCanvas({
 
       {/* 熨烫预览模态框 */}
       {showIronPreview && ironedResult && (
-        <div className="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-3xl shadow-2xl p-4 sm:p-8 max-w-4xl w-full relative max-h-[90vh] overflow-y-auto">
-            <div className="mb-6">
-              <h2 className="text-lg sm:text-2xl font-bold text-center mb-2">熨烫效果预览</h2>
-              <p className="text-center text-gray-600">
+        <div
+          className="fixed inset-0 z-50 flex items-end sm:items-center justify-center sm:p-4"
+          style={{ backgroundColor: 'rgba(58, 52, 42, 0.7)' }}
+        >
+          <div className="relative bg-paper-soft border border-edge-sand rounded-t-card sm:rounded-card p-4 sm:p-8 max-w-4xl w-full max-h-[92vh] sm:max-h-[90vh] overflow-y-auto animate-in slide-in-from-bottom duration-200 sm:slide-in-from-bottom-0 sm:zoom-in-95">
+            {/* 手机端 drag handle */}
+            <div className="sm:hidden absolute top-2 left-1/2 -translate-x-1/2 w-10 h-1 rounded-bead bg-edge-sand" aria-hidden="true" />
+
+            <div className="mb-6 mt-2 sm:mt-0">
+              <h2 className="text-xl sm:text-2xl font-semibold text-center mb-2 text-ink-warm" style={{ fontFamily: 'var(--font-headline)' }}>熨烫效果预览</h2>
+              <p className="text-center text-ink-soft text-sm">
                 {IRONING_METHODS[ironingMethod].name} · {removeBackground ? '透明背景' : '白色背景'}
               </p>
             </div>
 
-            <div className="bg-gray-100 rounded-2xl p-6 mb-6 overflow-auto max-h-[500px]">
-              <div className="inline-block">
-                <img
-                  src={ironedResult}
-                  alt="熨烫效果"
-                  className="max-w-full h-auto rounded-lg shadow-lg"
-                  style={{
-                    imageRendering: 'pixelated',
-                    backgroundColor: removeBackground ? 'transparent' : 'white',
-                  }}
-                />
-              </div>
+            <div className="bg-paper-deep border border-edge-sand rounded-surface p-4 sm:p-6 mb-6 overflow-auto max-h-[50vh] sm:max-h-[500px] flex items-center justify-center">
+              <img
+                src={ironedResult}
+                alt="熨烫效果"
+                className="max-w-full h-auto rounded-control"
+                style={{
+                  imageRendering: 'pixelated',
+                  backgroundColor: removeBackground ? 'transparent' : 'var(--bead-paper-bg)',
+                }}
+              />
             </div>
 
             <div className="flex flex-wrap gap-3">
@@ -1746,7 +1752,7 @@ export function BeadCanvas({
                   setShowIronPreview(false);
                   setIronedResult(null);
                 }}
-                className="flex-1 px-4 py-3 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition-colors font-semibold"
+                className="flex-1 min-w-[40%] inline-flex items-center justify-center min-h-[48px] px-4 py-3 bg-paper-bg border border-edge-sand text-ink-warm rounded-control font-semibold hover:bg-paper-deep transition-colors focus-visible:outline-2 focus-visible:outline-moss focus-visible:outline-offset-2"
               >
                 关闭
               </button>
@@ -1755,8 +1761,9 @@ export function BeadCanvas({
                   setShowIronPreview(false);
                   setShowIroningModal(true);
                 }}
-                className="flex-1 px-4 py-3 bg-blue-500 text-white rounded-xl hover:bg-blue-600 transition-colors font-semibold"
+                className="flex-1 min-w-[40%] inline-flex items-center justify-center gap-2 min-h-[48px] px-4 py-3 bg-paper-bg border border-edge-sand text-ink-warm rounded-control font-semibold hover:bg-paper-deep transition-colors focus-visible:outline-2 focus-visible:outline-moss focus-visible:outline-offset-2"
               >
+                <Flame className="w-4 h-4" aria-hidden="true" />
                 重新熨烫
               </button>
               <button
@@ -1767,9 +1774,13 @@ export function BeadCanvas({
                   handleAddToGallery(ironedResult!, methodNames[ironingMethod]);
                 }}
                 disabled={savedToGallery}
-                className="flex-1 px-4 py-3 bg-gradient-to-r from-[#1f5c57] to-[#2d7a74] text-white rounded-xl hover:opacity-90 transition-opacity font-semibold flex items-center justify-center gap-2 disabled:opacity-70"
+                className="flex-1 min-w-[40%] inline-flex items-center justify-center gap-2 min-h-[48px] px-4 py-3 bg-paper-bg border border-edge-sand text-ink-warm rounded-control font-semibold hover:bg-paper-deep transition-colors disabled:opacity-50 disabled:cursor-not-allowed focus-visible:outline-2 focus-visible:outline-moss focus-visible:outline-offset-2"
               >
-                {savedToGallery ? '✓ 已加入' : '🏛️ 加入作品馆'}
+                {savedToGallery ? (
+                  <><Check className="w-4 h-4 text-moss" aria-hidden="true" />已加入</>
+                ) : (
+                  <><Library className="w-4 h-4" aria-hidden="true" />加入作品馆</>
+                )}
               </button>
               <button
                 onClick={() => {
@@ -1781,9 +1792,10 @@ export function BeadCanvas({
                   link.href = ironedResult!;
                   link.click();
                 }}
-                className="flex-1 px-4 py-3 bg-gradient-to-r from-green-500 to-emerald-500 text-white rounded-xl hover:opacity-90 transition-opacity font-semibold flex items-center justify-center gap-2"
+                className="flex-1 min-w-[40%] inline-flex items-center justify-center gap-2 min-h-[48px] px-4 py-3 bg-terracotta text-paper-bg rounded-control font-semibold hover:bg-terracotta-deep transition-colors focus-visible:outline-2 focus-visible:outline-moss focus-visible:outline-offset-2"
+                style={{ boxShadow: 'var(--shadow-lift-bead)' }}
               >
-                <Download className="w-5 h-5" />
+                <Download className="w-5 h-5" aria-hidden="true" />
                 下载
               </button>
             </div>
@@ -1793,48 +1805,57 @@ export function BeadCanvas({
 
       {/* 高清渲染预览模态框 */}
       {showHDPreview && hdResult && (
-        <div className="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-3xl shadow-2xl p-4 sm:p-8 max-w-4xl w-full relative max-h-[90vh] overflow-y-auto">
-            <div className="mb-6">
-              <h2 className="text-lg sm:text-2xl font-bold text-center mb-2">高清渲染预览</h2>
-              <p className="text-center text-gray-600">
+        <div
+          className="fixed inset-0 z-50 flex items-end sm:items-center justify-center sm:p-4"
+          style={{ backgroundColor: 'rgba(58, 52, 42, 0.7)' }}
+        >
+          <div className="relative bg-paper-soft border border-edge-sand rounded-t-card sm:rounded-card p-4 sm:p-8 max-w-4xl w-full max-h-[92vh] sm:max-h-[90vh] overflow-y-auto animate-in slide-in-from-bottom duration-200 sm:slide-in-from-bottom-0 sm:zoom-in-95">
+            {/* 手机端 drag handle */}
+            <div className="sm:hidden absolute top-2 left-1/2 -translate-x-1/2 w-10 h-1 rounded-bead bg-edge-sand" aria-hidden="true" />
+
+            <div className="mb-6 mt-2 sm:mt-0">
+              <h2 className="text-xl sm:text-2xl font-semibold text-center mb-2 text-ink-warm" style={{ fontFamily: 'var(--font-headline)' }}>高清渲染预览</h2>
+              <p className="text-center text-ink-soft text-sm" style={{ fontFamily: 'var(--font-num)' }}>
                 {hdScale}x 渲染 · {hdRemoveBackground ? '透明背景' : '白色背景'}
               </p>
             </div>
 
-            <div className="bg-gray-100 rounded-2xl p-6 mb-6 overflow-auto max-h-[500px]">
-              <div className="inline-block">
-                <img
-                  src={hdResult}
-                  alt="高清渲染"
-                  className="max-w-full h-auto rounded-lg shadow-lg"
-                  style={{
-                    imageRendering: 'auto',
-                    backgroundColor: hdRemoveBackground ? 'transparent' : 'white',
-                  }}
-                />
-              </div>
+            <div className="bg-paper-deep border border-edge-sand rounded-surface p-4 sm:p-6 mb-6 overflow-auto max-h-[50vh] sm:max-h-[500px] flex items-center justify-center">
+              <img
+                src={hdResult}
+                alt="高清渲染"
+                className="max-w-full h-auto rounded-control"
+                style={{
+                  imageRendering: 'auto',
+                  backgroundColor: hdRemoveBackground ? 'transparent' : 'var(--bead-paper-bg)',
+                }}
+              />
             </div>
 
             <div className="flex flex-wrap gap-3">
               <button
                 onClick={() => { setShowHDPreview(false); setHdResult(null); }}
-                className="flex-1 px-4 py-3 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition-colors font-semibold"
+                className="flex-1 min-w-[40%] inline-flex items-center justify-center min-h-[48px] px-4 py-3 bg-paper-bg border border-edge-sand text-ink-warm rounded-control font-semibold hover:bg-paper-deep transition-colors focus-visible:outline-2 focus-visible:outline-moss focus-visible:outline-offset-2"
               >
                 关闭
               </button>
               <button
                 onClick={() => { setShowHDPreview(false); setShowHDModal(true); }}
-                className="flex-1 px-4 py-3 bg-blue-500 text-white rounded-xl hover:bg-blue-600 transition-colors font-semibold"
+                className="flex-1 min-w-[40%] inline-flex items-center justify-center gap-2 min-h-[48px] px-4 py-3 bg-paper-bg border border-edge-sand text-ink-warm rounded-control font-semibold hover:bg-paper-deep transition-colors focus-visible:outline-2 focus-visible:outline-moss focus-visible:outline-offset-2"
               >
+                <Sparkles className="w-4 h-4" aria-hidden="true" />
                 重新渲染
               </button>
               <button
                 onClick={() => handleAddToGallery(hdResult!, `高清${hdScale}x渲染`)}
                 disabled={savedToGallery}
-                className="flex-1 px-4 py-3 bg-gradient-to-r from-[#1f5c57] to-[#2d7a74] text-white rounded-xl hover:opacity-90 transition-opacity font-semibold flex items-center justify-center gap-2 disabled:opacity-70"
+                className="flex-1 min-w-[40%] inline-flex items-center justify-center gap-2 min-h-[48px] px-4 py-3 bg-paper-bg border border-edge-sand text-ink-warm rounded-control font-semibold hover:bg-paper-deep transition-colors disabled:opacity-50 disabled:cursor-not-allowed focus-visible:outline-2 focus-visible:outline-moss focus-visible:outline-offset-2"
               >
-                {savedToGallery ? '✓ 已加入' : '🏛️ 加入作品馆'}
+                {savedToGallery ? (
+                  <><Check className="w-4 h-4 text-moss" aria-hidden="true" />已加入</>
+                ) : (
+                  <><Library className="w-4 h-4" aria-hidden="true" />加入作品馆</>
+                )}
               </button>
               <button
                 onClick={() => {
@@ -1843,9 +1864,10 @@ export function BeadCanvas({
                   link.href = hdResult!;
                   link.click();
                 }}
-                className="flex-1 px-4 py-3 bg-gradient-to-r from-green-500 to-emerald-500 text-white rounded-xl hover:opacity-90 transition-opacity font-semibold flex items-center justify-center gap-2"
+                className="flex-1 min-w-[40%] inline-flex items-center justify-center gap-2 min-h-[48px] px-4 py-3 bg-terracotta text-paper-bg rounded-control font-semibold hover:bg-terracotta-deep transition-colors focus-visible:outline-2 focus-visible:outline-moss focus-visible:outline-offset-2"
+                style={{ boxShadow: 'var(--shadow-lift-bead)' }}
               >
-                <Download className="w-5 h-5" />
+                <Download className="w-5 h-5" aria-hidden="true" />
                 下载
               </button>
             </div>
@@ -1855,113 +1877,123 @@ export function BeadCanvas({
 
       {/* 熨烫进度动画 - 展示熨斗在画板上移动 */}
       {isIroning && (
-        <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-3xl shadow-2xl p-4 sm:p-8 max-w-3xl w-full relative overflow-hidden">
-            {/* 动画背景 */}
-            <div className="absolute inset-0 bg-gradient-to-br from-orange-100 via-red-100 to-pink-100 opacity-40" />
+        <div
+          className="fixed inset-0 z-50 flex items-end sm:items-center justify-center sm:p-4"
+          style={{ backgroundColor: 'rgba(58, 52, 42, 0.7)' }}
+        >
+          <div className="relative bg-paper-soft border border-edge-sand rounded-t-card sm:rounded-card p-4 sm:p-8 max-w-3xl w-full max-h-[92vh] sm:max-h-none overflow-y-auto animate-in slide-in-from-bottom duration-200 sm:slide-in-from-bottom-0 sm:zoom-in-95">
+            <h3 className="text-xl sm:text-2xl font-semibold mb-2 mt-2 sm:mt-0 text-center text-ink-warm flex items-center justify-center gap-2" style={{ fontFamily: 'var(--font-headline)' }}>
+              <Flame className="w-6 h-6 text-terracotta" aria-hidden="true" />
+              熨烫中…
+            </h3>
+            <p className="text-ink-soft mb-6 text-center text-sm">
+              正在用 <span className="text-ink-warm font-semibold">{IRONING_METHODS[ironingMethod].name}</span> 方式熨烫您的作品
+            </p>
 
-            <div className="relative z-10">
-              <h3 className="text-lg sm:text-2xl font-bold mb-4 text-center text-gray-800">
-                🔥 熨烫中...
-              </h3>
-              <p className="text-gray-600 mb-6 text-center">
-                正在用{IRONING_METHODS[ironingMethod].name}方式熨烫您的作品
-              </p>
-
-              {/* 拼豆板和熨斗动画 */}
-              <div className="mb-6 bg-gray-100 rounded-2xl p-6 relative" style={{ aspectRatio: `${workingGrid[0].length} / ${workingGrid.length}`, maxHeight: '400px' }}>
-                {/* 拼豆板网格 */}
-                <div 
-                  className="grid gap-0 w-full h-full relative"
-                  style={{
-                    gridTemplateColumns: `repeat(${workingGrid[0].length}, 1fr)`,
-                  }}
-                >
-                  {workingGrid.map((row, y) =>
-                    row.map((color, x) => {
-                      const isPassed = y < ironPosition.y || (y === ironPosition.y && x <= ironPosition.x);
-                      return (
-                        <div
-                          key={`iron-${x}-${y}`}
-                          className="border border-gray-300 transition-all duration-300"
-                          style={{
-                            backgroundColor: color || '#FAFAFA',
-                            opacity: isPassed ? 1 : 0.6,
-                            transform: isPassed ? 'scale(0.98)' : 'scale(1)',
-                          }}
-                        >
-                          {color && !isPassed && (
-                            <div
-                              className="w-full h-full rounded-full m-0.5"
-                              style={{
-                                backgroundColor: color,
-                                boxShadow: 'inset 0 1px 2px rgba(0,0,0,0.2)',
-                              }}
-                            />
-                          )}
-                        </div>
-                      );
-                    })
-                  )}
-                </div>
-
-                {/* 熨斗图标 */}
-                <div
-                  className="absolute pointer-events-none transition-all duration-300"
-                  style={{
-                    left: `${(ironPosition.x / workingGrid[0].length) * 100}%`,
-                    top: `${(ironPosition.y / workingGrid.length) * 100}%`,
-                    transform: 'translate(-50%, -50%)',
-                  }}
-                >
-                  <div className="relative">
-                    {/* 熨斗主体 */}
-                    <div className="w-16 h-16 bg-gradient-to-br from-gray-600 to-gray-800 rounded-t-lg relative shadow-2xl transform -rotate-12">
-                      {/* 熨斗底板 */}
-                      <div className="absolute -bottom-1 left-0 right-0 h-3 bg-gradient-to-b from-gray-400 to-gray-500 rounded-b-lg" />
-                      {/* 手柄 */}
-                      <div className="absolute -top-3 left-1/2 -translate-x-1/2 w-8 h-5 bg-gradient-to-br from-red-500 to-orange-500 rounded-t-lg" />
-                      {/* 热蒸汽效果 */}
-                      <div className="absolute -bottom-4 left-1/2 -translate-x-1/2 flex gap-1">
-                        <div className="w-1.5 h-3 bg-white opacity-60 rounded-full animate-pulse" />
-                        <div className="w-1.5 h-4 bg-white opacity-50 rounded-full animate-pulse" style={{ animationDelay: '0.2s' }} />
-                        <div className="w-1.5 h-3 bg-white opacity-60 rounded-full animate-pulse" style={{ animationDelay: '0.4s' }} />
+            {/* 拼豆板和熨斗动画 */}
+            <div
+              className="mb-6 bg-paper-deep border border-edge-sand rounded-surface p-4 sm:p-6 relative"
+              style={{ aspectRatio: `${workingGrid[0].length} / ${workingGrid.length}`, maxHeight: '400px' }}
+            >
+              {/* 拼豆板网格 */}
+              <div
+                className="grid gap-0 w-full h-full relative"
+                style={{ gridTemplateColumns: `repeat(${workingGrid[0].length}, 1fr)` }}
+              >
+                {workingGrid.map((row, y) =>
+                  row.map((color, x) => {
+                    const isPassed = y < ironPosition.y || (y === ironPosition.y && x <= ironPosition.x);
+                    return (
+                      <div
+                        key={`iron-${x}-${y}`}
+                        className="border border-edge-sand/40 transition-all duration-300"
+                        style={{
+                          backgroundColor: color || 'var(--bead-paper-bg)',
+                          opacity: isPassed ? 1 : 0.6,
+                          transform: isPassed ? 'scale(0.98)' : 'scale(1)',
+                        }}
+                      >
+                        {color && !isPassed && (
+                          <div
+                            className="w-full h-full rounded-bead m-0.5"
+                            style={{
+                              backgroundColor: color,
+                              boxShadow: 'inset 0 1px 2px rgba(58, 52, 42, 0.2)',
+                            }}
+                          />
+                        )}
                       </div>
-                    </div>
-                    {/* 热量光晕 */}
-                    <div className="absolute inset-0 bg-orange-400 opacity-30 blur-xl rounded-full animate-pulse" />
-                  </div>
-                </div>
-
-                {/* 热纸图层（如果不是直烫） */}
-                {ironingMethod !== 'direct' && (
-                  <div className="absolute inset-0 bg-white opacity-10 pointer-events-none" />
+                    );
+                  })
                 )}
               </div>
 
-              {/* 进度条 */}
-              <div className="w-full h-4 bg-gray-200 rounded-full overflow-hidden mb-2">
-                <div
-                  className="h-full bg-gradient-to-r from-orange-500 via-red-500 to-pink-500 transition-all duration-300 rounded-full relative"
-                  style={{ width: `${ironProgress}%` }}
-                >
-                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white to-transparent opacity-50 animate-pulse" />
+              {/* 熨斗图标 — 暖色调金属手感（保留物体形态，换成 brand 色） */}
+              <div
+                className="absolute pointer-events-none transition-all duration-300"
+                style={{
+                  left: `${(ironPosition.x / workingGrid[0].length) * 100}%`,
+                  top: `${(ironPosition.y / workingGrid.length) * 100}%`,
+                  transform: 'translate(-50%, -50%)',
+                }}
+                aria-hidden="true"
+              >
+                <div className="relative">
+                  {/* 熨斗主体（暖墨色，模拟铸铁） */}
+                  <div
+                    className="w-14 h-14 sm:w-16 sm:h-16 bg-ink-warm rounded-t-control relative transform -rotate-12"
+                    style={{ boxShadow: 'var(--shadow-lift-bead)' }}
+                  >
+                    {/* 熨斗底板（稍浅一阶） */}
+                    <div className="absolute -bottom-1 left-0 right-0 h-3 bg-ink-soft rounded-b-control" />
+                    {/* 手柄（terracotta = "热"的物质暗示） */}
+                    <div className="absolute -top-3 left-1/2 -translate-x-1/2 w-8 h-5 bg-terracotta rounded-t-control" />
+                    {/* 热蒸汽 */}
+                    <div className="absolute -bottom-4 left-1/2 -translate-x-1/2 flex gap-1">
+                      <div className="w-1.5 h-3 bg-paper-bg opacity-70 rounded-bead animate-pulse" />
+                      <div className="w-1.5 h-4 bg-paper-bg opacity-60 rounded-bead animate-pulse" style={{ animationDelay: '0.2s' }} />
+                      <div className="w-1.5 h-3 bg-paper-bg opacity-70 rounded-bead animate-pulse" style={{ animationDelay: '0.4s' }} />
+                    </div>
+                  </div>
+                  {/* 热量光晕（honey 取代 orange） */}
+                  <div className="absolute inset-0 bg-honey opacity-30 blur-xl rounded-bead animate-pulse" />
                 </div>
               </div>
-              <p className="text-sm text-gray-500 text-center mb-4">{Math.round(ironProgress)}%</p>
 
-              <div className="flex items-center justify-center gap-3 text-sm text-gray-600">
-                <div className="flex items-center gap-1">
-                  <span className={ironProgress < 30 ? "text-red-600 font-bold" : ""}>🌡️ 加热</span>
-                </div>
-                <span className="text-gray-400">→</span>
-                <div className="flex items-center gap-1">
-                  <span className={ironProgress >= 30 && ironProgress < 70 ? "text-orange-600 font-bold" : ""}>🔥 熨烫</span>
-                </div>
-                <span className="text-gray-400">→</span>
-                <div className="flex items-center gap-1">
-                  <span className={ironProgress >= 70 ? "text-blue-600 font-bold" : ""}>❄️ 冷却</span>
-                </div>
+              {/* 热纸图层（如果不是直烫） */}
+              {ironingMethod !== 'direct' && (
+                <div className="absolute inset-0 bg-paper-bg opacity-10 pointer-events-none rounded-surface" />
+              )}
+            </div>
+
+            {/* 进度条 — 实色 terracotta + paper-bg shimmer */}
+            <div className="w-full h-3 bg-paper-deep border border-edge-sand rounded-bead overflow-hidden mb-2">
+              <div
+                className="h-full bg-terracotta transition-all duration-300 rounded-bead relative"
+                style={{ width: `${ironProgress}%` }}
+              >
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-paper-bg to-transparent opacity-40 animate-pulse" />
+              </div>
+            </div>
+            <p className="text-sm text-ink-soft text-center mb-4" style={{ fontFamily: 'var(--font-num)' }}>
+              {Math.round(ironProgress)}%
+            </p>
+
+            {/* 阶段指示 */}
+            <div className="flex items-center justify-center gap-3 text-sm text-ink-soft flex-wrap">
+              <div className={`flex items-center gap-1.5 transition-colors ${ironProgress < 30 ? 'text-terracotta font-semibold' : ''}`}>
+                <Thermometer className="w-4 h-4" aria-hidden="true" />
+                加热
+              </div>
+              <span className="text-ink-soft" aria-hidden="true">→</span>
+              <div className={`flex items-center gap-1.5 transition-colors ${ironProgress >= 30 && ironProgress < 70 ? 'text-terracotta font-semibold' : ''}`}>
+                <Flame className="w-4 h-4" aria-hidden="true" />
+                熨烫
+              </div>
+              <span className="text-ink-soft" aria-hidden="true">→</span>
+              <div className={`flex items-center gap-1.5 transition-colors ${ironProgress >= 70 ? 'text-moss font-semibold' : ''}`}>
+                <Snowflake className="w-4 h-4" aria-hidden="true" />
+                冷却
               </div>
             </div>
           </div>
@@ -1979,11 +2011,20 @@ export function BeadCanvas({
             animation: 'colorDoneToast 2.8s ease forwards',
           }}
         >
-          {/* 彩屑 */}
-          {['#ff6b6b','#ffd93d','#6bcb77','#4d96ff','#ff9f1c','#e040fb','#00d2d3','#ff9ff3'].map((c, i) => (
+          {/* 彩屑 — 用 brand 4 色循环（terracotta / moss / honey / honey-glow），不是霓虹拼盘 */}
+          {[
+            'var(--bead-terracotta)',
+            'var(--bead-moss)',
+            'var(--bead-honey)',
+            'var(--bead-honey-glow)',
+            'var(--bead-terracotta-deep)',
+            'var(--bead-moss-deep)',
+            'var(--bead-honey)',
+            'var(--bead-terracotta)',
+          ].map((c, i) => (
             <div
               key={i}
-              className="absolute rounded-full"
+              className="absolute rounded-bead"
               style={{
                 width: 7, height: 7,
                 backgroundColor: c,
@@ -1997,23 +2038,29 @@ export function BeadCanvas({
 
           {/* Toast 卡片 */}
           <div
-            className="relative bg-white rounded-2xl shadow-2xl flex items-center gap-3 px-5 py-3.5 whitespace-nowrap"
-            style={{ border: `2.5px solid ${celebratingColor.hex}` }}
+            className="relative bg-paper-soft border-2 rounded-card flex items-center gap-3 px-5 py-3.5 whitespace-nowrap"
+            style={{
+              borderColor: celebratingColor.hex,
+              boxShadow: 'var(--shadow-lift-bead)',
+            }}
           >
             <div
-              className="w-8 h-8 rounded-full flex-shrink-0"
+              className="w-8 h-8 rounded-bead flex-shrink-0"
               style={{
                 backgroundColor: celebratingColor.hex,
-                boxShadow: `inset -2px -2px 4px rgba(0,0,0,0.25), inset 2px 2px 4px rgba(255,255,255,0.4), 0 2px 8px ${celebratingColor.hex}66`,
+                // 用暖色调 inset 模拟塑料反光（不是冷黑）
+                boxShadow: `inset -2px -2px 4px rgba(58, 52, 42, 0.25), inset 2px 2px 4px rgba(246, 239, 226, 0.4), 0 2px 8px ${celebratingColor.hex}66`,
               }}
             />
             <div>
-              <div className="font-bold text-gray-900 text-sm leading-tight">这个色拼完啦 🎉</div>
-              <div className="text-xs text-gray-400 mt-0.5">
+              <div className="font-semibold text-ink-warm text-sm leading-tight flex items-center gap-1.5">
+                这个色拼完啦
+                <PartyPopper className="w-4 h-4 text-honey" aria-hidden="true" />
+              </div>
+              <div className="text-xs text-ink-soft mt-0.5" style={{ fontFamily: 'var(--font-num)' }}>
                 {celebratingColor.code}{celebratingColor.name ? ` · ${celebratingColor.name}` : ''}
               </div>
             </div>
-            <span className="text-base ml-1">✨</span>
           </div>
         </div>
       )}

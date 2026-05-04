@@ -55,6 +55,63 @@ npm run dev                # 看终端输出的本地端口（通常 5173）
 
 ## 2. 修改历史（按 commit 倒序）
 
+### 2026-05-03 移动端适配 阶段 4a：BeadCanvas 6 个 modal + 庆祝 toast brand 清理
+
+阶段 4 拆 4 个子阶段（详见 brief 流），4a 仅清理 modal 视觉债：**6 个 dialog + 1 个 toast，全员违 brand**。
+
+主画布 / 工具栏 / 色盘 / 圆格改造 / 触摸 UX 留给 4b/4c/4d。
+
+**改造的 7 个 surface**（行号来自改造前）：
+
+| # | Surface | 行号 | 致命违规 |
+|---|---|---|---|
+| 1 | 完成提示 modal | L1437 | `from-purple-100 via-pink-100 to-yellow-100` 装饰背景；`from-purple-500 to-pink-500` 圆形图标背景；**渐变文字标题** "🎉 恭喜完成！"；3 个按钮分别 `blue-cyan` / `[#1f5c57]→[#2d7a74]` / `purple-pink` 渐变；emoji `🎉 🏛️ ✓` |
+| 2 | 熨烫选择 modal | L1510 | `from-orange-50 via-red-50 to-pink-50`；`from-orange-500 to-red-500` 圆图标；**渐变文字标题**；purple checkbox 卡；4 个方法按钮的 emoji `📄 🧺 ✨ 💎`；`from-orange-500 via-red-500 to-pink-500` 主 CTA |
+| 3 | 高清渲染 modal | L1637 | `from-blue-50 via-cyan-50` 背景；`from-blue-500 to-cyan-500` 圆图标 + 主 CTA；蓝色 selected state |
+| 4 | 熨烫预览 modal | L1720 | `bg-black bg-opacity-80` overlay；`bg-blue-500` 重新熨烫按钮；`from-[#1f5c57] to-[#2d7a74]` 加入作品馆按钮；`from-green-500 to-emerald-500` 下载；emoji `🏛️ ✓` |
+| 5 | HD 渲染预览 modal | L1796 | 同上 |
+| 6 | 熨烫进度动画 modal | L1858 | `from-orange-100 via-red-100 to-pink-100` 背景；熨斗用 `gray-600/800/400/500` + `red-500/orange-500` 手柄渐变 + `orange-400` 光晕；`from-orange-500 via-red-500 to-pink-500` 进度条；emoji `🔥 🌡️ ❄️` 状态指示 |
+| 7 | 单色完成 toast | L1972 | 8 个霓虹彩屑色 `#ff6b6b #ffd93d #6bcb77 #4d96ff #ff9f1c #e040fb #00d2d3 #ff9ff3`；`bg-white shadow-2xl text-gray-900/400`；emoji `🎉 ✨` |
+
+**统一改造模板**（适用于全部 6 个 dialog）：
+
+- **Overlay**：`bg-black bg-opacity-60/70/80` → `style={{ backgroundColor: 'rgba(58, 52, 42, 0.6/0.7)' }}` 暖墨色（`--bead-ink` 的 RGB），手感像"打湿的纸张"
+- **手机锚底**：`items-center` → `items-end sm:items-center`；`rounded-3xl` → `rounded-t-card sm:rounded-card`；`p-4` → `sm:p-4`（手机不要外缘 padding）；`max-h-[90vh]` → `max-h-[92vh] sm:max-h-[90vh]`
+- **进入动画**：加 `animate-in slide-in-from-bottom duration-200 sm:slide-in-from-bottom-0 sm:zoom-in-95`（tw-animate-css，手机滑入桌面缩放进入）
+- **drag handle**：`<div className="sm:hidden absolute top-2 left-1/2 -translate-x-1/2 w-10 h-1 rounded-bead bg-edge-sand" />`
+- **装饰渐变背景**：**全部删除**（`<div absolute bg-gradient-to-br from-X-50 ...>` 那种）。背景的"温度"靠 `bg-paper-soft` 给，不靠堆叠半透明色块
+- **图标圆**：`from-X-500 to-Y-500 rounded-full` → 单一 brand 色 (`bg-honey` / `bg-terracotta` / `bg-moss`) + lift-bead 暖阴影
+- **标题文字**：`bg-clip-text text-transparent bg-gradient-to-r from-X to-Y` 渐变文字 → `text-ink-warm` 实色 + `var(--font-display)` 字体（**DESIGN.md 绝对禁渐变文字**）
+- **CTA 主**：彩色渐变 → `bg-terracotta text-paper-bg` + `--shadow-lift-bead`
+- **CTA 次**：彩色背景 → `bg-paper-bg border-edge-sand text-ink-warm` ghost
+- **selected state**：彩色 border + 浅彩 bg → `border-terracotta bg-paper-deep` 或 `border-moss bg-paper-deep`
+- **emoji 替换**（按语义）：`🎉` → `PartyPopper` icon；`🏛️` → `Library` icon；`✓` → `Check` icon；`📄` → `FileText`；`🧺` → `Layers`；`✨` → `Sparkles`；`💎` → `Sparkles`；`🌡️` → `Thermometer`；`🔥` → `Flame`；`❄️` → `Snowflake`
+- **触摸目标**：所有按钮 `min-h-[48px]`；checkbox label `min-h-[44px]`；checkbox 加 `accent-moss` 用品牌主色
+
+**熨斗动画特殊处理**（保留物体形态，换 brand 色）：
+
+- 熨斗主体（`from-gray-600 to-gray-800`）→ `bg-ink-warm`（暖墨色铸铁感）
+- 熨斗底板（`from-gray-400 to-gray-500`）→ `bg-ink-soft`
+- 手柄（`from-red-500 to-orange-500`）→ `bg-terracotta`（陶土红 = "热"的物质暗示，比 SaaS 红更对）
+- 蒸汽（`bg-white opacity-60`）→ `bg-paper-bg opacity-70`
+- 热量光晕（`bg-orange-400`）→ `bg-honey opacity-30`（honey = brand 的"温暖光泽"色）
+- 进度条 `from-orange via-red to-pink` → `bg-terracotta` 实色 + `paper-bg` shimmer overlay
+- 阶段指示色（红 / 橙 / 蓝）→ terracotta / terracotta / moss（避免冷蓝）
+
+**彩屑 Toast 特殊处理**：
+
+- 8 个霓虹色 → 4 个 brand 色循环 2 次：`terracotta / moss / honey / honey-glow / terracotta-deep / moss-deep / honey / terracotta`
+- Toast 卡片 `bg-white shadow-2xl` → `bg-paper-soft border-2 [color]` + `lift-bead` 暖阴影
+- 内部色块 inset 阴影 `rgba(0,0,0,0.25)` → `rgba(58, 52, 42, 0.25)` 暖墨色
+- 文字 `text-gray-900/400` → `text-ink-warm/ink-soft`
+
+**4b/4c/4d 仍未做**：
+- **4b**：主画布外的工具栏 / 色盘 / 侧边栏 brand + mobile 紧凑化
+- **4c**：BeadCanvas 圆格改造（DESIGN doctrine 强行要求 — "Don't 让 BeadCanvas 的格子是方形"）
+- **4d**：触摸 / 双指缩放 / 惯性滚动 UX 打磨
+
+修改文件：`src/components/BeadCanvas.tsx`、`PROGRESS.md`
+
 ### 2026-05-03 移动端适配 阶段 3：GalleryView brand 重做 + 移动适配 + 嵌套 modal 双锚底
 
 完成阶段 2/3 的最后一段——作品馆。整文件 237 行，**所有像素都违 brand**（密度比 BeadPattern 还高）。一次过：全 `Write` 重写而非 surgical Edit，更稳。
