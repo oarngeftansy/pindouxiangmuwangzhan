@@ -55,6 +55,48 @@ npm run dev                # 看终端输出的本地端口（通常 5173）
 
 ## 2. 修改历史（按 commit 倒序）
 
+### 2026-05-03 移动端适配 阶段 3：GalleryView brand 重做 + 移动适配 + 嵌套 modal 双锚底
+
+完成阶段 2/3 的最后一段——作品馆。整文件 237 行，**所有像素都违 brand**（密度比 BeadPattern 还高）。一次过：全 `Write` 重写而非 surgical Edit，更稳。
+
+**Brand token 大替换**（按违规类型）：
+
+| 违规 | 替换 |
+|---|---|
+| `bg-black/70` `bg-black/80` overlay | `rgba(58, 52, 42, 0.6/0.7)` 内联（暖色烫纸感，对应 `--bead-ink`）— 不能用 Tailwind alpha 因为没有 `bg-ink-warm/60` 直接类 |
+| `bg-white` `bg-[#f3f1ec]` `bg-[#f9f8f5]` `bg-[#e5e0d8]` 老色 | `bg-paper-soft` / `bg-paper-bg` / `bg-paper-deep` 三阶 |
+| `border-[#d7d1c3]` `border-[#e5e0d8]` `border-[#1f5c57]` `border-gray-100` | `border-edge-sand` / `border-moss`（输入框 focus） |
+| `text-[#1f2937]` `text-[#6b7280]` `text-[#9ca3af]` `text-gray-400/600` | `text-ink-warm` / `text-ink-soft` |
+| `bg-[#1f5c57]` 老冷绿按钮 | `bg-moss` (oklch 0.45 0.085 165，暖松绿) |
+| 5 种 chip 色（`bg-[#e8f4f1]` 青 / `bg-purple-50` 紫 / `bg-amber-50` 琥珀 / `bg-orange-50` 橙 / `bg-gray-100` 灰） | 3 种语义色：尺寸/颗数 = `paper-deep` 中性；颜色数 = `paper-deep + text-moss` 重音；烫法 = `honey-glow/40 + border-honey/40`（特定工艺记号）；日期 = `paper-bg` 最弱 |
+| `hover:bg-red-50 hover:text-red-600` 删除按钮 | `hover:bg-alert-rose/10 hover:border-alert-rose hover:text-alert-rose` — 默认 ghost 形态，**只有 hover 才显警示色**，避免视觉惊慌。注意 token 名是 `alert-rose` 不是 `alert`（globals.css 第 103 行） |
+| `bg-gradient-to-r from-green-500 to-emerald-500` 下载 CTA | `bg-terracotta` 实心 + lift-bead 阴影（绿不在调色板，gradient 也禁） |
+| `shadow-2xl shadow-sm shadow-md` | 删除（DESIGN：flat by default）；CTA 加 `--shadow-lift-bead` |
+| `rounded-3xl` `rounded-2xl` `rounded-xl` `rounded-lg` `rounded-full` 杂用 | `rounded-card` (20) / `rounded-surface` (16) / `rounded-control` (12) / `rounded-chip` (10) / `rounded-bead` (9999) 按语义 |
+| `font-medium` 数字 | `style={{ fontFamily: 'var(--font-num)' }}` (Nunito tabular) |
+
+**移动适配**（与阶段 1 ImageUploader 保持一致的"穷人 sheet"模式）：
+
+- **嵌套 modal 双锚底**：列表 modal 和详情 modal 都用 `items-end sm:items-center` + `rounded-t-card sm:rounded-card` + `slide-in-from-bottom`。手机上详情盖在列表上方都从底部滑出，非常顺
+- 两个 modal 都加顶部 4px drag handle 视觉提示
+- 关闭按钮 `p-2` (~36px) → `min-h-[44px] min-w-[44px]`（44pt 触摸目标）
+- 编辑铅笔 icon `p-1.5` → `min-h-[36px] min-w-[36px]`（卡片内空间紧，36 是接受下限）
+- 内联编辑输入框 `text-sm py-0.5` → `text-sm py-2`（详情那个改 `text-base sm:text-lg py-2`，防 iOS 自动放大）
+- 编辑确认按钮 icon `w-3 h-3` → `w-4 h-4` + `min-h-[36/44]`
+- 详情底部按钮组 `flex` → `flex-col-reverse sm:flex-row`：手机上**下载在上、删除在下**，符合"主操作在指尖，破坏性操作离指尖远一点"的拇指可达性原则
+
+**有意保留的细节**：
+- 嵌套 modal 结构没改（最简方案）。如果以后觉得"详情盖在列表上"逻辑上重，可以重构为单 modal + 内部状态切换 view
+- 删除按钮用 `window.confirm`——原生 confirm 在手机 UX 不好（系统弹窗丑），但替换需要再加一个第三层 modal。这次保留，后续优化项
+- 缩略图 `imageRendering: 'pixelated'` 保留——拼豆图本来就是像素风，不要平滑化
+
+**为什么 overlay 用内联 `rgba(58, 52, 42, 0.X)` 而不是 `bg-ink-warm/60`**：
+- Tailwind v4 的 alpha 修饰符 `/60` 需要 `--color-ink-warm` 是 oklch，内部要做 `oklch + alpha` 计算。这一套 OKLCH alpha 在某些浏览器（特别是老 Safari）渲染异常
+- 内联 rgba 是 100% 兼容的"硬保险"，且数值 (58, 52, 42) 直接对应 `#3a342a` (`--bead-ink`) 的 RGB
+- 视觉上 60-70% 不透明度的暖墨色 = 类似看打湿的纸张那种暗下来的感觉，比 `bg-black/70` 冷绝望感好太多
+
+修改文件：`src/components/GalleryView.tsx`（全文重写，从 237 行 → 220 行）、`PROGRESS.md`
+
 ### 2026-05-03 移动端适配 阶段 2：BeadPattern brand 重做 + 移动适配 + 修 hover-only bug
 
 承接阶段 1，对图纸预览页（`BeadPattern.tsx`，705 行）做完整改造。这一页之前**完全没碰过**——既没跟 brand 重构，也几乎没移动适配。一次过。
