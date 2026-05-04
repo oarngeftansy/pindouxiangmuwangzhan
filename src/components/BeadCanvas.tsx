@@ -608,129 +608,140 @@ export function BeadCanvas({
   return (
     <div className="flex flex-col gap-3" style={{ minHeight: 'calc(100dvh - 80px)' }}>
       {/* 工具栏 */}
-      <div className="bg-white rounded-2xl shadow-xl p-3 sm:p-4 shrink-0">
+      <div className="bg-paper-soft border border-edge-sand rounded-card p-3 sm:p-4 shrink-0">
         <div className={`flex items-center gap-2 ${isMobile ? 'flex-wrap gap-y-2' : 'flex-wrap gap-3'}`}>
           {/* 工具选择 */}
           <div className="flex gap-2">
             <button
               onClick={() => setActiveTool("brush")}
-              className={`p-3 rounded-xl transition-all ${
+              className={`inline-flex items-center justify-center min-h-[44px] min-w-[44px] p-3 rounded-control border transition-colors focus-visible:outline-2 focus-visible:outline-moss focus-visible:outline-offset-2 ${
                 activeTool === "brush"
-                  ? "bg-purple-500 text-white shadow-lg"
-                  : "bg-gray-100 hover:bg-gray-200"
+                  ? "bg-moss text-paper-bg border-moss"
+                  : "bg-paper-bg text-ink-warm border-edge-sand hover:bg-paper-deep"
               }`}
+              aria-label="画笔"
+              aria-pressed={activeTool === "brush"}
             >
-              <Paintbrush className="w-5 h-5" />
+              <Paintbrush className="w-5 h-5" aria-hidden="true" />
             </button>
             <button
               onClick={() => setActiveTool("eraser")}
-              className={`p-3 rounded-xl transition-all ${
+              className={`inline-flex items-center justify-center min-h-[44px] min-w-[44px] p-3 rounded-control border transition-colors focus-visible:outline-2 focus-visible:outline-moss focus-visible:outline-offset-2 ${
                 activeTool === "eraser"
-                  ? "bg-purple-500 text-white shadow-lg"
-                  : "bg-gray-100 hover:bg-gray-200"
+                  ? "bg-moss text-paper-bg border-moss"
+                  : "bg-paper-bg text-ink-warm border-edge-sand hover:bg-paper-deep"
               }`}
+              aria-label="橡皮"
+              aria-pressed={activeTool === "eraser"}
             >
-              <Eraser className="w-5 h-5" />
+              <Eraser className="w-5 h-5" aria-hidden="true" />
             </button>
           </div>
 
-          <div className="h-8 w-px bg-gray-300" />
+          <div className="h-8 w-px bg-edge-sand" aria-hidden="true" />
 
           {/* 缩放控制 */}
           <div className="flex items-center gap-2">
             <button
               onClick={handleZoomOut}
-              className="p-2 rounded-lg bg-gray-100 hover:bg-gray-200 transition-colors"
+              className="inline-flex items-center justify-center min-h-[44px] min-w-[44px] p-2 rounded-control bg-paper-bg border border-edge-sand text-ink-warm hover:bg-paper-deep transition-colors focus-visible:outline-2 focus-visible:outline-moss focus-visible:outline-offset-2"
+              aria-label="缩小"
             >
-              <ZoomOut className="w-5 h-5" />
+              <ZoomOut className="w-5 h-5" aria-hidden="true" />
             </button>
-            <span className="text-sm font-medium w-12 text-center">
+            <span className="text-sm font-semibold w-12 text-center text-ink-warm" style={{ fontFamily: 'var(--font-num)' }}>
               {Math.round(zoom * 100)}%
             </span>
             <button
               onClick={handleZoomIn}
-              className="p-2 rounded-lg bg-gray-100 hover:bg-gray-200 transition-colors"
+              className="inline-flex items-center justify-center min-h-[44px] min-w-[44px] p-2 rounded-control bg-paper-bg border border-edge-sand text-ink-warm hover:bg-paper-deep transition-colors focus-visible:outline-2 focus-visible:outline-moss focus-visible:outline-offset-2"
+              aria-label="放大"
             >
-              <ZoomIn className="w-5 h-5" />
+              <ZoomIn className="w-5 h-5" aria-hidden="true" />
             </button>
           </div>
 
-          <div className="h-8 w-px bg-gray-300" />
+          <div className="h-8 w-px bg-edge-sand" aria-hidden="true" />
 
           {/* 网格显示 */}
           <button
             onClick={() => setShowGrid(!showGrid)}
-            className={`p-2 rounded-lg transition-all ${
+            className={`inline-flex items-center justify-center min-h-[44px] min-w-[44px] p-2 rounded-control border transition-colors focus-visible:outline-2 focus-visible:outline-moss focus-visible:outline-offset-2 ${
               showGrid
-                ? "bg-purple-100 text-purple-700"
-                : "bg-gray-100"
+                ? "bg-paper-deep text-moss border-moss"
+                : "bg-paper-bg text-ink-warm border-edge-sand hover:bg-paper-deep"
             }`}
             title="网格"
+            aria-label="切换网格显示"
+            aria-pressed={showGrid}
           >
-            <GridIcon className="w-5 h-5" />
+            <GridIcon className="w-5 h-5" aria-hidden="true" />
           </button>
 
-          {/* 参考图纸显��� */}
+          {/* 参考图纸显示 */}
           <button
             onClick={() => setShowReference(!showReference)}
-            className={`px-3 py-2 rounded-lg transition-all flex items-center gap-2 ${
+            className={`inline-flex items-center min-h-[44px] gap-2 px-3 py-2 rounded-control border transition-colors focus-visible:outline-2 focus-visible:outline-moss focus-visible:outline-offset-2 ${
               showReference
-                ? "bg-blue-100 text-blue-700"
-                : "bg-gray-100"
+                ? "bg-paper-deep text-moss border-moss"
+                : "bg-paper-bg text-ink-warm border-edge-sand hover:bg-paper-deep"
             }`}
+            aria-pressed={showReference}
           >
-            {showReference ? (
-              <Eye className="w-5 h-5" />
-            ) : (
-              <EyeOff className="w-5 h-5" />
-            )}
-            <span className="text-sm font-medium hidden sm:inline">
-              参考图纸
-            </span>
+            {showReference ? <Eye className="w-5 h-5" aria-hidden="true" /> : <EyeOff className="w-5 h-5" aria-hidden="true" />}
+            <span className="text-sm font-semibold hidden sm:inline">参考图纸</span>
           </button>
 
           {/* 材料清单显示 - 只在拼豆板模式下显示 */}
           {viewMode === 'pegboard' && (
             <button
               onClick={() => setShowMaterialList(!showMaterialList)}
-              className={`px-3 py-2 rounded-lg transition-all flex items-center gap-2 ${
+              className={`inline-flex items-center min-h-[44px] gap-2 px-3 py-2 rounded-control border transition-colors focus-visible:outline-2 focus-visible:outline-moss focus-visible:outline-offset-2 ${
                 showMaterialList
-                  ? "bg-green-100 text-green-700"
-                  : "bg-gray-100"
+                  ? "bg-paper-deep text-moss border-moss"
+                  : "bg-paper-bg text-ink-warm border-edge-sand hover:bg-paper-deep"
               }`}
+              aria-pressed={showMaterialList}
             >
-              {showMaterialList ? (
-                <Square className="w-5 h-5" />
-              ) : (
-                <EyeOff className="w-5 h-5" />
-              )}
-              <span className="text-sm font-medium hidden sm:inline">
-                材料清单
-              </span>
+              {showMaterialList ? <Square className="w-5 h-5" aria-hidden="true" /> : <EyeOff className="w-5 h-5" aria-hidden="true" />}
+              <span className="text-sm font-semibold hidden sm:inline">材料清单</span>
             </button>
           )}
 
           {/* 滑豆模式 + 锁色指示 — 桌面内联，手机隐藏（改为画布浮动徽章） */}
           {lockedColor && !isMobile && (
             <>
-              <div className="h-8 w-px bg-gray-300" />
-              <div className="flex items-center gap-2 px-3 py-2 bg-gradient-to-r from-orange-50 to-red-50 rounded-lg border border-orange-200">
-                <span className="text-sm font-medium text-gray-700 hidden sm:inline">滑豆</span>
+              <div className="h-8 w-px bg-edge-sand" aria-hidden="true" />
+              <div className="flex items-center gap-2 px-3 py-2 bg-paper-bg border border-edge-sand rounded-control">
+                <span className="text-sm font-semibold text-ink-warm hidden sm:inline">滑豆</span>
                 <button
                   onClick={() => setPourMode(!pourMode)}
-                  className={`relative w-12 h-6 rounded-full transition-all duration-300 ${pourMode ? "bg-gradient-to-r from-orange-500 to-red-500" : "bg-gray-300"}`}
+                  className={`relative w-12 h-6 rounded-bead transition-colors duration-300 ${pourMode ? "bg-terracotta" : "bg-bead-shadow"}`}
+                  aria-label="切换滑豆模式"
+                  aria-pressed={pourMode}
                 >
-                  <div className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow-md transition-transform duration-300 flex items-center justify-center ${pourMode ? "translate-x-6" : "translate-x-0"}`}>
-                    {pourMode && <Sparkles className="w-3 h-3 text-orange-500" />}
+                  <div
+                    className={`absolute top-0.5 left-0.5 w-5 h-5 bg-paper-bg rounded-bead transition-transform duration-300 flex items-center justify-center ${pourMode ? "translate-x-6" : "translate-x-0"}`}
+                    style={{ boxShadow: '0 1px 2px rgba(58, 52, 42, 0.2)' }}
+                  >
+                    {pourMode && <Zap className="w-3 h-3 text-terracotta" aria-hidden="true" />}
                   </div>
                 </button>
               </div>
-              <div className="h-8 w-px bg-gray-300" />
-              <div className="flex items-center gap-2 px-3 py-2 bg-amber-100 rounded-lg border border-amber-300">
-                <div className="w-6 h-6 rounded-full border-2 border-white shadow-sm" style={{ backgroundColor: lockedColor }} />
-                <span className="text-sm font-semibold text-amber-900">锁定: {getColorCode(lockedColor)}</span>
-                {pourMode && <span className="text-xs text-orange-600">⚡</span>}
-                <button onClick={() => { setLockedColor(null); setPourMode(false); }} className="ml-1 text-amber-700 hover:text-amber-900 text-xs">解锁</button>
+              <div className="h-8 w-px bg-edge-sand" aria-hidden="true" />
+              <div className="flex items-center gap-2 px-3 py-2 bg-honey-glow/40 border border-honey/50 rounded-control">
+                <div className="w-6 h-6 rounded-bead border border-edge-sand" style={{ backgroundColor: lockedColor }} aria-hidden="true" />
+                <span className="text-sm font-semibold text-ink-warm" style={{ fontFamily: 'var(--font-num)' }}>
+                  锁定 {getColorCode(lockedColor)}
+                </span>
+                {pourMode && <Zap className="w-3.5 h-3.5 text-terracotta" aria-hidden="true" />}
+                <button
+                  onClick={() => { setLockedColor(null); setPourMode(false); }}
+                  className="ml-1 text-ink-soft hover:text-ink-warm text-xs underline transition-colors"
+                  aria-label="解锁颜色"
+                >
+                  解锁
+                </button>
               </div>
             </>
           )}
@@ -740,35 +751,27 @@ export function BeadCanvas({
             <button
               onClick={() => setShowIroningModal(true)}
               disabled={isIroning}
-              className="px-3 sm:px-5 py-2.5 bg-gradient-to-r from-orange-500 via-red-500 to-pink-500 text-white rounded-xl hover:opacity-90 transition-opacity flex items-center gap-2 disabled:opacity-50 shadow-lg font-semibold whitespace-nowrap"
+              className="inline-flex items-center gap-2 min-h-[44px] px-3 sm:px-5 py-2.5 bg-terracotta text-paper-bg rounded-control hover:bg-terracotta-deep transition-colors disabled:opacity-50 disabled:cursor-not-allowed font-semibold whitespace-nowrap focus-visible:outline-2 focus-visible:outline-moss focus-visible:outline-offset-2"
+              style={{ boxShadow: 'var(--shadow-lift-bead)' }}
               title="一键熨烫"
             >
-              {isIroning ? (
-                <>
-                  <Flame className="w-5 h-5 animate-pulse" />
-                  <span className="hidden sm:inline">熨烫中...</span>
-                </>
-              ) : (
-                <>
-                  <Flame className="w-5 h-5" />
-                  <span className="hidden sm:inline">一键熨烫</span>
-                </>
-              )}
+              <Flame className={`w-5 h-5 ${isIroning ? 'animate-pulse' : ''}`} aria-hidden="true" />
+              <span className="hidden sm:inline">{isIroning ? '熨烫中…' : '一键熨烫'}</span>
             </button>
             <button
               onClick={() => setShowHDModal(true)}
-              className="px-3 sm:px-5 py-2.5 bg-gradient-to-r from-blue-500 to-cyan-500 text-white rounded-xl hover:opacity-90 transition-opacity flex items-center gap-2 font-semibold whitespace-nowrap shadow-lg"
+              className="inline-flex items-center gap-2 min-h-[44px] px-3 sm:px-5 py-2.5 bg-paper-bg border border-edge-sand text-ink-warm rounded-control hover:bg-paper-deep transition-colors font-semibold whitespace-nowrap focus-visible:outline-2 focus-visible:outline-moss focus-visible:outline-offset-2"
               title="高清渲染"
             >
-              <Sparkles className="w-5 h-5" />
+              <Sparkles className="w-5 h-5" aria-hidden="true" />
               <span className="hidden sm:inline">高清渲染</span>
             </button>
             <button
               onClick={downloadCanvas}
-              className="px-3 sm:px-5 py-2.5 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-xl hover:opacity-90 transition-opacity flex items-center gap-2 font-semibold whitespace-nowrap"
+              className="inline-flex items-center gap-2 min-h-[44px] px-3 sm:px-5 py-2.5 bg-paper-bg border border-edge-sand text-ink-warm rounded-control hover:bg-paper-deep transition-colors font-semibold whitespace-nowrap focus-visible:outline-2 focus-visible:outline-moss focus-visible:outline-offset-2"
               title="下载图纸"
             >
-              <Download className="w-5 h-5" />
+              <Download className="w-5 h-5" aria-hidden="true" />
               <span className="hidden sm:inline">下载图纸</span>
             </button>
           </div>
@@ -781,23 +784,24 @@ export function BeadCanvas({
           <button
             onClick={() => setShowIroningModal(true)}
             disabled={isIroning}
-            className="flex-1 py-3 bg-gradient-to-r from-orange-500 via-red-500 to-pink-500 text-white rounded-xl flex items-center justify-center gap-2 font-semibold disabled:opacity-50 shadow-lg"
+            className="flex-1 inline-flex items-center justify-center gap-2 min-h-[48px] py-3 bg-terracotta text-paper-bg rounded-control font-semibold disabled:opacity-50 disabled:cursor-not-allowed focus-visible:outline-2 focus-visible:outline-moss focus-visible:outline-offset-2"
+            style={{ boxShadow: 'var(--shadow-lift-bead)' }}
           >
-            <Flame className={`w-5 h-5 ${isIroning ? 'animate-pulse' : ''}`} />
-            {isIroning ? '熨烫中...' : '一键熨烫'}
+            <Flame className={`w-5 h-5 ${isIroning ? 'animate-pulse' : ''}`} aria-hidden="true" />
+            {isIroning ? '熨烫中…' : '一键熨烫'}
           </button>
           <button
             onClick={() => setShowHDModal(true)}
-            className="flex-1 py-3 bg-gradient-to-r from-blue-500 to-cyan-500 text-white rounded-xl flex items-center justify-center gap-2 font-semibold shadow-lg"
+            className="flex-1 inline-flex items-center justify-center gap-2 min-h-[48px] py-3 bg-paper-soft border border-edge-sand text-ink-warm rounded-control font-semibold focus-visible:outline-2 focus-visible:outline-moss focus-visible:outline-offset-2"
           >
-            <Sparkles className="w-5 h-5" />
-            高清渲染
+            <Sparkles className="w-5 h-5" aria-hidden="true" />
+            高清
           </button>
           <button
             onClick={downloadCanvas}
-            className="flex-1 py-3 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-xl flex items-center justify-center gap-2 font-semibold"
+            className="flex-1 inline-flex items-center justify-center gap-2 min-h-[48px] py-3 bg-paper-soft border border-edge-sand text-ink-warm rounded-control font-semibold focus-visible:outline-2 focus-visible:outline-moss focus-visible:outline-offset-2"
           >
-            <Download className="w-5 h-5" />
+            <Download className="w-5 h-5" aria-hidden="true" />
             下载
           </button>
         </div>
@@ -819,46 +823,50 @@ export function BeadCanvas({
           {isMobile && (
             <button
               onClick={() => setSidebarCollapsed(v => !v)}
-              className="w-full flex items-center justify-between px-4 py-2 bg-white rounded-xl shadow text-sm font-semibold text-gray-700 mb-2"
+              className="w-full flex items-center justify-between min-h-[44px] px-4 py-2 bg-paper-soft border border-edge-sand rounded-control text-sm font-semibold text-ink-warm mb-2 hover:bg-paper-deep transition-colors focus-visible:outline-2 focus-visible:outline-moss focus-visible:outline-offset-2"
+              aria-expanded={!sidebarCollapsed}
             >
               <span>{sidebarCollapsed ? '展开参考 / 颜色' : '收起'}</span>
-              <span className="text-gray-400">{sidebarCollapsed ? '▼' : '▲'}</span>
+              <span className="text-ink-soft text-xs" aria-hidden="true">{sidebarCollapsed ? '▼' : '▲'}</span>
             </button>
           )}
           <div className={`space-y-3 ${isMobile && sidebarCollapsed ? 'hidden' : ''}`}>
             {/* 参考图纸 */}
             {showReference && (
-          <div className="bg-white rounded-2xl shadow-xl overflow-hidden border-2 border-purple-300">
+          <div className="bg-paper-soft border border-edge-sand rounded-card overflow-hidden">
             {/* 顶部标题栏 */}
-            <div className="bg-gradient-to-r from-purple-600 to-pink-600 text-white px-4 py-2 flex items-center justify-between">
+            <div className="bg-paper-deep border-b border-edge-sand text-ink-warm px-4 py-2.5 flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <Eye className="w-4 h-4" />
+                <Eye className="w-4 h-4 text-moss" aria-hidden="true" />
                 <span className="font-semibold text-sm">参考图纸</span>
               </div>
               <button
                 onClick={() => setShowReference(false)}
-                className="p-1 hover:bg-white/20 rounded transition-colors"
+                className="inline-flex items-center justify-center min-h-[36px] min-w-[36px] rounded-control hover:bg-paper-bg transition-colors"
                 title="关闭"
+                aria-label="关闭参考图纸"
               >
-                <EyeOff className="w-3 h-3" />
+                <X className="w-4 h-4 text-ink-soft" aria-hidden="true" />
               </button>
             </div>
 
             {/* 当前锁定颜色提示 */}
             {lockedColor && (
-              <div className="px-4 py-2 bg-amber-100 border-b border-amber-200 flex items-center justify-between">
+              <div className="px-4 py-2.5 bg-honey-glow/40 border-b border-honey/40 flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <div 
-                    className="w-4 h-4 rounded-full border border-amber-400"
+                  <div
+                    className="w-4 h-4 rounded-bead border border-edge-sand"
                     style={{ backgroundColor: lockedColor }}
+                    aria-hidden="true"
                   />
-                  <span className="text-xs font-semibold text-amber-800">
-                    已锁定：{getColorCode(lockedColor)}
+                  <span className="text-xs font-semibold text-ink-warm" style={{ fontFamily: 'var(--font-num)' }}>
+                    已锁定 {getColorCode(lockedColor)}
                   </span>
                 </div>
                 <button
                   onClick={() => handleColorLock(lockedColor)}
-                  className="text-xs text-amber-700 hover:text-amber-900 underline"
+                  className="text-xs text-ink-soft hover:text-ink-warm underline transition-colors"
+                  aria-label="解锁颜色"
                 >
                   解锁
                 </button>
@@ -866,15 +874,14 @@ export function BeadCanvas({
             )}
 
             {/* 参考图内容 */}
-            <div className="bg-white p-3 overflow-auto" style={{ maxHeight: '40vh' }}>
+            <div className="bg-paper-bg p-3 overflow-auto touch-pan-x touch-pan-y" style={{ maxHeight: '40vh' }}>
               <div className="inline-block">
                 <div
-                  className="grid gap-0 rounded-lg overflow-hidden border border-gray-200"
+                  className="grid gap-0 rounded-control overflow-hidden border border-edge-sand"
                   style={{
                     gridTemplateColumns: `repeat(${referenceGrid[0].length}, ${baseSize * zoom * 0.3}px)`,
                     width: "fit-content",
-                    backgroundColor: '#FFFFFF',
-                    boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
+                    backgroundColor: 'var(--bead-paper-bg)',
                   }}
                 >
                   {referenceGrid.map((row, y) =>
@@ -915,35 +922,35 @@ export function BeadCanvas({
             </div>
 
             {/* 提示文字 */}
-            <div className="px-4 py-2 bg-purple-50 border-t border-purple-200">
-              <p className="text-xs text-purple-700 text-center">
-                💡 点击豆子锁定颜色
-              </p>
+            <div className="px-4 py-2.5 bg-paper-deep border-t border-edge-sand flex items-center justify-center gap-1.5">
+              <Zap className="w-3.5 h-3.5 text-moss shrink-0" aria-hidden="true" />
+              <p className="text-xs text-ink-soft">点击豆子锁定颜色</p>
             </div>
           </div>
         )}
 
         {/* 材料清单 */}
         {showMaterialList && (
-          <div className="bg-white rounded-2xl shadow-xl overflow-hidden border-2 border-green-300">
+          <div className="bg-paper-soft border border-edge-sand rounded-card overflow-hidden">
             {/* 顶部标题栏 */}
-            <div className="bg-gradient-to-r from-green-600 to-emerald-600 text-white px-4 py-2 flex items-center justify-between">
+            <div className="bg-paper-deep border-b border-edge-sand text-ink-warm px-4 py-2.5 flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <Square className="w-4 h-4" />
+                <Square className="w-4 h-4 text-moss" aria-hidden="true" />
                 <span className="font-semibold text-sm">材料清单</span>
               </div>
               <button
                 onClick={() => setShowMaterialList(false)}
-                className="p-1 hover:bg-white/20 rounded transition-colors"
+                className="inline-flex items-center justify-center min-h-[36px] min-w-[36px] rounded-control hover:bg-paper-bg transition-colors"
                 title="关闭"
+                aria-label="关闭材料清单"
               >
-                <EyeOff className="w-3 h-3" />
+                <X className="w-4 h-4 text-ink-soft" aria-hidden="true" />
               </button>
             </div>
 
             {/* 材料清单内容 */}
             <div className="overflow-y-auto p-4" style={{ maxHeight: '40vh' }}>
-              <div className="text-sm text-gray-600 mb-3">
+              <div className="text-sm text-ink-soft mb-3">
                 点击颜色自动拾取并高亮对应区域
               </div>
               <div className="space-y-2">
@@ -960,52 +967,42 @@ export function BeadCanvas({
                       <button
                         key={colorHex}
                         onClick={() => handleColorLock(colorHex)}
-                        className={`w-full text-left p-3 rounded-xl border-2 transition-all hover:shadow-md ${
+                        className={`w-full text-left p-3 rounded-control border-2 transition-colors focus-visible:outline-2 focus-visible:outline-moss focus-visible:outline-offset-2 ${
                           isLocked
-                            ? "border-amber-400 bg-amber-50 shadow-md"
-                            : "border-gray-200 bg-gray-50 hover:border-purple-300"
-                        } ${
-                          completed
-                            ? "opacity-60"
-                            : ""
-                        }`}
+                            ? "border-honey bg-honey-glow/40"
+                            : "border-edge-sand bg-paper-bg hover:bg-paper-deep"
+                        } ${completed ? "opacity-60" : ""}`}
+                        aria-pressed={isLocked}
                       >
                         <div className="flex items-center justify-between mb-2">
-                          <div className="flex items-center gap-3">
+                          <div className="flex items-center gap-3 min-w-0">
                             <div
-                              className="w-8 h-8 rounded-lg border-2 border-gray-300 shadow-sm"
-                              style={{
-                                backgroundColor: colorHex,
-                              }}
+                              className="w-8 h-8 rounded-control border border-edge-sand shrink-0"
+                              style={{ backgroundColor: colorHex }}
+                              aria-hidden="true"
                             />
-                            <div className="flex flex-col">
-                              <span className="font-mono font-bold text-sm text-gray-700">
+                            <div className="flex flex-col min-w-0">
+                              <span className="font-bold text-sm text-ink-warm" style={{ fontFamily: 'var(--font-num)' }}>
                                 {code}
                               </span>
-                              <div className="flex items-center gap-2">
-                                <span className="text-sm font-semibold text-gray-900">
-                                  {placed}/{total}
-                                </span>
-                              </div>
+                              <span className="text-sm font-semibold text-ink-warm" style={{ fontFamily: 'var(--font-num)' }}>
+                                {placed}/{total}
+                              </span>
                             </div>
                           </div>
                           {isLocked && (
-                            <div className="text-amber-700 font-bold text-sm">
+                            <div className="text-ink-warm font-semibold text-xs shrink-0">
                               锁定中
                             </div>
                           )}
                         </div>
                         {/* 进度条 */}
-                        <div className="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
+                        <div className="w-full h-2 bg-paper-deep rounded-bead overflow-hidden">
                           <div
-                            className={`h-full transition-all ${
-                              completed
-                                ? "bg-green-500"
-                                : "bg-purple-500"
+                            className={`h-full transition-all duration-300 rounded-bead ${
+                              completed ? "bg-moss" : "bg-terracotta"
                             }`}
-                            style={{
-                              width: `${Math.min(progress, 100)}%`,
-                            }}
+                            style={{ width: `${Math.min(progress, 100)}%` }}
                           />
                         </div>
                       </button>
@@ -1015,18 +1012,16 @@ export function BeadCanvas({
             </div>
 
             {/* 总进度 */}
-            <div className="px-4 py-3 border-t bg-gray-50">
-              <div className="text-sm text-gray-600 mb-2">
-                总进度
-              </div>
-              <div className="flex justify-between text-lg font-bold mb-2">
+            <div className="px-4 py-3 border-t border-edge-sand bg-paper-bg">
+              <div className="text-sm text-ink-soft mb-2">总进度</div>
+              <div className="flex items-baseline justify-center gap-2 text-lg font-semibold mb-2 text-ink-warm" style={{ fontFamily: 'var(--font-num)' }}>
                 <span>{getTotalPlaced()}</span>
-                <span>/</span>
+                <span className="text-ink-soft">/</span>
                 <span>{getTotalRequired()}</span>
               </div>
-              <div className="w-full h-3 bg-gray-200 rounded-full overflow-hidden">
+              <div className="w-full h-3 bg-paper-deep rounded-bead overflow-hidden">
                 <div
-                  className="h-full bg-gradient-to-r from-purple-500 to-pink-500 transition-all"
+                  className="h-full bg-terracotta transition-all duration-300 rounded-bead"
                   style={{
                     width: `${getTotalRequired() > 0 ? (getTotalPlaced() / getTotalRequired()) * 100 : 0}%`,
                   }}
@@ -1037,13 +1032,14 @@ export function BeadCanvas({
         )}
 
             {/* 颜色选择面板 */}
-            <div className="bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-200">
-              <div className="px-4 py-2 bg-gray-50 border-b border-gray-200 flex items-center justify-between">
-                <span className="font-semibold text-sm text-gray-700">选色</span>
+            <div className="bg-paper-soft border border-edge-sand rounded-card overflow-hidden">
+              <div className="px-4 py-2.5 bg-paper-deep border-b border-edge-sand flex items-center justify-between">
+                <span className="font-semibold text-sm text-ink-warm">选色</span>
                 {lockedColor && (
                   <button
                     onClick={() => { setLockedColor(null); setPourMode(false); }}
-                    className="text-xs text-amber-700 underline"
+                    className="text-xs text-ink-soft hover:text-ink-warm underline transition-colors"
+                    aria-label="解锁颜色"
                   >
                     解锁
                   </button>
@@ -1052,18 +1048,21 @@ export function BeadCanvas({
               <div className="p-3 overflow-y-auto" style={{ maxHeight: isMobile ? '28vh' : '40vh' }}>
                 {/* 当前选中色 */}
                 {lockedColor && (
-                  <div className="flex items-center gap-2 mb-3 px-2 py-1.5 bg-amber-50 rounded-lg border border-amber-200">
-                    <div className="w-5 h-5 rounded-full border-2 border-amber-400 flex-shrink-0"
-                      style={{ backgroundColor: lockedColor }} />
-                    <span className="text-xs font-bold text-amber-800">
+                  <div className="flex items-center gap-2 mb-3 px-2.5 py-2 bg-honey-glow/40 border border-honey/40 rounded-control">
+                    <div
+                      className="w-5 h-5 rounded-bead border border-edge-sand flex-shrink-0"
+                      style={{ backgroundColor: lockedColor }}
+                      aria-hidden="true"
+                    />
+                    <span className="text-xs font-bold text-ink-warm" style={{ fontFamily: 'var(--font-num)' }}>
                       {getColorCode(lockedColor)}
                     </span>
-                    <span className="text-xs text-amber-600 truncate">
+                    <span className="text-xs text-ink-soft truncate">
                       {beadColors.find(c => c.hex === lockedColor)?.name || ''}
                     </span>
                   </div>
                 )}
-                {/* 颜色网格 */}
+                {/* 颜色网格 — 22px swatch 已经接近 24px 触摸下限；rest 态保留用尺寸优先而非 44pt */}
                 <div className="flex flex-wrap gap-1.5">
                   {beadColors.map(color => {
                     const isSelected = lockedColor === color.hex;
@@ -1073,18 +1072,31 @@ export function BeadCanvas({
                         key={color.hex}
                         title={`${color[colorSystem] || color.mard} ${color.name}`}
                         onClick={() => handleColorLock(color.hex)}
-                        className="relative rounded-full transition-transform hover:scale-110 active:scale-95"
+                        className="relative rounded-bead transition-transform hover:scale-110 active:scale-95 focus-visible:outline-2 focus-visible:outline-moss focus-visible:outline-offset-2"
                         style={{
                           width: 22, height: 22,
                           backgroundColor: color.hex,
+                          // 选中：白纸描边 + 色卡外圈，模拟"色卡被取出来"
+                          // 默认：暖墨色 inset 模拟塑料反光
                           boxShadow: isSelected
-                            ? `0 0 0 2px white, 0 0 0 4px ${color.hex}`
-                            : '0 1px 3px rgba(0,0,0,0.25)',
+                            ? `0 0 0 2px var(--bead-paper-bg), 0 0 0 4px ${color.hex}`
+                            : 'inset -1px -1px 2px rgba(58, 52, 42, 0.2), inset 1px 1px 2px rgba(246, 239, 226, 0.4)',
                           opacity: completed ? 0.4 : 1,
                         }}
+                        aria-label={`${color[colorSystem] || color.mard} ${color.name}${completed ? '（已完成）' : ''}`}
+                        aria-pressed={isSelected}
                       >
                         {completed && (
-                          <span className="absolute inset-0 flex items-center justify-center text-white text-[8px] font-bold">✓</span>
+                          <span
+                            className="absolute inset-0 flex items-center justify-center text-[10px] font-bold pointer-events-none"
+                            style={{
+                              color: 'var(--bead-ink)',
+                              textShadow: '0 0 2px var(--bead-paper-bg)',
+                            }}
+                            aria-hidden="true"
+                          >
+                            ✓
+                          </span>
                         )}
                       </button>
                     );
@@ -1333,110 +1345,112 @@ export function BeadCanvas({
 
         {/* 材料单 - 只在简洁模式下显示在右侧 */}
         {viewMode === 'simple' && (
-          <div className="bg-white rounded-2xl shadow-xl p-6 h-fit sticky top-4">
-          <h3 className="text-xl font-bold mb-4">材料清单</h3>
-          <div className="text-sm text-gray-600 mb-4">
-            点击颜色自动拾取并高亮对应区域
-          </div>
-          <div className="space-y-2 max-h-[600px] overflow-y-auto pr-2">
-            {Array.from(colorCount.entries())
-              .sort((a, b) => b[1] - a[1])
-              .map(([colorHex, total]) => {
-                const placed = getPlacedCount(colorHex);
-                const completed = placed >= total;
-                const isLocked = lockedColor === colorHex;
-                const code = getColorCode(colorHex);
-                const progress = (placed / total) * 100;
+          <div className="bg-paper-soft border border-edge-sand rounded-card p-6 h-fit sticky top-4">
+            <h3 className="text-xl font-semibold mb-4 text-ink-warm" style={{ fontFamily: 'var(--font-headline)' }}>材料清单</h3>
+            <div className="text-sm text-ink-soft mb-4">
+              点击颜色自动拾取并高亮对应区域
+            </div>
+            <div className="space-y-2 max-h-[600px] overflow-y-auto pr-2">
+              {Array.from(colorCount.entries())
+                .sort((a, b) => b[1] - a[1])
+                .map(([colorHex, total]) => {
+                  const placed = getPlacedCount(colorHex);
+                  const completed = placed >= total;
+                  const isLocked = lockedColor === colorHex;
+                  const code = getColorCode(colorHex);
+                  const progress = (placed / total) * 100;
 
-                return (
-                  <button
-                    key={colorHex}
-                    onClick={() => handleColorLock(colorHex)}
-                    className={`w-full p-3 rounded-xl transition-all text-left ${
-                      isLocked
-                        ? "bg-amber-100 border-2 border-amber-400 shadow-md"
-                        : completed
-                          ? "bg-green-50 border-2 border-green-300"
-                          : "bg-gray-50 hover:bg-gray-100 border-2 border-transparent"
-                    }`}
-                  >
-                    <div className="flex items-center justify-between mb-2">
-                      <div className="flex items-center gap-3">
-                        <div
-                          className="w-10 h-10 rounded-full border-2 border-white shadow-sm flex items-center justify-center"
-                          style={{ backgroundColor: colorHex }}
-                        >
-                          {completed && (
-                            <span className="text-white text-lg">
-                              ✓
-                            </span>
-                          )}
-                        </div>
-                        <div>
-                          <div className="font-mono font-bold text-sm">
-                            {code}
+                  return (
+                    <button
+                      key={colorHex}
+                      onClick={() => handleColorLock(colorHex)}
+                      className={`w-full p-3 rounded-control transition-colors text-left border-2 focus-visible:outline-2 focus-visible:outline-moss focus-visible:outline-offset-2 ${
+                        isLocked
+                          ? "bg-honey-glow/40 border-honey"
+                          : completed
+                            ? "bg-paper-deep border-moss/40"
+                            : "bg-paper-bg border-edge-sand hover:bg-paper-deep"
+                      }`}
+                      aria-pressed={isLocked}
+                    >
+                      <div className="flex items-center justify-between mb-2">
+                        <div className="flex items-center gap-3 min-w-0">
+                          <div
+                            className="w-10 h-10 rounded-bead border border-edge-sand flex items-center justify-center shrink-0"
+                            style={{ backgroundColor: colorHex }}
+                            aria-hidden="true"
+                          >
+                            {completed && (
+                              <Check
+                                className="w-5 h-5"
+                                style={{
+                                  color: 'var(--bead-ink)',
+                                  filter: 'drop-shadow(0 0 2px var(--bead-paper-bg))',
+                                }}
+                                aria-hidden="true"
+                              />
+                            )}
                           </div>
-                          <div className="text-xs text-gray-600">
-                            {placed}/{total} 颗
+                          <div className="min-w-0">
+                            <div className="font-bold text-sm text-ink-warm" style={{ fontFamily: 'var(--font-num)' }}>
+                              {code}
+                            </div>
+                            <div className="text-xs text-ink-soft" style={{ fontFamily: 'var(--font-num)' }}>
+                              {placed}/{total} 颗
+                            </div>
                           </div>
                         </div>
+                        {isLocked && (
+                          <div className="text-ink-warm font-semibold text-xs shrink-0">
+                            锁定中
+                          </div>
+                        )}
                       </div>
-                      {isLocked && (
-                        <div className="text-amber-700 font-bold text-sm">
-                          锁定中
-                        </div>
-                      )}
-                    </div>
-                    {/* 进度条 */}
-                    <div className="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
-                      <div
-                        className={`h-full transition-all ${
-                          completed
-                            ? "bg-green-500"
-                            : "bg-purple-500"
-                        }`}
-                        style={{
-                          width: `${Math.min(progress, 100)}%`,
-                        }}
-                      />
-                    </div>
-                  </button>
-                );
-              })}
-          </div>
+                      {/* 进度条 */}
+                      <div className="w-full h-2 bg-paper-deep rounded-bead overflow-hidden">
+                        <div
+                          className={`h-full transition-all duration-300 rounded-bead ${
+                            completed ? "bg-moss" : "bg-terracotta"
+                          }`}
+                          style={{ width: `${Math.min(progress, 100)}%` }}
+                        />
+                      </div>
+                    </button>
+                  );
+                })}
+            </div>
 
-          {/* 总进度 */}
-          <div className="mt-6 pt-6 border-t">
-            <div className="text-sm text-gray-600 mb-2">
-              总进度
+            {/* 总进度 */}
+            <div className="mt-6 pt-6 border-t border-edge-sand">
+              <div className="text-sm text-ink-soft mb-2">总进度</div>
+              <div className="flex items-baseline justify-center gap-2 text-lg font-semibold mb-2 text-ink-warm" style={{ fontFamily: 'var(--font-num)' }}>
+                <span>{getTotalPlaced()}</span>
+                <span className="text-ink-soft">/</span>
+                <span>{getTotalRequired()}</span>
+              </div>
+              <div className="w-full h-3 bg-paper-deep rounded-bead overflow-hidden">
+                <div
+                  className="h-full bg-terracotta transition-all duration-300 rounded-bead"
+                  style={{
+                    width: `${getTotalRequired() > 0 ? (getTotalPlaced() / getTotalRequired()) * 100 : 0}%`,
+                  }}
+                />
+              </div>
             </div>
-            <div className="flex justify-between text-lg font-bold mb-2">
-              <span>{getTotalPlaced()}</span>
-              <span className="text-gray-400">/</span>
-              <span>{getTotalRequired()}</span>
-            </div>
-            <div className="w-full h-3 bg-gray-200 rounded-full overflow-hidden">
-              <div
-                className="h-full bg-gradient-to-r from-purple-500 to-pink-500 transition-all"
-                style={{
-                  width: `${getTotalRequired() > 0 ? (getTotalPlaced() / getTotalRequired()) * 100 : 0}%`,
-                }}
-              />
-            </div>
-          </div>
 
-          {/* 使用提示 */}
-          <div className="mt-6 p-4 bg-orange-50 rounded-xl border border-orange-200">
-            <p className="text-sm text-orange-800 font-semibold mb-2">
-              ⚡ 滑豆模式使用提示
-            </p>
-            <ul className="text-sm text-orange-700 space-y-1 pl-4">
-              <li>• 点击材料清单中的颜色可锁定该颜色</li>
-              <li>• 锁定后开启<span className="font-bold">滑豆模式</span>开关</li>
-              <li>• 鼠标滑过即上色，大面积填色超高效！</li>
-            </ul>
+            {/* 使用提示 — 跟 phase 3 GalleryView 同款 honey-glow tip */}
+            <div className="mt-6 p-4 bg-honey-glow/40 border border-honey/40 rounded-surface flex items-start gap-2.5">
+              <Zap className="w-4 h-4 text-ink-warm shrink-0 mt-0.5" aria-hidden="true" />
+              <div className="text-sm text-ink-warm leading-relaxed">
+                <p className="font-semibold mb-1.5">滑豆模式使用提示</p>
+                <ul className="space-y-1 text-ink-soft">
+                  <li>• 点击材料清单中的颜色可锁定该颜色</li>
+                  <li>• 锁定后开启 <span className="font-semibold text-ink-warm">滑豆模式</span> 开关</li>
+                  <li>• 鼠标滑过即上色，大面积填色超高效</li>
+                </ul>
+              </div>
+            </div>
           </div>
-        </div>
         )}
 
       </div>

@@ -55,6 +55,44 @@ npm run dev                # 看终端输出的本地端口（通常 5173）
 
 ## 2. 修改历史（按 commit 倒序）
 
+### 2026-05-05 移动端适配 阶段 4b：BeadCanvas 工具栏/侧边栏/色盘/材料清单 brand + 触摸
+
+继 4a 之后，把画布**周边的所有控件**带回品牌系。范围严格不含主画布本体（4c 圆格改造单独 shape）和触摸 UX 微调（4d）。
+
+**6 个 surface 全部清扫**：
+
+| Surface | 行号区段 | 关键改动 |
+|---|---|---|
+| 顶部工具栏 | L611-776 | tool selected `bg-purple-500` → `bg-moss text-paper-bg`；显示开关（grid/参考/材料）三种颜色（紫/蓝/绿）→ 统一 `bg-paper-deep text-moss border-moss`；缩放按钮加 `min-h/min-w-[44px]`；锁定徽章 `bg-amber-100` → `bg-honey-glow/40`；滑豆开关 `from-orange-500 to-red-500` → `bg-terracotta`；3 个右侧 CTA 区分语义（熨烫=terracotta 主，高清/下载=ghost） |
+| 手机底部栏 | L778-804 | 3 个橙红蓝紫渐变 → 一主两 ghost 同上 |
+| 手机折叠条 | L819-826 | `bg-white shadow` → `bg-paper-soft border-edge-sand`；加 `aria-expanded` |
+| 参考图卡 | L831-924 | 顶栏 `from-purple-600 to-pink-600` → `bg-paper-deep border-edge-sand text-moss`；锁定提示 amber → honey-glow；提示卡 `bg-purple-50 + 💡` → `bg-paper-deep + Lucide Zap`；关闭按钮 `EyeOff w-3` → `X w-4 + 36×36 触摸` |
+| 材料清单卡（pegboard 模式侧边栏） | L928-1037 | 顶栏 `from-green-600 to-emerald-600` → `bg-paper-deep border + Square text-moss`；卡片 `border-amber-400 bg-amber-50` → `border-honey bg-honey-glow/40`；进度条 `green-500` (完成) / `purple-500` (中) → `moss` / `terracotta`；总进度 `from-purple-500 to-pink-500` → `bg-terracotta` 实色 |
+| 色盘 | L1040-1094 | 容器 `bg-white shadow-xl` → `bg-paper-soft border-edge-sand`；锁定提示 `bg-amber-50` → `bg-honey-glow/40`；色卡 swatch 的 `boxShadow rgba(0,0,0,0.25)` 冷阴影 → 暖色 `rgba(58,52,42,0.2)` inset + `rgba(246,239,226,0.4)` paper inset 模拟塑料反光；选中环 `0 0 0 2px white` → `var(--bead-paper-bg)`；完成 ✓ 字色 `text-white` → `var(--bead-ink) + paper-bg textShadow` |
+| 简洁模式右侧材料单 | L1336-1440 | 同 pegboard 材料卡的所有改动；底部使用提示 `bg-orange-50 + ⚡` → `bg-honey-glow/40 + Lucide Zap`（与 phase 3 GalleryView tip 同款） |
+
+**统一规则**（横跨这 6 个 surface）：
+
+- **所有 "selected/active" state 一律 `bg-paper-deep + moss accent`**（替换原本的紫/蓝/绿/琥珀杂用）。**色彩词汇收敛是这次最大的一致性升级**——之前每个工具/状态有自己的颜色，认知噪音很大；现在 moss 是"功能性激活"的统一信号
+- **所有 "locked color" highlight = honey 系**（`bg-honey-glow/40 border-honey/40`）。原 amber/orange 在 brand 里最近的等价物，且 lock 是稀缺性强调 = 符合 honey rarity rule（≤5%）
+- **所有按钮 ≥44pt 触摸目标 + `focus-visible:outline-2 outline-moss`**（键盘可访问）
+- **进度条**：completed = `bg-moss`（成功），in-progress = `bg-terracotta`（活跃）。**不再是 4 种颜色**
+- **3 CTA 语义层级**：一键熨烫 = `bg-terracotta` 主（"完成动作"），高清渲染/下载 = `paper-bg ghost`（工具）。原本三个都霓虹渐变，互相抢戏
+- **shadow 全部去除**（DESIGN：flat by default），仅 CTA 和 toast 用 `--shadow-lift-bead` 暖阴影
+- **font-mono → var(--font-num)**（Nunito tabular），数字对齐美感
+
+**删除的 emoji**：💡 → Lucide Zap；⚡ → Lucide Zap；✓ 字符 → Lucide Check（材料卡内）
+
+**为什么色盘里 ✓ 没换 Lucide**：22×22px swatch 内塞 Lucide SVG 太大，保留 ✓ Unicode 字符但调整成 ink-warm + paper-bg textShadow，视觉融入更顺
+
+**为什么色盘 swatch 不强行 44pt**：色盘要展示 100+ 颗豆子；强 44pt 会变成 5 列网格，违反 PRODUCT.md "abundance, not clutter"。当前 22px 接近 24px 触摸下限，加 hover scale + active scale 反馈补偿；实际使用是"扫色"+"精确点"，不是错按敏感的关键操作
+
+**4c/4d 仍未做**：
+- **4c**：主画布区域（L1100-1330）+ 圆格改造（豆子格子方→圆，DESIGN doctrine）
+- **4d**：触摸 / pan / zoom / 双指缩放 UX 打磨
+
+修改文件：`src/components/BeadCanvas.tsx`、`PROGRESS.md`
+
 ### 2026-05-03 移动端适配 阶段 4a：BeadCanvas 6 个 modal + 庆祝 toast brand 清理
 
 阶段 4 拆 4 个子阶段（详见 brief 流），4a 仅清理 modal 视觉债：**6 个 dialog + 1 个 toast，全员违 brand**。
