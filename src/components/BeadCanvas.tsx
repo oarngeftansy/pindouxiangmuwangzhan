@@ -678,9 +678,13 @@ export function BeadCanvas({
             <GridIcon className="w-5 h-5" aria-hidden="true" />
           </button>
 
-          {/* 参考图纸显示 */}
+          {/* 参考图纸显示 — 手机端打开时同步展开 sidebar，否则用户看不见 */}
           <button
-            onClick={() => setShowReference(!showReference)}
+            onClick={() => {
+              const next = !showReference;
+              setShowReference(next);
+              if (next && isMobile) setSidebarCollapsed(false);
+            }}
             className={`inline-flex items-center min-h-[44px] gap-2 px-3 py-2 rounded-control border transition-colors focus-visible:outline-2 focus-visible:outline-moss focus-visible:outline-offset-2 ${
               showReference
                 ? "bg-paper-deep text-moss border-moss"
@@ -695,7 +699,11 @@ export function BeadCanvas({
           {/* 材料清单显示 - 只在拼豆板模式下显示 */}
           {viewMode === 'pegboard' && (
             <button
-              onClick={() => setShowMaterialList(!showMaterialList)}
+              onClick={() => {
+                const next = !showMaterialList;
+                setShowMaterialList(next);
+                if (next && isMobile) setSidebarCollapsed(false);
+              }}
               className={`inline-flex items-center min-h-[44px] gap-2 px-3 py-2 rounded-control border transition-colors focus-visible:outline-2 focus-visible:outline-moss focus-visible:outline-offset-2 ${
                 showMaterialList
                   ? "bg-paper-deep text-moss border-moss"
@@ -819,14 +827,24 @@ export function BeadCanvas({
             ? 'shrink-0'
             : 'w-[260px] lg:w-[320px] shrink-0 overflow-y-auto'
           }>
-          {/* 手机：折叠切换条 */}
+          {/* 手机：折叠切换条 — 展开时同步打开参考图和材料清单（否则只见色盘） */}
           {isMobile && (
             <button
-              onClick={() => setSidebarCollapsed(v => !v)}
+              onClick={() => {
+                setSidebarCollapsed(v => {
+                  const next = !v;
+                  if (!next) {
+                    // 即将展开：把参考图和材料清单都默认打开
+                    setShowReference(true);
+                    setShowMaterialList(true);
+                  }
+                  return next;
+                });
+              }}
               className="w-full flex items-center justify-between min-h-[44px] px-4 py-2 bg-paper-soft border border-edge-sand rounded-control text-sm font-semibold text-ink-warm mb-2 hover:bg-paper-deep transition-colors focus-visible:outline-2 focus-visible:outline-moss focus-visible:outline-offset-2"
               aria-expanded={!sidebarCollapsed}
             >
-              <span>{sidebarCollapsed ? '展开参考 / 颜色' : '收起'}</span>
+              <span>{sidebarCollapsed ? '展开参考 / 材料 / 颜色' : '收起'}</span>
               <span className="text-ink-soft text-xs" aria-hidden="true">{sidebarCollapsed ? '▼' : '▲'}</span>
             </button>
           )}
