@@ -33,6 +33,9 @@ import { PegboardCell } from "./PegboardCell";
 import { ViewModeToggle } from "./ViewModeToggle";
 import { loadCanvasParams, type CanvasParams } from "../data/canvasParams";
 
+// 暂时隐藏高清渲染入口；将来重启用时翻成 true，工具栏 / 手机底栏 / 完成 modal 三处会一起恢复。
+const SHOW_HD_RENDER = false;
+
 interface BeadCanvasProps {
   beadGrid: BeadGrid;
   setBeadGrid: (grid: BeadGrid) => void;
@@ -425,7 +428,8 @@ export function BeadCanvas({
   const handleZoomOut = () =>
     setZoom((prev) => Math.max(prev - 0.25, 0.5));
 
-  const downloadCanvas = () => {
+  // 把当前工作画布渲染成 PNG dataURL，下载和"加入作品馆"共用
+  const generateCanvasDataURL = (): string => {
     const canvas = document.createElement("canvas");
     const ctx = canvas.getContext("2d")!;
     const cellSize = 30;
@@ -459,11 +463,15 @@ export function BeadCanvas({
       });
     });
 
+    return canvas.toDataURL();
+  };
+
+  const downloadCanvas = () => {
     const link = document.createElement("a");
     const w = workingGrid[0]?.length ?? 0;
     const h = workingGrid.length;
     link.download = `拼豆图纸-${w}x${h}.png`;
-    link.href = canvas.toDataURL();
+    link.href = generateCanvasDataURL();
     link.click();
   };
 
@@ -808,14 +816,16 @@ export function BeadCanvas({
               <Flame className={`w-5 h-5 ${isIroning ? 'animate-pulse' : ''}`} aria-hidden="true" />
               <span className="hidden sm:inline">{isIroning ? '熨烫中…' : '一键熨烫'}</span>
             </button>
-            <button
-              onClick={() => setShowHDModal(true)}
-              className="inline-flex items-center gap-2 min-h-[44px] px-3 sm:px-5 py-2.5 bg-paper-bg border border-edge-sand text-ink-warm rounded-control hover:bg-paper-deep transition-colors font-semibold whitespace-nowrap focus-visible:outline-2 focus-visible:outline-moss focus-visible:outline-offset-2"
-              title="高清渲染"
-            >
-              <Sparkles className="w-5 h-5" aria-hidden="true" />
-              <span className="hidden sm:inline">高清渲染</span>
-            </button>
+            {SHOW_HD_RENDER && (
+              <button
+                onClick={() => setShowHDModal(true)}
+                className="inline-flex items-center gap-2 min-h-[44px] px-3 sm:px-5 py-2.5 bg-paper-bg border border-edge-sand text-ink-warm rounded-control hover:bg-paper-deep transition-colors font-semibold whitespace-nowrap focus-visible:outline-2 focus-visible:outline-moss focus-visible:outline-offset-2"
+                title="高清渲染"
+              >
+                <Sparkles className="w-5 h-5" aria-hidden="true" />
+                <span className="hidden sm:inline">高清渲染</span>
+              </button>
+            )}
             <button
               onClick={downloadCanvas}
               className="inline-flex items-center gap-2 min-h-[44px] px-3 sm:px-5 py-2.5 bg-paper-bg border border-edge-sand text-ink-warm rounded-control hover:bg-paper-deep transition-colors font-semibold whitespace-nowrap focus-visible:outline-2 focus-visible:outline-moss focus-visible:outline-offset-2"
@@ -840,13 +850,15 @@ export function BeadCanvas({
             <Flame className={`w-5 h-5 ${isIroning ? 'animate-pulse' : ''}`} aria-hidden="true" />
             {isIroning ? '熨烫中…' : '一键熨烫'}
           </button>
-          <button
-            onClick={() => setShowHDModal(true)}
-            className="flex-1 inline-flex items-center justify-center gap-2 min-h-[48px] py-3 bg-paper-soft border border-edge-sand text-ink-warm rounded-control font-semibold focus-visible:outline-2 focus-visible:outline-moss focus-visible:outline-offset-2"
-          >
-            <Sparkles className="w-5 h-5" aria-hidden="true" />
-            高清
-          </button>
+          {SHOW_HD_RENDER && (
+            <button
+              onClick={() => setShowHDModal(true)}
+              className="flex-1 inline-flex items-center justify-center gap-2 min-h-[48px] py-3 bg-paper-soft border border-edge-sand text-ink-warm rounded-control font-semibold focus-visible:outline-2 focus-visible:outline-moss focus-visible:outline-offset-2"
+            >
+              <Sparkles className="w-5 h-5" aria-hidden="true" />
+              高清
+            </button>
+          )}
           <button
             onClick={downloadCanvas}
             className="flex-1 inline-flex items-center justify-center gap-2 min-h-[48px] py-3 bg-paper-soft border border-edge-sand text-ink-warm rounded-control font-semibold focus-visible:outline-2 focus-visible:outline-moss focus-visible:outline-offset-2"
@@ -906,7 +918,7 @@ export function BeadCanvas({
               className="w-full flex items-center justify-between min-h-[44px] px-4 py-2 bg-paper-soft border border-edge-sand rounded-control text-sm font-semibold text-ink-warm mb-2 hover:bg-paper-deep transition-colors focus-visible:outline-2 focus-visible:outline-moss focus-visible:outline-offset-2"
               aria-expanded={!sidebarCollapsed}
             >
-              <span>{sidebarCollapsed ? '展开参考 / 材料 / 颜色' : '收起'}</span>
+              <span>{sidebarCollapsed ? '展开参考 / 材料' : '收起'}</span>
               <span className="text-ink-soft text-xs" aria-hidden="true">{sidebarCollapsed ? '▼' : '▲'}</span>
             </button>
           )}
@@ -1258,9 +1270,11 @@ export function BeadCanvas({
                 <div
                   className="rounded-control relative"
                   style={{
-                    // 物理拼豆板：暖纸纹质感（取代冷灰板）
-                    backgroundColor: 'var(--bead-paper-soft)',
-                    boxShadow: 'inset 0 2px 8px rgba(58, 52, 42, 0.10), 0 4px 16px rgba(168, 130, 90, 0.18)',
+                    // 物理拼豆板：高明度、低饱和的近白板
+                    // 之前 var(--bead-paper-soft) (oklch 0.95 0.022 84) 视感偏奶黄；
+                    // 现在 oklch(0.985 0.006 80) 几乎纯白带极淡暖意，更像真实塑料板
+                    backgroundColor: 'oklch(0.985 0.006 80)',
+                    boxShadow: 'inset 0 2px 8px rgba(58, 52, 42, 0.08), 0 4px 16px rgba(168, 130, 90, 0.18)',
                     padding: '16px',
                     border: '6px solid var(--bead-edge)',
                   }}
@@ -1601,22 +1615,21 @@ export function BeadCanvas({
             </p>
 
             <div className="flex flex-col sm:flex-row gap-3 mb-4">
+              {SHOW_HD_RENDER && (
+                <button
+                  onClick={renderHighResolution}
+                  disabled={isRendering}
+                  className="flex-1 inline-flex items-center justify-center gap-2 min-h-[48px] px-4 py-3 bg-paper-bg border border-edge-sand text-ink-warm rounded-control font-semibold hover:bg-paper-deep transition-colors disabled:opacity-50 disabled:cursor-not-allowed focus-visible:outline-2 focus-visible:outline-moss focus-visible:outline-offset-2"
+                >
+                  {isRendering ? (
+                    <><Sparkles className="w-5 h-5 animate-spin" aria-hidden="true" />渲染中…</>
+                  ) : (
+                    <><Sparkles className="w-5 h-5" aria-hidden="true" />导出高清</>
+                  )}
+                </button>
+              )}
               <button
-                onClick={renderHighResolution}
-                disabled={isRendering}
-                className="flex-1 inline-flex items-center justify-center gap-2 min-h-[48px] px-4 py-3 bg-paper-bg border border-edge-sand text-ink-warm rounded-control font-semibold hover:bg-paper-deep transition-colors disabled:opacity-50 disabled:cursor-not-allowed focus-visible:outline-2 focus-visible:outline-moss focus-visible:outline-offset-2"
-              >
-                {isRendering ? (
-                  <><Sparkles className="w-5 h-5 animate-spin" aria-hidden="true" />渲染中…</>
-                ) : (
-                  <><Sparkles className="w-5 h-5" aria-hidden="true" />导出高清</>
-                )}
-              </button>
-              <button
-                onClick={() => {
-                  setShowCompletionModal(false);
-                  setShowHDModal(true);
-                }}
+                onClick={() => handleAddToGallery(generateCanvasDataURL())}
                 disabled={savedToGallery}
                 className="flex-1 inline-flex items-center justify-center gap-2 min-h-[48px] px-4 py-3 bg-paper-bg border border-edge-sand text-ink-warm rounded-control font-semibold hover:bg-paper-deep transition-colors disabled:opacity-50 disabled:cursor-not-allowed focus-visible:outline-2 focus-visible:outline-moss focus-visible:outline-offset-2"
               >
