@@ -388,9 +388,9 @@ export function PatternImportTool() {
     : [];
 
   return (
-    <div className="min-h-screen bg-[#f3f1ec]">
+    <div className="min-h-screen bg-paper-bg">
       {/* Header */}
-      <header className="bg-[#1f5c57] text-white px-6 py-4">
+      <header className="bg-moss text-white px-6 py-4">
         <div className="max-w-5xl mx-auto flex items-center gap-3">
           <div className="w-8 h-8 bg-white/20 rounded flex items-center justify-center text-sm font-bold">
             DEV
@@ -405,17 +405,17 @@ export function PatternImportTool() {
       <div className="max-w-5xl mx-auto px-4 py-6 space-y-6">
 
         {/* 已入库图纸列表 */}
-        <section className="bg-white rounded-xl border border-[#d7d1c3] p-5">
-          <h2 className="font-semibold text-[#1f2937] mb-4 flex items-center gap-2">
-            <span className="w-6 h-6 bg-[#1f5c57] text-white rounded-full text-xs flex items-center justify-center">{savedPatterns.length}</span>
+        <section className="bg-white rounded-xl border border-edge-sand p-5">
+          <h2 className="font-semibold text-ink-warm mb-4 flex items-center gap-2">
+            <span className="w-6 h-6 bg-moss text-white rounded-full text-xs flex items-center justify-center">{savedPatterns.length}</span>
             已入库图纸
           </h2>
           {savedPatterns.length === 0 ? (
-            <p className="text-sm text-[#9ca3af] text-center py-4">还没有入库的图纸，上传图片并转换后点击"入库"</p>
+            <p className="text-sm text-ink-soft text-center py-4">还没有入库的图纸，上传图片并转换后点击"入库"</p>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
               {savedPatterns.map(p => (
-                <div key={p.id} className="bg-[#f3f1ec] rounded-lg p-3">
+                <div key={p.id} className="bg-paper-bg rounded-lg p-3">
                   {/* 缩略图 */}
                   <div className="flex items-center justify-center bg-white rounded-lg p-2 mb-2 h-[80px] overflow-hidden">
                     {p.previewImage ? (
@@ -433,17 +433,17 @@ export function PatternImportTool() {
                       if (val && val !== p.name) handleRename(p.id, val);
                     }}
                     onKeyDown={e => { if (e.key === 'Enter') (e.target as HTMLInputElement).blur(); }}
-                    className="w-full text-sm font-medium text-[#1f2937] bg-transparent border-b border-transparent hover:border-[#d7d1c3] focus:border-[#1f5c57] focus:outline-none px-0.5 py-0.5 mb-1"
+                    className="w-full text-sm font-medium text-ink-warm bg-transparent border-b border-transparent hover:border-edge-sand focus:border-moss focus:outline-none px-0.5 py-0.5 mb-1"
                   />
                   {/* 信息 */}
-                  <p className="text-xs text-[#9ca3af] mb-2">
+                  <p className="text-xs text-ink-soft mb-2">
                     {p.gridWidth}x{p.gridHeight} · {p.beadCount}颗 · {p.colorCount}色
                     {p.tags.length > 0 && ` · ${p.tags.join(', ')}`}
                   </p>
                   {/* 删除 */}
                   <button
                     onClick={() => handleDelete(p.id)}
-                    className="text-xs text-red-400 hover:text-red-600 hover:bg-red-50 px-2 py-1 rounded transition-colors"
+                    className="text-xs text-ink-soft hover:text-alert-rose hover:bg-alert-rose/10 px-2 py-1 rounded-control transition-colors"
                   >
                     删除
                   </button>
@@ -454,17 +454,17 @@ export function PatternImportTool() {
         </section>
 
         {/* 已入库盲盒列表 */}
-        <section className="bg-white rounded-xl border border-[#6366f1]/30 p-5">
-          <h2 className="font-semibold text-[#1f2937] mb-4 flex items-center gap-2">
-            <span className="w-6 h-6 bg-[#6366f1] text-white rounded-full text-xs flex items-center justify-center">{savedBlindBox.length}</span>
+        <section className="bg-white rounded-xl border border-edge-sand p-5">
+          <h2 className="font-semibold text-ink-warm mb-4 flex items-center gap-2">
+            <span className="w-6 h-6 bg-terracotta text-white rounded-full text-xs flex items-center justify-center">{savedBlindBox.length}</span>
             已入库盲盒
           </h2>
           {savedBlindBox.length === 0 ? (
-            <p className="text-sm text-[#9ca3af] text-center py-4">还没有入库的盲盒图案，转换后点击"盲盒入库"</p>
+            <p className="text-sm text-ink-soft text-center py-4">还没有入库的盲盒图案，转换后点击"盲盒入库"</p>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
               {savedBlindBox.map(p => (
-                <div key={p.id} className="bg-[#f0f0ff] rounded-lg p-3">
+                <div key={p.id} className="bg-paper-bg rounded-lg p-3">
                   <div className="flex items-center justify-center bg-white rounded-lg p-2 mb-2 h-[80px] overflow-hidden">
                     {p.previewUrl ? (
                       <img src={p.previewUrl} alt={p.name} className="max-h-[72px] max-w-full object-contain" />
@@ -480,12 +480,12 @@ export function PatternImportTool() {
                       if (val && val !== p.name) handleRenameBlindBox(p.id, val);
                     }}
                     onKeyDown={e => { if (e.key === 'Enter') (e.target as HTMLInputElement).blur(); }}
-                    className="w-full text-sm font-medium text-[#1f2937] bg-transparent border-b border-transparent hover:border-[#d7d1c3] focus:border-[#6366f1] focus:outline-none px-0.5 py-0.5 mb-1"
+                    className="w-full text-sm font-medium text-ink-warm bg-transparent border-b border-transparent hover:border-edge-sand focus:border-moss focus:outline-none px-0.5 py-0.5 mb-1"
                   />
-                  <p className="text-xs text-[#9ca3af] mb-2">{p.description}</p>
+                  <p className="text-xs text-ink-soft mb-2">{p.description}</p>
                   <button
                     onClick={() => handleDeleteBlindBox(p.id)}
-                    className="text-xs text-red-400 hover:text-red-600 hover:bg-red-50 px-2 py-1 rounded transition-colors"
+                    className="text-xs text-ink-soft hover:text-alert-rose hover:bg-alert-rose/10 px-2 py-1 rounded-control transition-colors"
                   >
                     删除
                   </button>
@@ -496,14 +496,14 @@ export function PatternImportTool() {
         </section>
 
         {/* Step 1: 上传图片 */}
-        <section className="bg-white rounded-xl border border-[#d7d1c3] p-5">
-          <h2 className="font-semibold text-[#1f2937] mb-4 flex items-center gap-2">
-            <span className="w-6 h-6 bg-[#1f5c57] text-white rounded-full text-xs flex items-center justify-center">1</span>
+        <section className="bg-white rounded-xl border border-edge-sand p-5">
+          <h2 className="font-semibold text-ink-warm mb-4 flex items-center gap-2">
+            <span className="w-6 h-6 bg-moss text-white rounded-full text-xs flex items-center justify-center">1</span>
             上传图片
           </h2>
 
           <div
-            className="border-2 border-dashed border-[#d7d1c3] rounded-lg p-8 text-center cursor-pointer hover:border-[#1f5c57] hover:bg-[#f3f1ec] transition-colors"
+            className="border-2 border-dashed border-edge-sand rounded-control p-8 text-center cursor-pointer hover:border-moss hover:bg-paper-deep transition-colors"
             onClick={() => fileInputRef.current?.click()}
           >
             {imageSrc ? (
@@ -511,8 +511,8 @@ export function PatternImportTool() {
             ) : (
               <div className="space-y-2">
                 <div className="text-4xl">📎</div>
-                <p className="text-[#5b6470]">点击上传图片</p>
-                <p className="text-xs text-[#9ca3af]">支持 JPG / PNG / WEBP</p>
+                <p className="text-ink-soft">点击上传图片</p>
+                <p className="text-xs text-ink-soft">支持 JPG / PNG / WEBP</p>
               </div>
             )}
           </div>
@@ -525,7 +525,7 @@ export function PatternImportTool() {
           />
           {imageSrc && (
             <button
-              className="mt-2 text-xs text-[#9ca3af] hover:text-[#5b6470]"
+              className="mt-2 text-xs text-ink-soft hover:text-ink-soft"
               onClick={() => fileInputRef.current?.click()}
             >
               重新上传
@@ -534,38 +534,38 @@ export function PatternImportTool() {
         </section>
 
         {/* Step 2: 元数据 + 转换参数 */}
-        <section className="bg-white rounded-xl border border-[#d7d1c3] p-5">
-          <h2 className="font-semibold text-[#1f2937] mb-4 flex items-center gap-2">
-            <span className="w-6 h-6 bg-[#1f5c57] text-white rounded-full text-xs flex items-center justify-center">2</span>
+        <section className="bg-white rounded-xl border border-edge-sand p-5">
+          <h2 className="font-semibold text-ink-warm mb-4 flex items-center gap-2">
+            <span className="w-6 h-6 bg-moss text-white rounded-full text-xs flex items-center justify-center">2</span>
             填写元数据 & 转换参数
           </h2>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {/* 图纸名称 */}
             <div>
-              <label className="block text-sm font-medium text-[#374151] mb-1">图纸名称</label>
+              <label className="block text-sm font-medium text-ink-warm mb-1">图纸名称</label>
               <input
                 type="text"
                 value={patternName}
                 onChange={e => setPatternName(e.target.value)}
                 placeholder="如：苹果图案"
-                className="w-full px-3 py-2 border border-[#d7d1c3] rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#1f5c57]"
+                className="w-full px-3 py-2 border border-edge-sand rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-moss"
               />
             </div>
 
             {/* ID */}
             <div>
-              <label className="block text-sm font-medium text-[#374151] mb-1">图纸 ID</label>
+              <label className="block text-sm font-medium text-ink-warm mb-1">图纸 ID</label>
               <div className="flex gap-2">
                 <input
                   type="text"
                   value={patternId}
                   onChange={e => setPatternId(e.target.value)}
-                  className="flex-1 px-3 py-2 border border-[#d7d1c3] rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#1f5c57] font-mono"
+                  className="flex-1 px-3 py-2 border border-edge-sand rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-moss font-mono"
                 />
                 <button
                   onClick={() => setPatternId(`pattern_${Date.now()}`)}
-                  className="px-3 py-2 bg-[#f3f1ec] border border-[#d7d1c3] rounded-lg text-xs hover:bg-[#e8e5de]"
+                  className="px-3 py-2 bg-paper-bg border border-edge-sand rounded-lg text-xs hover:bg-paper-deep"
                   title="重新生成 ID"
                 >
                   刷新
@@ -575,39 +575,39 @@ export function PatternImportTool() {
 
             {/* 网格尺寸 */}
             <div>
-              <label className="block text-sm font-medium text-[#374151] mb-1">网格尺寸</label>
+              <label className="block text-sm font-medium text-ink-warm mb-1">网格尺寸</label>
               <div className="flex items-center gap-2">
                 <input
                   type="number"
                   value={gridWidth}
                   onChange={e => setGridWidth(Math.max(1, parseInt(e.target.value) || 1))}
-                  className="w-20 px-3 py-2 border border-[#d7d1c3] rounded-lg text-sm text-center focus:outline-none focus:ring-2 focus:ring-[#1f5c57]"
+                  className="w-20 px-3 py-2 border border-edge-sand rounded-lg text-sm text-center focus:outline-none focus:ring-2 focus:ring-moss"
                 />
-                <span className="text-[#5b6470]">x</span>
+                <span className="text-ink-soft">x</span>
                 <input
                   type="number"
                   value={gridHeight}
                   onChange={e => setGridHeight(Math.max(1, parseInt(e.target.value) || 1))}
-                  className="w-20 px-3 py-2 border border-[#d7d1c3] rounded-lg text-sm text-center focus:outline-none focus:ring-2 focus:ring-[#1f5c57]"
+                  className="w-20 px-3 py-2 border border-edge-sand rounded-lg text-sm text-center focus:outline-none focus:ring-2 focus:ring-moss"
                 />
-                <span className="text-xs text-[#9ca3af]">（宽 x 高）</span>
+                <span className="text-xs text-ink-soft">（宽 x 高）</span>
               </div>
             </div>
 
             {/* 最大颜色数 */}
             <div>
-              <label className="block text-sm font-medium text-[#374151] mb-1">最大颜色数</label>
+              <label className="block text-sm font-medium text-ink-warm mb-1">最大颜色数</label>
               <input
                 type="number"
                 value={maxColors}
                 onChange={e => setMaxColors(Math.max(1, parseInt(e.target.value) || 1))}
-                className="w-20 px-3 py-2 border border-[#d7d1c3] rounded-lg text-sm text-center focus:outline-none focus:ring-2 focus:ring-[#1f5c57]"
+                className="w-20 px-3 py-2 border border-edge-sand rounded-lg text-sm text-center focus:outline-none focus:ring-2 focus:ring-moss"
               />
             </div>
 
             {/* 颜色合并阈值 */}
             <div>
-              <label className="block text-sm font-medium text-[#374151] mb-1">
+              <label className="block text-sm font-medium text-ink-warm mb-1">
                 颜色合并阈值 ({colorMergeThreshold})
               </label>
               <input
@@ -618,7 +618,7 @@ export function PatternImportTool() {
                 onChange={e => setColorMergeThreshold(parseInt(e.target.value))}
                 className="w-full"
               />
-              <div className="flex justify-between text-xs text-[#9ca3af] mt-1">
+              <div className="flex justify-between text-xs text-ink-soft mt-1">
                 <span>精细</span>
                 <span>简化</span>
               </div>
@@ -626,7 +626,7 @@ export function PatternImportTool() {
 
             {/* 难度 */}
             <div>
-              <label className="block text-sm font-medium text-[#374151] mb-1">难度</label>
+              <label className="block text-sm font-medium text-ink-warm mb-1">难度</label>
               <div className="flex gap-2">
                 {(['easy', 'medium', 'hard'] as const).map(d => (
                   <button
@@ -634,8 +634,8 @@ export function PatternImportTool() {
                     onClick={() => setDifficulty(d)}
                     className={`px-4 py-2 rounded-lg text-sm border transition-colors ${
                       difficulty === d
-                        ? 'bg-[#1f5c57] text-white border-[#1f5c57]'
-                        : 'bg-white text-[#374151] border-[#d7d1c3] hover:bg-[#f3f1ec]'
+                        ? 'bg-moss text-white border-moss'
+                        : 'bg-white text-ink-warm border-edge-sand hover:bg-paper-bg'
                     }`}
                   >
                     {DIFFICULTY_LABELS[d]}
@@ -646,7 +646,7 @@ export function PatternImportTool() {
 
             {/* 标签 */}
             <div className="sm:col-span-2">
-              <label className="block text-sm font-medium text-[#374151] mb-2">标签</label>
+              <label className="block text-sm font-medium text-ink-warm mb-2">标签</label>
               <div className="flex flex-wrap gap-2">
                 {PRESET_TAGS.map(tag => (
                   <button
@@ -654,8 +654,8 @@ export function PatternImportTool() {
                     onClick={() => toggleTag(tag)}
                     className={`px-3 py-1 rounded-full text-sm border transition-colors ${
                       selectedTags.includes(tag)
-                        ? 'bg-[#1f5c57] text-white border-[#1f5c57]'
-                        : 'bg-white text-[#374151] border-[#d7d1c3] hover:bg-[#f3f1ec]'
+                        ? 'bg-moss text-white border-moss'
+                        : 'bg-white text-ink-warm border-edge-sand hover:bg-paper-bg'
                     }`}
                   >
                     {tag}
@@ -670,8 +670,8 @@ export function PatternImportTool() {
             disabled={!loadedImage || isParsing}
             className={`mt-5 px-6 py-3 rounded-lg font-medium text-white transition-colors ${
               !loadedImage || isParsing
-                ? 'bg-[#9ca3af] cursor-not-allowed'
-                : 'bg-[#1f5c57] hover:bg-[#174d49]'
+                ? 'bg-bead-shadow cursor-not-allowed'
+                : 'bg-moss hover:bg-moss-deep'
             }`}
           >
             {isParsing ? '转换中...' : '开始转换'}
@@ -680,36 +680,36 @@ export function PatternImportTool() {
 
         {/* Step 3: 预览 */}
         {parsedGrid && (
-          <section className="bg-white rounded-xl border border-[#d7d1c3] p-5">
-            <h2 className="font-semibold text-[#1f2937] mb-4 flex items-center gap-2">
-              <span className="w-6 h-6 bg-[#1f5c57] text-white rounded-full text-xs flex items-center justify-center">3</span>
+          <section className="bg-white rounded-xl border border-edge-sand p-5">
+            <h2 className="font-semibold text-ink-warm mb-4 flex items-center gap-2">
+              <span className="w-6 h-6 bg-moss text-white rounded-full text-xs flex items-center justify-center">3</span>
               转换预览
             </h2>
 
             {/* 统计信息 */}
             <div className="flex flex-wrap gap-4 mb-4 text-sm">
-              <div className="bg-[#f3f1ec] rounded-lg px-4 py-2">
-                <span className="text-[#5b6470]">颜色数</span>
-                <span className="ml-2 font-semibold text-[#1f2937]">{colorCount}</span>
+              <div className="bg-paper-bg rounded-lg px-4 py-2">
+                <span className="text-ink-soft">颜色数</span>
+                <span className="ml-2 font-semibold text-ink-warm">{colorCount}</span>
               </div>
-              <div className="bg-[#f3f1ec] rounded-lg px-4 py-2">
-                <span className="text-[#5b6470]">豆子数</span>
-                <span className="ml-2 font-semibold text-[#1f2937]">{beadCount}</span>
+              <div className="bg-paper-bg rounded-lg px-4 py-2">
+                <span className="text-ink-soft">豆子数</span>
+                <span className="ml-2 font-semibold text-ink-warm">{beadCount}</span>
               </div>
-              <div className="bg-[#f3f1ec] rounded-lg px-4 py-2">
-                <span className="text-[#5b6470]">尺寸</span>
-                <span className="ml-2 font-semibold text-[#1f2937]">{gridWidth} x {gridHeight}</span>
+              <div className="bg-paper-bg rounded-lg px-4 py-2">
+                <span className="text-ink-soft">尺寸</span>
+                <span className="ml-2 font-semibold text-ink-warm">{gridWidth} x {gridHeight}</span>
               </div>
             </div>
 
             {/* 左右对比 */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
               <div>
-                <p className="text-sm font-medium text-[#374151] mb-2">原始图片</p>
-                <img src={imageSrc!} alt="original" className="max-w-full max-h-80 object-contain rounded border border-[#d7d1c3]" />
+                <p className="text-sm font-medium text-ink-warm mb-2">原始图片</p>
+                <img src={imageSrc!} alt="original" className="max-w-full max-h-80 object-contain rounded border border-edge-sand" />
               </div>
               <div>
-                <p className="text-sm font-medium text-[#374151] mb-2">拼豆网格预览</p>
+                <p className="text-sm font-medium text-ink-warm mb-2">拼豆网格预览</p>
                 <div className="overflow-auto max-h-80">
                   <MiniBeadGrid grid={parsedGrid} maxSize={320} />
                 </div>
@@ -719,14 +719,14 @@ export function PatternImportTool() {
             {/* 主要颜色列表 */}
             {colorStats.length > 0 && (
               <div className="mt-4">
-                <p className="text-sm font-medium text-[#374151] mb-2">使用最多的颜色（Top 10）</p>
+                <p className="text-sm font-medium text-ink-warm mb-2">使用最多的颜色（Top 10）</p>
                 <div className="flex flex-wrap gap-2">
                   {colorStats.map(({ hex, count, name, mard }) => (
-                    <div key={hex} className="flex items-center gap-1.5 bg-[#f3f1ec] rounded-lg px-3 py-1.5 text-xs">
-                      <div className="w-4 h-4 rounded-full border border-[#d7d1c3]" style={{ background: hex }} />
-                      <span className="text-[#374151]">{name}</span>
-                      {mard && <span className="text-[#9ca3af]">#{mard}</span>}
-                      <span className="text-[#5b6470]">x{count}</span>
+                    <div key={hex} className="flex items-center gap-1.5 bg-paper-bg rounded-lg px-3 py-1.5 text-xs">
+                      <div className="w-4 h-4 rounded-full border border-edge-sand" style={{ background: hex }} />
+                      <span className="text-ink-warm">{name}</span>
+                      {mard && <span className="text-ink-soft">#{mard}</span>}
+                      <span className="text-ink-soft">x{count}</span>
                     </div>
                   ))}
                 </div>
@@ -737,15 +737,15 @@ export function PatternImportTool() {
 
         {/* Step 4: 生成代码 */}
         {parsedGrid && (
-          <section className="bg-white rounded-xl border border-[#d7d1c3] p-5">
-            <h2 className="font-semibold text-[#1f2937] mb-4 flex items-center gap-2">
-              <span className="w-6 h-6 bg-[#1f5c57] text-white rounded-full text-xs flex items-center justify-center">4</span>
+          <section className="bg-white rounded-xl border border-edge-sand p-5">
+            <h2 className="font-semibold text-ink-warm mb-4 flex items-center gap-2">
+              <span className="w-6 h-6 bg-moss text-white rounded-full text-xs flex items-center justify-center">4</span>
               生成代码
             </h2>
 
             <button
               onClick={handleGenerateCode}
-              className="px-6 py-3 bg-[#1f5c57] text-white rounded-lg hover:bg-[#174d49] font-medium transition-colors"
+              className="px-6 py-3 bg-moss text-white rounded-lg hover:bg-moss-deep font-medium transition-colors"
             >
               生成 JSON 片段
             </button>
@@ -753,14 +753,14 @@ export function PatternImportTool() {
             {generatedCode && (
               <div className="mt-4">
                 <div className="flex items-center justify-between mb-2">
-                  <p className="text-sm text-[#5b6470]">JSON 预览</p>
+                  <p className="text-sm text-ink-soft">JSON 预览</p>
                   <div className="flex gap-2">
                     <button
                       onClick={handleCopy}
                       className={`px-4 py-1.5 rounded-lg text-sm font-medium transition-colors ${
                         copied
-                          ? 'bg-green-500 text-white'
-                          : 'bg-[#f3f1ec] text-[#374151] hover:bg-[#e8e5de]'
+                          ? 'bg-moss text-paper-bg'
+                          : 'bg-paper-bg text-ink-warm hover:bg-paper-deep'
                       }`}
                     >
                       {copied ? '已复制' : '复制'}
@@ -769,8 +769,8 @@ export function PatternImportTool() {
                       onClick={handleSave}
                       className={`px-4 py-1.5 rounded-lg text-sm font-medium transition-colors ${
                         saved
-                          ? 'bg-green-500 text-white'
-                          : 'bg-[#1f5c57] text-white hover:bg-[#174d49]'
+                          ? 'bg-moss text-paper-bg'
+                          : 'bg-moss text-white hover:bg-moss-deep'
                       }`}
                     >
                       {saved ? '已入库' : '网红图纸入库'}
@@ -779,15 +779,15 @@ export function PatternImportTool() {
                       onClick={handleSaveBlindBox}
                       className={`px-4 py-1.5 rounded-lg text-sm font-medium transition-colors ${
                         blindBoxSaved
-                          ? 'bg-green-500 text-white'
-                          : 'bg-[#6366f1] text-white hover:bg-[#4f46e5]'
+                          ? 'bg-moss text-paper-bg'
+                          : 'bg-terracotta text-white hover:bg-terracotta-deep'
                       }`}
                     >
                       {blindBoxSaved ? '已入库' : '盲盒入库'}
                     </button>
                   </div>
                 </div>
-                <pre className="text-xs bg-[#1f2937] text-[#d1fae5] rounded-lg p-4 overflow-auto max-h-96 leading-relaxed">
+                <pre className="text-xs bg-ink-warm text-paper-bg rounded-control p-4 overflow-auto max-h-96 leading-relaxed">
                   {generatedCode}
                 </pre>
               </div>
