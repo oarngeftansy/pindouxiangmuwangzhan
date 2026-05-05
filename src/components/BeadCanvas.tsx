@@ -990,13 +990,21 @@ export function BeadCanvas({
             </button>
           )}
           <div className={`space-y-3 ${isMobile && sidebarCollapsed ? 'hidden' : ''}`}>
-            {/* 参考图纸 — 置顶时 sticky 到视口顶部，滚动画布也能看见 */}
+            {/* 参考图纸 — 置顶时强制 fixed 到视口左上角（sticky 受 containing block
+                限制只在 sidebar 内"贴"，滚到 canvas 就消失；fixed 不受影响）*/}
             {showReference && (
           <div
-            className={`bg-paper-soft border border-edge-sand rounded-card overflow-hidden ${
-              referencePinned ? 'sticky top-2 z-30' : ''
-            }`}
-            style={referencePinned ? { boxShadow: 'var(--shadow-lift-card)' } : undefined}
+            className="bg-paper-soft border border-edge-sand rounded-card overflow-hidden"
+            style={referencePinned ? {
+              position: 'fixed',
+              top: '8px',
+              left: '8px',
+              right: '8px',
+              zIndex: 40,
+              maxHeight: '50vh',
+              overflowY: 'auto',
+              boxShadow: 'var(--shadow-lift-card)',
+            } : undefined}
           >
             {/* 顶部标题栏 */}
             <div className="bg-paper-deep border-b border-edge-sand text-ink-warm px-4 py-2.5 flex items-center justify-between">
