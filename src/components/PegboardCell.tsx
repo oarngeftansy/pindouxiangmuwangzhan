@@ -54,14 +54,18 @@ export function PegboardCell({
       <div
         key={`cell-${x}-${y}`}
         className={`flex items-center justify-center relative ${
-          shouldHighlight ? "ring-2 ring-amber-400" : ""
-        } ${canPlace ? "cursor-pointer hover:bg-gray-100" : "cursor-not-allowed"}`}
+          shouldHighlight ? "ring-2 ring-honey" : ""
+        } ${canPlace ? "cursor-pointer hover:bg-paper-deep" : "cursor-not-allowed"}`}
         style={{
           width: beadSize,
           height: beadSize,
-          backgroundColor:
-            shouldHighlight && isEmpty ? "#E5E7EB" : color || "#FAFAFA",
-          border: showGrid ? `1px solid rgba(156,163,175,${borderAlpha})` : '1px solid transparent',
+          backgroundColor: shouldHighlight && isEmpty
+            ? 'var(--bead-honey-glow)'
+            : color || 'var(--bead-paper-bg)',
+          // 网格线用暖墨色（替代冷灰），延续 paper 触感
+          border: showGrid
+            ? `1px solid rgba(58, 52, 42, ${borderAlpha})`
+            : '1px solid transparent',
         }}
         onMouseDown={onMouseDown}
         onMouseEnter={onMouseEnter}
@@ -73,12 +77,13 @@ export function PegboardCell({
               inset: `${inset}px`,
               borderRadius: `${borderRadius}%`,
               backgroundColor: color,
+              // 模拟塑料反光的内阴影 — 这里是物理材质渲染，保留 rgba(0,0,0)
               boxShadow: `inset 0 1px ${shadowBlur}px rgba(0,0,0,${shadowAlpha})`,
             }}
           />
         )}
         {shouldHighlight && isEmpty && beadSize > 15 && (
-          <span className="text-gray-400 text-xs select-none">+</span>
+          <span className="text-ink-soft text-xs select-none" aria-hidden="true">+</span>
         )}
       </div>
     );
@@ -87,10 +92,10 @@ export function PegboardCell({
   // ─�� 拼豆板模式 ────────────────────────────────────────
   const pp = canvasParams?.pegboard;
 
-  // 钉子
+  // 钉子 — 默认色暖化（边沙偏奶油），用户可通过 ironing-dev 工具页继续微调
   const pegRadiusRatio = pp?.pegRadiusRatio ?? 0.15;
-  const pegLight = pp?.pegLightColor ?? "#d4d4d4";
-  const pegDark = pp?.pegDarkColor ?? "#a3a3a3";
+  const pegLight = pp?.pegLightColor ?? "#e6dfce"; // ≈ paper-deep
+  const pegDark = pp?.pegDarkColor ?? "#c5bcae";   // ≈ bead-shadow
   const pegShadowAlpha = pp?.pegShadowAlpha ?? 0.25;
   const pegRadius = beadSize * pegRadiusRatio;
 
@@ -152,7 +157,7 @@ export function PegboardCell({
 
   // 高亮
   const hbWidth = pp?.highlightBorderWidth ?? 2.5;
-  const hbColor = pp?.highlightBorderColor ?? "#F59E0B";
+  const hbColor = pp?.highlightBorderColor ?? "#e9b347"; // honey 替代 amber
   const hfAlpha = pp?.highlightFillAlpha ?? 0.25;
   const hgAlpha = pp?.highlightGlowAlpha ?? 0.4;
 
@@ -272,7 +277,7 @@ export function PegboardCell({
         </>
       )}
 
-      {/* 高亮提示 - 待放豆位置 */}
+      {/* 高亮提示 - 待放豆位置 — amber rgba(251,191,36) → honey rgba(233,179,71) */}
       {shouldHighlight && isEmpty && (
         <div
           className="absolute"
@@ -281,8 +286,8 @@ export function PegboardCell({
             height: beadH - beadGap,
             borderRadius: `${beadBorderRadius}%`,
             border: `${hbWidth}px dashed ${hbColor}`,
-            backgroundColor: `rgba(251, 191, 36, ${hfAlpha})`,
-            boxShadow: `0 0 6px rgba(251, 191, 36, ${hgAlpha})`,
+            backgroundColor: `rgba(233, 179, 71, ${hfAlpha})`,
+            boxShadow: `0 0 6px rgba(233, 179, 71, ${hgAlpha})`,
           }}
         />
       )}
