@@ -5,6 +5,67 @@
 
 ---
 
+## 📰 早上看这段（2026-05-05 夜间自动工作总结）
+
+如果你是用户，这一节是夜里那段时间 Claude 自动干完的事，按"先做了什么 → 怎么测 → 没做什么 → 下一步"的顺序写。
+
+### 夜里自动 push 的 commit（按时间倒序）
+
+| commit | 范围 | 净 LOC |
+|---|---|---|
+| `ffa98b7` chore(brand): sweep PatternImportTool dev page | dev.html 用的导入工具页 brand 跟新 | ±0 |
+| `e586c84` feat(brand): finish BeadCanvas main canvas + ViewModeToggle + ImageUploader inner modals | 主画布外框 + 视图切换 + 上传配置 modal 内部 | -16 |
+| `3541c6e` feat(canvas): phase 4b 工具栏/侧边栏/色盘/材料清单 | 画布周边所有控件 brand + 触摸 | +52 |
+| `47b7400` feat(canvas): phase 4a — 6 modals + celebrate toast | BeadCanvas 6 个对话框 + 庆祝 toast | +104 |
+
+**全部已推 GitHub**（origin/main），Pages 自动重建。**Gitee 没推**（凭据弹窗问题没修，详见下面"Blocked"）。
+
+### 怎么验证
+
+公网地址（GitHub Pages 自动部署，1-2 分钟到位）：
+**https://oarngeftansy.github.io/pindouxiangmuwangzhan/**
+
+按这条路径走一圈最有效：
+1. 首页 → 选任意一张 trending → 进入图纸预览页（**phase 2 改造的**）
+2. 点一格看色号弹出（**phase 2 修了一个真 bug**：之前 `:hover` 在触摸设备失效）
+3. 点"开始拼豆DIY"进入 BeadCanvas
+4. 看顶部工具栏（**phase 4b**）：tool / 缩放 / 网格 / 参考 / 材料 5 个 toggle 全是 moss accent，不再是 4 种颜色乱用
+5. 锁定一颗豆子 → 看"锁定中"标识用 honey-glow（不是之前的 amber）
+6. 滑豆模式开关：从 orange-red gradient 变成 terracotta 实色
+7. 点"一键熨烫" → 选烫法（**phase 4a 改造的**）→ 看熨烫动画 modal（熨斗用 ink-warm 主体 + terracotta 手柄 + honey 光晕，全 brand 化）
+8. 完成后弹出庆祝 modal，单色拼完时弹彩屑 toast（彩屑用 brand 4 色循环不是霓虹）
+9. 进作品馆（**phase 3 改造的**）→ 看嵌套 modal 都从底部滑出
+10. 手机访问同样路径，重点看 modal 在底部锚定 + drag handle
+
+### 触摸目标 / 移动适配
+
+所有按钮已加 `min-h-[44px] min-w-[44px]`（Apple HIG）。modal 改 `items-end sm:items-center` + `rounded-t-card`。input 加 `text-base`（防 iOS 自动放大）。canvas overflow 区加 `touch-pan-x touch-pan-y`。
+
+### ⏭ 故意没做的事
+
+| 项 | 为什么 |
+|---|---|
+| **4c 圆格改造** | 动 `PegboardCell.tsx` 核心绘制逻辑，brief 自评 "高风险"，无人值守不能做。等用户白天醒着一起做。 |
+| **4d 真正的触摸 UX**（pinch-zoom 双指缩放、drawing 笔触感、惯性滚动） | 同样高风险，会动 BeadCanvas 的 onTouchStart/Move/End 逻辑。当前的 touch-action + 触摸目标已经覆盖大部分场景。 |
+| **IroningDevTool**（`/ironing-dev.html` 815 行） | 故意保留深色 dev 主题（`#1a1a2e` + gray-100 + 滑块），dev tool 传统暗色不刺眼，转 brand 反而损可用性 |
+| **5 个 dead code 文件**（共 ~690 行） | `ColorPalette.tsx` / `IroningModals.tsx` / `PartialIronModal.tsx` / `figma/ImageWithFallback.tsx` / `ui/chart.tsx`——grep 全项目无 import。未删，留给清理 commit 你白天审一眼再 rm |
+| **Gitee push** | 上次卡在凭据弹窗，无人值守模式不能弹窗。GitHub 已是最新，Gitee 落后多个 commit |
+
+### 🚧 BLOCKED — 需要你白天处理的事
+
+1. **Gitee 同步**：手动跑 `git push gitee main`，弹凭据窗就输入用户名 + 密码（或个人访问令牌），勾"保存凭据"。或者改 SSH key（gitee 后台加 SSH 公钥）。
+2. **真机测试**：我没法在 iPhone/iPad 上验证，你帮看下：modal 滑动是否流畅、按钮是否好点、字号在 iOS 上是否 OK
+3. **决定 4c 圆格改造**：要做的话，PegboardCell.tsx 是高风险区，做完 4c 整个画布观感会变（拼豆从方格变圆点）。是否继续这条路看你了
+4. **dead code 清理**：5 个未使用的文件可以删——但确认下没在哪个 markdown/skill/外部地方引用
+
+### 接下来推荐的 3 件事（优先级）
+
+1. **真机 5 分钟扫一眼**——前面所有努力的兜底验证
+2. **修 Gitee push**（一次性事）——避免长期只有 GitHub 一个 remote
+3. **决定 4c**——如果觉得目前画布"够用"，4c 可以无限期延后；如果你看实物图觉得方格不像拼豆，那再做
+
+---
+
 ## 0. 新会话 / 新设备 onboarding（关键）
 
 如果你是新一轮会话的 Claude，**按顺序读这三份文件**就能完全 onboarding：
