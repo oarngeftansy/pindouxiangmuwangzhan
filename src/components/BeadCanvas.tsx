@@ -12,6 +12,7 @@ import {
   Library,
   Paintbrush,
   PartyPopper,
+  RotateCw,
   Snowflake,
   Sparkles,
   Square,
@@ -110,6 +111,17 @@ export function BeadCanvas({
 
   // 手机侧边栏折叠 — 默认展开（之前 true 时所有内容隐藏，用户以为没有 sidebar）
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+
+  // 横屏提示横幅 — 手机竖屏时建议旋转（浏览器无法主动锁定方向）
+  // localStorage 记忆"不再提示"，关一次后就不烦
+  const [showRotateHint, setShowRotateHint] = useState(() => {
+    if (typeof window === 'undefined') return false;
+    try {
+      return localStorage.getItem('rotate-hint-dismissed') !== '1';
+    } catch {
+      return true;
+    }
+  });
 
   // 统计工作画布的豆子信息
   const getGridStats = () => {
@@ -816,6 +828,26 @@ export function BeadCanvas({
         </div>
       )}
 
+      {/* 横屏体验提示 — 手机竖屏时显示，横屏 / 关闭过 / iPad 桌面均不出现 */}
+      {isMobile && showRotateHint && (
+        <div className="shrink-0 flex items-center justify-between gap-3 px-4 py-2.5 bg-honey-glow/40 border border-honey/40 rounded-control text-sm text-ink-warm">
+          <div className="flex items-center gap-2 min-w-0">
+            <RotateCw className="w-4 h-4 text-moss shrink-0" aria-hidden="true" />
+            <span>横屏放大画布，操作更顺手</span>
+          </div>
+          <button
+            onClick={() => {
+              setShowRotateHint(false);
+              try { localStorage.setItem('rotate-hint-dismissed', '1'); } catch {}
+            }}
+            className="inline-flex items-center justify-center min-h-[36px] min-w-[36px] -mr-2 rounded-control text-ink-soft hover:text-ink-warm transition-colors"
+            aria-label="不再提示横屏建议"
+          >
+            <X className="w-4 h-4" aria-hidden="true" />
+          </button>
+        </div>
+      )}
+
       {/* 主内容区域 */}
       <div className={`flex-1 min-h-0 flex gap-4 relative ${
         viewMode === 'pegboard'
@@ -1050,7 +1082,9 @@ export function BeadCanvas({
           </div>
         )}
 
-            {/* 颜色选择面板 */}
+            {/* 颜色选择面板 — 手机端隐藏：材料清单的每一行已经是色卡选择器，
+                两个挤在一起浪费屏幕，让参考图 / 材料 / 画布能在一屏看完 */}
+            {!isMobile && (
             <div className="bg-paper-soft border border-edge-sand rounded-card overflow-hidden">
               <div className="px-4 py-2.5 bg-paper-deep border-b border-edge-sand flex items-center justify-between">
                 <span className="font-semibold text-sm text-ink-warm">选色</span>
@@ -1123,6 +1157,7 @@ export function BeadCanvas({
                 </div>
               </div>
             </div>
+            )}
 
           </div>
           </div>
@@ -1181,7 +1216,7 @@ export function BeadCanvas({
                     ref={canvasRef}
                     className="grid gap-0"
                     style={{
-                      gridTemplateColumns: `repeat(${workingGrid[0].length}, ${baseSize * pegboardScale}px)`,
+                      gridTemplateColumns: `repeat(${workingGrid[0].length}, ${baseSize * pegboardScale * zoom}px)`,
                       width: "fit-content",
                       backgroundColor: 'transparent',
                       touchAction: 'none',
@@ -1209,7 +1244,7 @@ export function BeadCanvas({
                             x={x}
                             y={y}
                             color={color}
-                            beadSize={baseSize * pegboardScale}
+                            beadSize={baseSize * pegboardScale * zoom}
                             viewMode={viewMode}
                             showGrid={false}
                             shouldHighlight={shouldHighlight}
@@ -1344,7 +1379,7 @@ export function BeadCanvas({
                               x={x}
                               y={y}
                               color={color}
-                              beadSize={baseSize * pegboardScale}
+                              beadSize={baseSize * pegboardScale * zoom}
                               viewMode={viewMode}
                               showGrid={showGrid}
                               shouldHighlight={shouldHighlight}
