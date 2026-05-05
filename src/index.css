@@ -21,6 +21,16 @@
   100% { opacity: 0;   transform: rotate(var(--a, 0deg)) translateY(-52px) scale(0.8); }
 }
 
+/* 横屏提示：手机来回摇动暗示"旋转" */
+@keyframes rotateHintRock {
+  0%, 100% { transform: rotate(-25deg); }
+  50%      { transform: rotate(25deg); }
+}
+.animate-rotate-hint {
+  animation: rotateHintRock 1.6s ease-in-out infinite;
+  transform-origin: center;
+}
+
 @layer base {
   html, body, #root { min-height: 100vh; height: 100%; margin: 0; }
   body {

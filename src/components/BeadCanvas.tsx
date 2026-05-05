@@ -127,6 +127,19 @@ export function BeadCanvas({
       return true;
     }
   });
+  // 第一次进入手机竖屏 DIY 时的强提示 modal（独立 localStorage key）
+  const [showRotateModal, setShowRotateModal] = useState(() => {
+    if (typeof window === 'undefined') return false;
+    try {
+      return localStorage.getItem('rotate-modal-dismissed') !== '1';
+    } catch {
+      return true;
+    }
+  });
+  const dismissRotateModal = () => {
+    setShowRotateModal(false);
+    try { localStorage.setItem('rotate-modal-dismissed', '1'); } catch {}
+  };
 
   // 参考图置顶 — 用户滚动画布时仍能看见，sticky 定位
   const [referencePinned, setReferencePinned] = useState(() => {
@@ -869,22 +882,76 @@ export function BeadCanvas({
         </div>
       )}
 
-      {/* 横屏体验提示 — 手机竖屏时显示，横屏 / 关闭过 / iPad 桌面均不出现 */}
-      {isMobile && showRotateHint && (
-        <div className="shrink-0 flex items-center justify-between gap-3 px-4 py-2.5 bg-honey-glow/40 border border-honey/40 rounded-control text-sm text-ink-warm">
-          <div className="flex items-center gap-2 min-w-0">
-            <RotateCw className="w-4 h-4 text-moss shrink-0" aria-hidden="true" />
-            <span>横屏放大画布，操作更顺手</span>
+      {/* 横屏建议 modal — 仅在手机竖屏 + 第一次进 DIY + 还没 dismiss 过时弹一次
+          强提示版，比 banner 更难错过 */}
+      {isMobile && showRotateModal && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-6 animate-in fade-in duration-200"
+          style={{ backgroundColor: 'rgba(58, 52, 42, 0.55)' }}
+          onClick={dismissRotateModal}
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="rotate-modal-title"
+        >
+          <div
+            className="relative bg-paper-bg border border-edge-sand rounded-card max-w-sm w-full p-7 sm:p-8 animate-in zoom-in-95 duration-200"
+            style={{ boxShadow: 'var(--shadow-lift-card)' }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex flex-col items-center text-center">
+              <div className="w-20 h-20 rounded-card bg-honey-glow flex items-center justify-center mb-5">
+                <RotateCw className="w-10 h-10 text-terracotta animate-rotate-hint" aria-hidden="true" />
+              </div>
+              <h3
+                id="rotate-modal-title"
+                className="text-xl font-semibold text-ink-warm mb-2"
+                style={{ fontFamily: 'var(--font-headline)' }}
+              >
+                请试试横屏
+              </h3>
+              <p className="text-sm text-ink-soft mb-6 leading-relaxed">
+                画布会大很多，参考图、材料清单都能在一屏看到，操作也更精准。
+              </p>
+              <button
+                onClick={dismissRotateModal}
+                className="w-full inline-flex items-center justify-center min-h-[48px] px-6 py-3 bg-terracotta text-paper-bg rounded-control font-semibold hover:bg-terracotta-deep transition-colors focus-visible:outline-2 focus-visible:outline-moss focus-visible:outline-offset-2"
+                style={{ boxShadow: 'var(--shadow-lift-bead)' }}
+              >
+                知道了
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 横屏体验提示 — 手机竖屏时显示，横屏 / 关闭过 / iPad 桌面均不出现
+          视觉策略：solid honey + 摇摆图标 + 大字加粗，让用户一眼看到
+          注意：modal 还没 dismiss 时不显示 banner，避免双重提示叠加 */}
+      {isMobile && showRotateHint && !showRotateModal && (
+        <div
+          className="shrink-0 flex items-center justify-between gap-3 px-4 py-3.5 bg-honey rounded-control text-base font-semibold text-ink-warm animate-in slide-in-from-top-2 duration-300"
+          style={{ boxShadow: 'var(--shadow-lift-bead)' }}
+          role="status"
+        >
+          <div className="flex items-center gap-3 min-w-0">
+            {/* 摇摆图标 — 模拟手机来回旋转的动作，比静态图标抓眼 */}
+            <div className="shrink-0 w-8 h-8 rounded-control bg-paper-bg flex items-center justify-center">
+              <RotateCw className="w-5 h-5 text-terracotta animate-rotate-hint" aria-hidden="true" />
+            </div>
+            <div className="min-w-0">
+              <div className="leading-tight">请试试横屏</div>
+              <div className="text-xs font-normal text-ink-soft mt-0.5">画布更大、操作更准</div>
+            </div>
           </div>
           <button
             onClick={() => {
               setShowRotateHint(false);
               try { localStorage.setItem('rotate-hint-dismissed', '1'); } catch {}
             }}
-            className="inline-flex items-center justify-center min-h-[36px] min-w-[36px] -mr-2 rounded-control text-ink-soft hover:text-ink-warm transition-colors"
+            className="inline-flex items-center justify-center min-h-[40px] min-w-[40px] -mr-1 rounded-control text-ink-warm/70 hover:text-ink-warm hover:bg-paper-bg/40 transition-colors"
             aria-label="不再提示横屏建议"
           >
-            <X className="w-4 h-4" aria-hidden="true" />
+            <X className="w-5 h-5" aria-hidden="true" />
           </button>
         </div>
       )}
