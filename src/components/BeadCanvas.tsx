@@ -925,9 +925,12 @@ export function BeadCanvas({
           <div className={`space-y-3 ${isMobile && sidebarCollapsed ? 'hidden' : ''}`}>
             {/* 参考图纸 — 置顶时 sticky 到视口顶部，滚动画布也能看见 */}
             {showReference && (
-          <div className={`bg-paper-soft border border-edge-sand rounded-card overflow-hidden ${
-            referencePinned ? 'sticky top-2 z-30 shadow-[var(--shadow-lift-card)]' : ''
-          }`}>
+          <div
+            className={`bg-paper-soft border border-edge-sand rounded-card overflow-hidden ${
+              referencePinned ? 'sticky top-2 z-30' : ''
+            }`}
+            style={referencePinned ? { boxShadow: 'var(--shadow-lift-card)' } : undefined}
+          >
             {/* 顶部标题栏 */}
             <div className="bg-paper-deep border-b border-edge-sand text-ink-warm px-4 py-2.5 flex items-center justify-between">
               <div className="flex items-center gap-2">
@@ -1286,7 +1289,7 @@ export function BeadCanvas({
                       gridTemplateColumns: `repeat(${workingGrid[0].length}, ${baseSize * pegboardScale * zoom}px)`,
                       width: "fit-content",
                       backgroundColor: 'transparent',
-                      touchAction: 'pinch-zoom',
+                      touchAction: 'manipulation',
                       userSelect: 'none',
                     }}
                     onTouchStart={handleTouchStart}
@@ -1421,7 +1424,7 @@ export function BeadCanvas({
                         gridTemplateColumns: `repeat(${workingGrid[0].length}, ${beadSize}px)`,
                         width: "fit-content",
                         backgroundColor: 'var(--bead-paper-bg)',
-                        touchAction: 'pinch-zoom',
+                        touchAction: 'manipulation',
                         userSelect: 'none',
                       }}
                       onTouchStart={handleTouchStart}
