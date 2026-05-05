@@ -64,7 +64,8 @@ export function BeadCanvas({
   const [lockedColor, setLockedColor] = useState<string | null>(
     null,
   );
-  const [showReference, setShowReference] = useState(() => window.innerWidth > window.innerHeight || window.innerWidth >= 768);
+  // 参考图默认显示——之前手机端默认 false 导致用户找不到
+  const [showReference, setShowReference] = useState(true);
   const canvasRef = useRef<HTMLDivElement>(null);
   const [showCompletionModal, setShowCompletionModal] =
     useState(false);
@@ -96,7 +97,8 @@ export function BeadCanvas({
   const [refWindowSize, setRefWindowSize] = useState(0.35); // 相对于主画布的比例
   // 横屏时视为桌面布局（竖屏小屏才走移动端 UI）
   const isLandscape = () => window.innerWidth > window.innerHeight;
-  const [showMaterialList, setShowMaterialList] = useState(() => isLandscape() || window.innerWidth >= 768);
+  // 材料清单默认显示——之前手机端默认 false 导致用户以为只有简洁模式才有
+  const [showMaterialList, setShowMaterialList] = useState(true);
   const [isMobile, setIsMobile] = useState(() => !isLandscape() && window.innerWidth < 768);
 
   // 单色完成庆祝
@@ -106,8 +108,8 @@ export function BeadCanvas({
   // 作品馆保存提示
   const [savedToGallery, setSavedToGallery] = useState(false);
 
-  // 手机侧边栏折叠
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(true);
+  // 手机侧边栏折叠 — 默认展开（之前 true 时所有内容隐藏，用户以为没有 sidebar）
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
   // 统计工作画布的豆子信息
   const getGridStats = () => {
@@ -190,15 +192,14 @@ export function BeadCanvas({
   }, [viewMode, workingGrid.length, workingGrid[0]?.length, referenceGrid.length, referenceGrid[0]?.length, baseSize]);
 
   // 移动端/平板检测：横屏时视为桌面
+  // 注意：不再强制设置 showReference / showMaterialList。
+  // 之前的 setShowMaterialList(landscape || width>=768) 会在每次旋转/resize 时
+  // 把手机竖屏强制改成 false，覆盖用户的明确选择。现在默认全部 true，
+  // 用户可以通过工具栏 toggle 或 sidebar 折叠条隐藏。
   useEffect(() => {
     const handleResize = () => {
       const landscape = window.innerWidth > window.innerHeight;
       setIsMobile(!landscape && window.innerWidth < 768);
-      setShowMaterialList(landscape || window.innerWidth >= 768);
-      // 切换到横屏/大屏时自动显示参考图纸
-      if (landscape || window.innerWidth >= 768) {
-        setShowReference(true);
-      }
     };
     window.addEventListener('resize', handleResize);
     window.addEventListener('orientationchange', handleResize);
