@@ -12,6 +12,8 @@ import {
   Library,
   Paintbrush,
   PartyPopper,
+  Pin,
+  PinOff,
   RotateCw,
   Snowflake,
   Sparkles,
@@ -122,6 +124,23 @@ export function BeadCanvas({
       return true;
     }
   });
+
+  // 参考图置顶 — 用户滚动画布时仍能看见，sticky 定位
+  const [referencePinned, setReferencePinned] = useState(() => {
+    if (typeof window === 'undefined') return false;
+    try {
+      return localStorage.getItem('reference-pinned') === '1';
+    } catch {
+      return false;
+    }
+  });
+  const togglePinReference = () => {
+    setReferencePinned((prev) => {
+      const next = !prev;
+      try { localStorage.setItem('reference-pinned', next ? '1' : '0'); } catch {}
+      return next;
+    });
+  };
 
   // 统计工作画布的豆子信息
   const getGridStats = () => {
@@ -238,6 +257,11 @@ export function BeadCanvas({
   };
 
   const handleTouchStart = (e: React.TouchEvent) => {
+    // 多指（pinch）让浏览器自己缩放页面，不绘制
+    if (e.touches.length > 1) {
+      setIsDrawing(false);
+      return;
+    }
     e.preventDefault();
     const touch = e.touches[0];
     const cell = getCellFromTouch(touch);
@@ -250,6 +274,11 @@ export function BeadCanvas({
   };
 
   const handleTouchMove = (e: React.TouchEvent) => {
+    // 多指：放手浏览器处理 pinch zoom
+    if (e.touches.length > 1) {
+      setIsDrawing(false);
+      return;
+    }
     e.preventDefault();
     // 滑豆模式下无需按住也能上色，普通模式需要 isDrawing
     if (!isDrawing && !(pourMode && lockedColor)) return;
@@ -882,23 +911,47 @@ export function BeadCanvas({
             </button>
           )}
           <div className={`space-y-3 ${isMobile && sidebarCollapsed ? 'hidden' : ''}`}>
-            {/* 参考图纸 */}
+            {/* 参考图纸 — 置顶时 sticky 到视口顶部，滚动画布也能看见 */}
             {showReference && (
-          <div className="bg-paper-soft border border-edge-sand rounded-card overflow-hidden">
+          <div className={`bg-paper-soft border border-edge-sand rounded-card overflow-hidden ${
+            referencePinned ? 'sticky top-2 z-30 shadow-[var(--shadow-lift-card)]' : ''
+          }`}>
             {/* 顶部标题栏 */}
             <div className="bg-paper-deep border-b border-edge-sand text-ink-warm px-4 py-2.5 flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <Eye className="w-4 h-4 text-moss" aria-hidden="true" />
                 <span className="font-semibold text-sm">参考图纸</span>
+                {referencePinned && (
+                  <span className="text-xs text-moss font-semibold">· 已置顶</span>
+                )}
               </div>
-              <button
-                onClick={() => setShowReference(false)}
-                className="inline-flex items-center justify-center min-h-[36px] min-w-[36px] rounded-control hover:bg-paper-bg transition-colors"
-                title="关闭"
-                aria-label="关闭参考图纸"
-              >
-                <X className="w-4 h-4 text-ink-soft" aria-hidden="true" />
-              </button>
+              <div className="flex items-center gap-1">
+                <button
+                  onClick={togglePinReference}
+                  className={`inline-flex items-center justify-center min-h-[36px] min-w-[36px] rounded-control transition-colors ${
+                    referencePinned
+                      ? 'text-moss hover:bg-paper-bg'
+                      : 'text-ink-soft hover:bg-paper-bg hover:text-ink-warm'
+                  }`}
+                  title={referencePinned ? '取消置顶' : '置顶到视口顶部'}
+                  aria-label={referencePinned ? '取消置顶参考图' : '置顶参考图'}
+                  aria-pressed={referencePinned}
+                >
+                  {referencePinned ? (
+                    <PinOff className="w-4 h-4" aria-hidden="true" />
+                  ) : (
+                    <Pin className="w-4 h-4" aria-hidden="true" />
+                  )}
+                </button>
+                <button
+                  onClick={() => setShowReference(false)}
+                  className="inline-flex items-center justify-center min-h-[36px] min-w-[36px] rounded-control hover:bg-paper-bg transition-colors"
+                  title="关闭"
+                  aria-label="关闭参考图纸"
+                >
+                  <X className="w-4 h-4 text-ink-soft" aria-hidden="true" />
+                </button>
+              </div>
             </div>
 
             {/* 当前锁定颜色提示 */}
@@ -1219,7 +1272,7 @@ export function BeadCanvas({
                       gridTemplateColumns: `repeat(${workingGrid[0].length}, ${baseSize * pegboardScale * zoom}px)`,
                       width: "fit-content",
                       backgroundColor: 'transparent',
-                      touchAction: 'none',
+                      touchAction: 'pinch-zoom',
                       userSelect: 'none',
                     }}
                     onTouchStart={handleTouchStart}
@@ -1354,7 +1407,7 @@ export function BeadCanvas({
                         gridTemplateColumns: `repeat(${workingGrid[0].length}, ${beadSize}px)`,
                         width: "fit-content",
                         backgroundColor: 'var(--bead-paper-bg)',
-                        touchAction: 'none',
+                        touchAction: 'pinch-zoom',
                         userSelect: 'none',
                       }}
                       onTouchStart={handleTouchStart}
