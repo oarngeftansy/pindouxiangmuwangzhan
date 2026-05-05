@@ -1113,10 +1113,10 @@ export function BeadCanvas({
         <div className="flex-1 min-w-0 min-h-0 flex flex-col">
           {/* 拼豆板模式：全屏主画布 */}
           {viewMode === 'pegboard' ? (
-            <div className="bg-white rounded-2xl shadow-xl p-3 sm:p-4 flex-1 flex flex-col min-h-0">
+            <div className="bg-paper-soft border border-edge-sand rounded-card p-3 sm:p-4 flex-1 flex flex-col min-h-0">
               <div className="flex items-center justify-between mb-3">
-                <h3 className="text-lg font-bold flex items-center gap-2">
-                  <Paintbrush className="w-5 h-5 text-purple-600" />
+                <h3 className="text-lg font-semibold flex items-center gap-2 text-ink-warm" style={{ fontFamily: 'var(--font-headline)' }}>
+                  <Paintbrush className="w-5 h-5 text-moss" aria-hidden="true" />
                   拼豆创作台
                 </h3>
                 <ViewModeToggle viewMode={viewMode} onChange={setViewMode} />
@@ -1124,30 +1124,38 @@ export function BeadCanvas({
               {/* 手机锁色浮动徽章 */}
               {isMobile && lockedColor && (
                 <div className="flex items-center gap-2 mb-2 flex-wrap">
-                  <div className="flex items-center gap-2 px-3 py-1.5 bg-amber-100 border border-amber-300 rounded-full text-sm">
-                    <div className="w-4 h-4 rounded-full border border-amber-400" style={{ backgroundColor: lockedColor }} />
-                    <span className="font-semibold text-amber-900">{getColorCode(lockedColor)}</span>
-                    <button onClick={() => { setLockedColor(null); setPourMode(false); }} className="text-amber-600 text-xs underline">解锁</button>
+                  <div className="flex items-center gap-2 px-3 py-1.5 bg-honey-glow/40 border border-honey/40 rounded-control text-sm">
+                    <div className="w-4 h-4 rounded-bead border border-edge-sand" style={{ backgroundColor: lockedColor }} aria-hidden="true" />
+                    <span className="font-semibold text-ink-warm" style={{ fontFamily: 'var(--font-num)' }}>{getColorCode(lockedColor)}</span>
+                    <button
+                      onClick={() => { setLockedColor(null); setPourMode(false); }}
+                      className="text-ink-soft hover:text-ink-warm text-xs underline transition-colors"
+                      aria-label="解锁颜色"
+                    >解锁</button>
                   </div>
                   <button
                     onClick={() => setPourMode(!pourMode)}
-                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium transition-colors ${pourMode ? 'bg-orange-500 text-white' : 'bg-gray-200 text-gray-700'}`}
+                    className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-control border text-sm font-semibold transition-colors focus-visible:outline-2 focus-visible:outline-moss focus-visible:outline-offset-2 ${
+                      pourMode
+                        ? 'bg-terracotta text-paper-bg border-terracotta'
+                        : 'bg-paper-bg text-ink-warm border-edge-sand hover:bg-paper-deep'
+                    }`}
+                    aria-pressed={pourMode}
                   >
-                    <Sparkles className="w-3.5 h-3.5" />
-                    滑豆{pourMode ? ' 开' : ' 关'}
+                    <Zap className="w-3.5 h-3.5" aria-hidden="true" />
+                    滑豆{pourMode ? ' · 开' : ' · 关'}
                   </button>
                 </div>
               )}
-              <div className="bg-gradient-to-br from-gray-100 to-gray-200 rounded-xl p-4 flex items-center justify-center flex-1 overflow-auto min-h-0">
-                <div 
-                  className="rounded-xl shadow-2xl relative"
+              <div className="bg-paper-deep rounded-surface p-4 flex items-center justify-center flex-1 overflow-auto min-h-0">
+                <div
+                  className="rounded-control relative"
                   style={{
-                    backgroundColor: '#E8E4DD',
-                    boxShadow: 'inset 0 2px 8px rgba(0,0,0,0.08), 0 4px 16px rgba(0,0,0,0.15)',
+                    // 物理拼豆板：暖纸纹质感（取代冷灰板）
+                    backgroundColor: 'var(--bead-paper-soft)',
+                    boxShadow: 'inset 0 2px 8px rgba(58, 52, 42, 0.10), 0 4px 16px rgba(168, 130, 90, 0.18)',
                     padding: '16px',
-                    /* pegboardScale 现在直接调整格子大小，不需要 CSS scale */
-                    border: '6px solid #d0d0d0',
-                    borderRadius: '12px',
+                    border: '6px solid var(--bead-edge)',
                   }}
                 >
                   <div
@@ -1204,19 +1212,19 @@ export function BeadCanvas({
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {/* 参考图纸 */}
               {showReference && (
-                <div className="bg-white rounded-2xl shadow-xl p-6">
-                  <h3 className="text-lg font-bold mb-4 flex items-center gap-2">
-                    <Eye className="w-5 h-5 text-blue-600" />
+                <div className="bg-paper-soft border border-edge-sand rounded-card p-6">
+                  <h3 className="text-lg font-semibold mb-4 flex items-center gap-2 text-ink-warm" style={{ fontFamily: 'var(--font-headline)' }}>
+                    <Eye className="w-5 h-5 text-moss" aria-hidden="true" />
                     参考图纸
                   </h3>
-                  <div className="bg-white rounded-xl p-4 overflow-auto max-h-[40vh] sm:max-h-[600px]">
+                  <div className="bg-paper-bg border border-edge-sand rounded-surface p-4 overflow-auto max-h-[40vh] sm:max-h-[600px] touch-pan-x touch-pan-y">
                     <div className="inline-block">
                       <div
-                        className="grid gap-0 rounded-lg overflow-hidden shadow-inner border border-gray-200"
+                        className="grid gap-0 rounded-control overflow-hidden border border-edge-sand"
                         style={{
                           gridTemplateColumns: `repeat(${referenceGrid[0].length}, ${beadSize}px)`,
                           width: "fit-content",
-                          backgroundColor: '#FFFFFF',
+                          backgroundColor: 'var(--bead-paper-bg)',
                         }}
                       >
                         {referenceGrid.map((row, y) =>
@@ -1228,42 +1236,37 @@ export function BeadCanvas({
                               <div
                                 key={`ref-${x}-${y}`}
                                 className={`flex items-center justify-center relative ${
-                                  shouldHighlight
-                                    ? "ring-2 ring-amber-400"
-                                    : ""
+                                  shouldHighlight ? 'ring-2 ring-honey' : ''
                                 }`}
                                 style={{
                                   width: beadSize,
                                   height: beadSize,
                                   backgroundColor: shouldHighlight
-                                    ? "#FEF3C7"
-                                    : color || "#FAFAFA",
+                                    ? 'var(--bead-honey-glow)'
+                                    : color || 'var(--bead-paper-bg)',
                                   opacity:
-                                    lockedColor &&
-                                    !shouldHighlight
-                                      ? 0.3
-                                      : 1,
-                                  border: "0.15px solid rgba(130, 130, 130, 1)",
+                                    lockedColor && !shouldHighlight ? 0.3 : 1,
+                                  border: '0.15px solid rgba(58, 52, 42, 0.5)',
                                 }}
                               >
                                 {color && (
                                   <div
-                                    className="absolute inset-0 rounded-full m-1"
+                                    className="absolute inset-0 rounded-bead m-1 pointer-events-none"
                                     style={{
                                       backgroundColor: color,
-                                      boxShadow:
-                                        "inset 0 1px 3px rgba(0,0,0,0.2)",
+                                      // 暖墨色 inset 模拟塑料反光
+                                      boxShadow: 'inset 0 1px 3px rgba(58, 52, 42, 0.2)',
                                     }}
                                   />
                                 )}
                                 {/* 显示已放置的豆子 */}
                                 {workingGrid[y][x] && (
                                   <div
-                                    className="absolute inset-0 rounded-full m-1 ring-2 ring-green-400"
+                                    className="absolute inset-0 rounded-bead m-1 ring-2 ring-moss pointer-events-none"
                                     style={{
                                       backgroundColor: workingGrid[y][x] || '',
                                       boxShadow:
-                                        "inset 0 1px 3px rgba(0,0,0,0.2), 0 0 8px rgba(34, 197, 94, 0.5)",
+                                        'inset 0 1px 3px rgba(58, 52, 42, 0.2), 0 0 8px rgba(44, 107, 84, 0.5)',
                                     }}
                                   />
                                 )}
@@ -1279,24 +1282,24 @@ export function BeadCanvas({
 
               {/* 编辑画板 */}
               <div
-                className={`bg-white rounded-2xl shadow-xl p-6 ${showReference ? "" : "lg:col-span-2"}`}
+                className={`bg-paper-soft border border-edge-sand rounded-card p-6 ${showReference ? "" : "lg:col-span-2"}`}
               >
                 <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-lg font-bold flex items-center gap-2">
-                    <Paintbrush className="w-5 h-5 text-purple-600" />
+                  <h3 className="text-lg font-semibold flex items-center gap-2 text-ink-warm" style={{ fontFamily: 'var(--font-headline)' }}>
+                    <Paintbrush className="w-5 h-5 text-moss" aria-hidden="true" />
                     编辑画板
                   </h3>
                   <ViewModeToggle viewMode={viewMode} onChange={setViewMode} />
                 </div>
-                <div className="bg-gray-50 rounded-xl p-4 overflow-auto max-h-[40vh] sm:max-h-[600px]">
+                <div className="bg-paper-deep border border-edge-sand rounded-surface p-4 overflow-auto max-h-[40vh] sm:max-h-[600px] touch-pan-x touch-pan-y">
                   <div className="inline-block">
                     <div
                       ref={canvasRef}
-                      className="grid gap-0 rounded-lg overflow-hidden shadow-inner border border-gray-300"
+                      className="grid gap-0 rounded-control overflow-hidden border border-edge-sand"
                       style={{
                         gridTemplateColumns: `repeat(${workingGrid[0].length}, ${beadSize}px)`,
                         width: "fit-content",
-                        backgroundColor: '#FFFFFF',
+                        backgroundColor: 'var(--bead-paper-bg)',
                         touchAction: 'none',
                         userSelect: 'none',
                       }}

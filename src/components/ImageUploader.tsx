@@ -352,17 +352,17 @@ export function ImageUploader({ onImageProcessed, onCreateBlank }: ImageUploader
         <div className="fixed inset-0 bg-black/50 flex items-end sm:items-center justify-center z-50 sm:p-4">
           <div className="relative bg-white rounded-t-2xl sm:rounded-2xl shadow-2xl p-4 sm:p-8 max-w-lg w-full max-h-[92vh] sm:max-h-[90vh] overflow-y-auto animate-in slide-in-from-bottom duration-200 sm:slide-in-from-bottom-0 sm:zoom-in-95">
             {/* 手机端顶部 drag handle 视觉提示 */}
-            <div className="sm:hidden absolute top-2 left-1/2 -translate-x-1/2 w-10 h-1 rounded-full bg-gray-300" aria-hidden="true" />
-            <div className="flex items-center gap-3 mb-6">
-              <Settings className="w-6 h-6 text-[#1f5c57]" />
-              <h3 className="text-2xl font-bold">图片转换设置</h3>
+            <div className="sm:hidden absolute top-2 left-1/2 -translate-x-1/2 w-10 h-1 rounded-bead bg-edge-sand" aria-hidden="true" />
+            <div className="flex items-center gap-3 mb-6 mt-2 sm:mt-0">
+              <Settings className="w-6 h-6 text-moss" aria-hidden="true" />
+              <h3 className="text-xl sm:text-2xl font-semibold text-ink-warm" style={{ fontFamily: 'var(--font-headline)' }}>图片转换设置</h3>
             </div>
-            
+
             <div className="space-y-6">
-              {/* 快捷预设 */}
+              {/* 快捷预设 — 3 个按钮统一 ghost 形态，去除杂色渐变 */}
               <div>
-                <label className="block text-sm font-medium mb-3">快捷预设</label>
-                <div className="grid grid-cols-3 gap-3">
+                <label className="block text-sm font-semibold mb-3 text-ink-warm">快捷预设</label>
+                <div className="grid grid-cols-3 gap-2 sm:gap-3">
                   <button
                     onClick={() => {
                       setGridWidth(Math.min(40, Math.max(10, gridWidth)));
@@ -370,10 +370,10 @@ export function ImageUploader({ onImageProcessed, onCreateBlank }: ImageUploader
                       setColorMergeThreshold(10);
                       setMaxColors(30);
                     }}
-                    className="px-4 py-3 bg-gradient-to-br from-slate-50 to-slate-100 border border-slate-200 rounded-lg font-medium text-sm hover:shadow-md transition-all text-gray-700"
+                    className="inline-flex flex-col items-center justify-center gap-1 min-h-[64px] px-3 py-3 bg-paper-bg border border-edge-sand rounded-control text-sm font-semibold text-ink-warm hover:bg-paper-deep transition-colors focus-visible:outline-2 focus-visible:outline-moss focus-visible:outline-offset-2"
                   >
-                    🎨 简单图案<br/>
-                    <span className="text-xs text-gray-500">低豆子数</span>
+                    <span>简单图案</span>
+                    <span className="text-xs font-normal text-ink-soft">低豆子数</span>
                   </button>
                   <button
                     onClick={() => {
@@ -392,10 +392,10 @@ export function ImageUploader({ onImageProcessed, onCreateBlank }: ImageUploader
                       setColorMergeThreshold(15);
                       setMaxColors(40);
                     }}
-                    className="px-4 py-3 bg-gradient-to-br from-teal-50 to-teal-100 border border-teal-200 rounded-lg font-medium text-sm hover:shadow-md transition-all text-gray-700"
+                    className="inline-flex flex-col items-center justify-center gap-1 min-h-[64px] px-3 py-3 bg-paper-bg border border-edge-sand rounded-control text-sm font-semibold text-ink-warm hover:bg-paper-deep transition-colors focus-visible:outline-2 focus-visible:outline-moss focus-visible:outline-offset-2"
                   >
-                    📸 普通照片<br/>
-                    <span className="text-xs text-gray-500">推荐设置</span>
+                    <span>普通照片</span>
+                    <span className="text-xs font-normal text-ink-soft">推荐</span>
                   </button>
                   <button
                     onClick={() => {
@@ -414,23 +414,24 @@ export function ImageUploader({ onImageProcessed, onCreateBlank }: ImageUploader
                       setColorMergeThreshold(5);
                       setMaxColors(60);
                     }}
-                    className="px-4 py-3 bg-gradient-to-br from-emerald-50 to-emerald-100 border border-emerald-200 rounded-lg font-medium text-sm hover:shadow-md transition-all text-gray-700"
+                    className="inline-flex flex-col items-center justify-center gap-1 min-h-[64px] px-3 py-3 bg-paper-bg border border-edge-sand rounded-control text-sm font-semibold text-ink-warm hover:bg-paper-deep transition-colors focus-visible:outline-2 focus-visible:outline-moss focus-visible:outline-offset-2"
                   >
-                    ✨ 高清照片<br/>
-                    <span className="text-xs text-gray-500">保留细节</span>
+                    <span>高清照片</span>
+                    <span className="text-xs font-normal text-ink-soft">保留细节</span>
                   </button>
                 </div>
-                <p className="text-xs text-gray-500 mt-2">
-                  💡 提示：照片建议使用"普通照片"或"高清照片"预设以保留更多细节
-                </p>
+                <div className="flex items-start gap-2 mt-2 text-xs text-ink-soft">
+                  <Sparkles className="w-3.5 h-3.5 text-moss shrink-0 mt-0.5" aria-hidden="true" />
+                  <p>照片建议用"普通照片"或"高清照片"预设以保留更多细节</p>
+                </div>
               </div>
 
               {/* 画板尺寸 */}
               <div>
-                <label className="block text-sm font-medium mb-3">画板尺寸（格子数量）</label>
+                <label className="block text-sm font-semibold mb-3 text-ink-warm">画板尺寸（格子数量）</label>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-xs text-gray-500 mb-1">宽度</label>
+                    <label className="block text-xs text-ink-soft mb-1">宽度</label>
                     <input
                       type="number"
                       min="10"
@@ -438,16 +439,11 @@ export function ImageUploader({ onImageProcessed, onCreateBlank }: ImageUploader
                       value={gridWidth}
                       onChange={(e) => {
                         const value = e.target.value;
-                        if (value === '') {
-                          return; // 允许暂时为空，不做处理
-                        }
+                        if (value === '') return;
                         const num = parseInt(value);
-                        if (!isNaN(num)) {
-                          setGridWidth(num); // 直接设置，不限制范围
-                        }
+                        if (!isNaN(num)) setGridWidth(num);
                       }}
                       onBlur={(e) => {
-                        // 失去焦点时才限制范围
                         const value = e.target.value;
                         if (value === '') {
                           setGridWidth(10);
@@ -456,11 +452,11 @@ export function ImageUploader({ onImageProcessed, onCreateBlank }: ImageUploader
                           setGridWidth(Math.max(10, Math.min(120, num)));
                         }
                       }}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#1f5c57] focus:border-transparent text-base"
+                      className="w-full px-4 py-3 border border-edge-sand bg-paper-bg text-ink-warm rounded-control text-base focus:outline-none focus:ring-2 focus:ring-moss focus:border-moss"
                     />
                   </div>
                   <div>
-                    <label className="block text-xs text-gray-500 mb-1">高度</label>
+                    <label className="block text-xs text-ink-soft mb-1">高度</label>
                     <input
                       type="number"
                       min="10"
@@ -468,16 +464,11 @@ export function ImageUploader({ onImageProcessed, onCreateBlank }: ImageUploader
                       value={gridHeight}
                       onChange={(e) => {
                         const value = e.target.value;
-                        if (value === '') {
-                          return; // 允许暂时为空，不做处理
-                        }
+                        if (value === '') return;
                         const num = parseInt(value);
-                        if (!isNaN(num)) {
-                          setGridHeight(num); // 直接设置，不限制范围
-                        }
+                        if (!isNaN(num)) setGridHeight(num);
                       }}
                       onBlur={(e) => {
-                        // 失去焦点时才限制范围
                         const value = e.target.value;
                         if (value === '') {
                           setGridHeight(10);
@@ -486,32 +477,38 @@ export function ImageUploader({ onImageProcessed, onCreateBlank }: ImageUploader
                           setGridHeight(Math.max(10, Math.min(120, num)));
                         }
                       }}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#1f5c57] focus:border-transparent text-base"
+                      className="w-full px-4 py-3 border border-edge-sand bg-paper-bg text-ink-warm rounded-control text-base focus:outline-none focus:ring-2 focus:ring-moss focus:border-moss"
                     />
                   </div>
                 </div>
-                <div className="text-center mt-2 text-sm text-gray-600">
-                  画板尺寸：{gridWidth} × {gridHeight} 格 = 最多需 {gridWidth * gridHeight} 颗拼豆
+                <div className="text-center mt-2 text-sm text-ink-warm">
+                  画板尺寸 <span style={{ fontFamily: 'var(--font-num)' }}>{gridWidth} × {gridHeight}</span> 格 ≈ 最多 <span style={{ fontFamily: 'var(--font-num)' }}>{gridWidth * gridHeight}</span> 颗
                 </div>
-                <div className="text-center text-xs text-gray-500 mt-1">
+                <div className="text-center text-xs text-ink-soft mt-1">
                   实际豆子数量 = 图片中有颜色的格子数量
                 </div>
               </div>
 
-              {/* 颜色合并阈值 */}
+              {/* 颜色合并阈值 — 加 py-3 触摸 hitbox */}
               <div>
-                <label className="block text-sm font-medium mb-2">
-                  颜色合并阈值 ({colorMergeThreshold})
+                <label className="block text-sm font-semibold mb-2 text-ink-warm">
+                  颜色合并阈值 <span className="text-ink-soft" style={{ fontFamily: 'var(--font-num)' }}>({colorMergeThreshold})</span>
                 </label>
-                <input
-                  type="range"
-                  min="0"
-                  max="100"
-                  value={colorMergeThreshold}
-                  onChange={(e) => setColorMergeThreshold(parseInt(e.target.value))}
-                  className="w-full"
-                />
-                <div className="flex justify-between text-xs text-gray-500 mt-1">
+                <div className="py-3">
+                  <input
+                    type="range"
+                    min="0"
+                    max="100"
+                    value={colorMergeThreshold}
+                    onChange={(e) => setColorMergeThreshold(parseInt(e.target.value))}
+                    className="w-full h-2 rounded-bead appearance-none cursor-pointer"
+                    style={{
+                      background: `linear-gradient(to right, var(--bead-moss) 0%, var(--bead-moss) ${colorMergeThreshold}%, var(--bead-paper-deep) ${colorMergeThreshold}%, var(--bead-paper-deep) 100%)`,
+                    }}
+                    aria-label="颜色合并阈值"
+                  />
+                </div>
+                <div className="flex justify-between text-xs text-ink-soft mt-1">
                   <span>精细（颜色多）</span>
                   <span>简化（颜色少）</span>
                 </div>
@@ -519,25 +516,27 @@ export function ImageUploader({ onImageProcessed, onCreateBlank }: ImageUploader
 
               {/* 处理模式 */}
               <div>
-                <label className="block text-sm font-medium mb-2">处理模式</label>
+                <label className="block text-sm font-semibold mb-2 text-ink-warm">处理模式</label>
                 <div className="grid grid-cols-2 gap-3">
                   <button
                     onClick={() => setProcessMode('cartoon')}
-                    className={`px-4 py-3 rounded-lg font-medium transition-all ${
+                    className={`min-h-[48px] px-4 py-3 rounded-control text-sm font-semibold transition-colors focus-visible:outline-2 focus-visible:outline-moss focus-visible:outline-offset-2 ${
                       processMode === 'cartoon'
-                        ? 'bg-[#1f5c57] text-white shadow-md'
-                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                        ? 'bg-moss text-paper-bg border border-moss'
+                        : 'bg-paper-bg text-ink-warm border border-edge-sand hover:bg-paper-deep'
                     }`}
+                    aria-pressed={processMode === 'cartoon'}
                   >
                     卡通风格
                   </button>
                   <button
                     onClick={() => setProcessMode('photo')}
-                    className={`px-4 py-3 rounded-lg font-medium transition-all ${
+                    className={`min-h-[48px] px-4 py-3 rounded-control text-sm font-semibold transition-colors focus-visible:outline-2 focus-visible:outline-moss focus-visible:outline-offset-2 ${
                       processMode === 'photo'
-                        ? 'bg-[#1f5c57] text-white shadow-md'
-                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                        ? 'bg-moss text-paper-bg border border-moss'
+                        : 'bg-paper-bg text-ink-warm border border-edge-sand hover:bg-paper-deep'
                     }`}
+                    aria-pressed={processMode === 'photo'}
                   >
                     照片风格
                   </button>
@@ -551,13 +550,14 @@ export function ImageUploader({ onImageProcessed, onCreateBlank }: ImageUploader
                   setShowImageConfig(false);
                   setPendingFile(null);
                 }}
-                className="flex-1 px-6 py-3 border border-gray-300 rounded-xl hover:bg-gray-50 transition-colors"
+                className="flex-1 inline-flex items-center justify-center min-h-[48px] px-6 py-3 bg-paper-bg border border-edge-sand text-ink-warm rounded-control font-semibold hover:bg-paper-deep transition-colors focus-visible:outline-2 focus-visible:outline-moss focus-visible:outline-offset-2"
               >
                 取消
               </button>
               <button
                 onClick={handleConfirmImageProcess}
-                className="flex-1 px-6 py-3 bg-[#1f5c57] text-white rounded-xl hover:opacity-90 transition-opacity"
+                className="flex-1 inline-flex items-center justify-center min-h-[48px] px-6 py-3 bg-terracotta text-paper-bg rounded-control font-semibold hover:bg-terracotta-deep transition-colors focus-visible:outline-2 focus-visible:outline-moss focus-visible:outline-offset-2"
+                style={{ boxShadow: 'var(--shadow-lift-bead)' }}
               >
                 开始转换
               </button>
@@ -569,13 +569,13 @@ export function ImageUploader({ onImageProcessed, onCreateBlank }: ImageUploader
       {/* 空白画布设置模态框 */}
       {showBlankModal && (
         <div className="fixed inset-0 bg-black/50 flex items-end sm:items-center justify-center z-50 sm:p-4">
-          <div className="relative bg-white rounded-t-2xl sm:rounded-2xl shadow-2xl p-4 sm:p-8 max-w-md w-full max-h-[92vh] sm:max-h-none overflow-y-auto animate-in slide-in-from-bottom duration-200 sm:slide-in-from-bottom-0 sm:zoom-in-95">
-            <div className="sm:hidden absolute top-2 left-1/2 -translate-x-1/2 w-10 h-1 rounded-full bg-gray-300" aria-hidden="true" />
-            <h3 className="text-2xl font-bold mb-6">创建空白画布</h3>
-            
+          <div className="relative bg-paper-soft border border-edge-sand rounded-t-card sm:rounded-card p-4 sm:p-8 max-w-md w-full max-h-[92vh] sm:max-h-none overflow-y-auto animate-in slide-in-from-bottom duration-200 sm:slide-in-from-bottom-0 sm:zoom-in-95">
+            <div className="sm:hidden absolute top-2 left-1/2 -translate-x-1/2 w-10 h-1 rounded-bead bg-edge-sand" aria-hidden="true" />
+            <h3 className="text-xl sm:text-2xl font-semibold mb-6 mt-2 sm:mt-0 text-ink-warm" style={{ fontFamily: 'var(--font-headline)' }}>创建空白画布</h3>
+
             <div className="space-y-6 mb-6">
               <div>
-                <label className="block text-sm font-medium mb-2">宽度（格子数）</label>
+                <label className="block text-sm font-semibold mb-2 text-ink-warm">宽度（格子数）</label>
                 <input
                   type="number"
                   min="10"
@@ -583,16 +583,11 @@ export function ImageUploader({ onImageProcessed, onCreateBlank }: ImageUploader
                   value={blankWidth}
                   onChange={(e) => {
                     const value = e.target.value;
-                    if (value === '') {
-                      return; // 允许暂时为空
-                    }
+                    if (value === '') return;
                     const num = parseInt(value);
-                    if (!isNaN(num)) {
-                      setBlankWidth(num); // 直接设置，不限制范围
-                    }
+                    if (!isNaN(num)) setBlankWidth(num);
                   }}
                   onBlur={(e) => {
-                    // 失去焦点时才限制范围
                     const value = e.target.value;
                     if (value === '') {
                       setBlankWidth(10);
@@ -601,12 +596,12 @@ export function ImageUploader({ onImageProcessed, onCreateBlank }: ImageUploader
                       setBlankWidth(Math.max(10, Math.min(120, num)));
                     }
                   }}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#1f5c57] focus:border-transparent text-lg"
+                  className="w-full px-4 py-3 border border-edge-sand bg-paper-bg text-ink-warm rounded-control text-lg focus:outline-none focus:ring-2 focus:ring-moss focus:border-moss"
                 />
               </div>
-              
+
               <div>
-                <label className="block text-sm font-medium mb-2">高度（格子数）</label>
+                <label className="block text-sm font-semibold mb-2 text-ink-warm">高度（格子数）</label>
                 <input
                   type="number"
                   min="10"
@@ -614,16 +609,11 @@ export function ImageUploader({ onImageProcessed, onCreateBlank }: ImageUploader
                   value={blankHeight}
                   onChange={(e) => {
                     const value = e.target.value;
-                    if (value === '') {
-                      return; // 允许暂时为空
-                    }
+                    if (value === '') return;
                     const num = parseInt(value);
-                    if (!isNaN(num)) {
-                      setBlankHeight(num); // 直接设置，不限制范围
-                    }
+                    if (!isNaN(num)) setBlankHeight(num);
                   }}
                   onBlur={(e) => {
-                    // 失去焦点时才限制范围
                     const value = e.target.value;
                     if (value === '') {
                       setBlankHeight(10);
@@ -632,17 +622,17 @@ export function ImageUploader({ onImageProcessed, onCreateBlank }: ImageUploader
                       setBlankHeight(Math.max(10, Math.min(120, num)));
                     }
                   }}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#1f5c57] focus:border-transparent text-lg"
+                  className="w-full px-4 py-3 border border-edge-sand bg-paper-bg text-ink-warm rounded-control text-lg focus:outline-none focus:ring-2 focus:ring-moss focus:border-moss"
                 />
               </div>
 
-              <div className="text-center p-4 bg-[#eef6f5] rounded-lg">
-                <div className="text-sm text-gray-600 mb-1">画布尺寸</div>
-                <div className="text-2xl font-bold text-[#1f5c57]">
+              <div className="text-center p-4 bg-paper-bg border border-edge-sand rounded-surface">
+                <div className="text-sm text-ink-soft mb-1">画布尺寸</div>
+                <div className="text-2xl font-semibold text-moss" style={{ fontFamily: 'var(--font-num)' }}>
                   {blankWidth} × {blankHeight}
                 </div>
-                <div className="text-sm text-gray-500 mt-1">
-                  共 {blankWidth * blankHeight} 颗豆子
+                <div className="text-sm text-ink-soft mt-1">
+                  共 <span style={{ fontFamily: 'var(--font-num)' }}>{blankWidth * blankHeight}</span> 颗豆子
                 </div>
               </div>
             </div>
@@ -650,13 +640,14 @@ export function ImageUploader({ onImageProcessed, onCreateBlank }: ImageUploader
             <div className="flex gap-3">
               <button
                 onClick={() => setShowBlankModal(false)}
-                className="flex-1 px-6 py-3 border border-gray-300 rounded-xl hover:bg-gray-50 transition-colors"
+                className="flex-1 inline-flex items-center justify-center min-h-[48px] px-6 py-3 bg-paper-bg border border-edge-sand text-ink-warm rounded-control font-semibold hover:bg-paper-deep transition-colors focus-visible:outline-2 focus-visible:outline-moss focus-visible:outline-offset-2"
               >
                 取消
               </button>
               <button
                 onClick={handleCreateBlank}
-                className="flex-1 px-6 py-3 bg-[#1f5c57] text-white rounded-xl hover:opacity-90 transition-opacity"
+                className="flex-1 inline-flex items-center justify-center min-h-[48px] px-6 py-3 bg-terracotta text-paper-bg rounded-control font-semibold hover:bg-terracotta-deep transition-colors focus-visible:outline-2 focus-visible:outline-moss focus-visible:outline-offset-2"
+                style={{ boxShadow: 'var(--shadow-lift-bead)' }}
               >
                 创建
               </button>
@@ -665,39 +656,22 @@ export function ImageUploader({ onImageProcessed, onCreateBlank }: ImageUploader
         </div>
       )}
 
-      {/* 功能介绍 */}
-      <div className="mt-14 grid md:grid-cols-4 gap-4">
-        <div className="bg-white rounded-lg p-5 border border-[#ddd6c8]">
-          <div className="w-10 h-10 bg-[#eef6f5] rounded-md flex items-center justify-center mb-3">
-            <Camera className="w-5 h-5 text-[#1f5c57]" />
+      {/* 功能介绍 — 4 个特性卡，统一 brand */}
+      <div className="mt-12 sm:mt-14 grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
+        {([
+          { Icon: Camera, title: '智能转换', desc: '高精度颜色匹配，适配多种拼豆色号。' },
+          { Icon: Palette, title: '模拟创作', desc: '在线预览拼豆排布，支持后续细节调整。' },
+          { Icon: FileDown, title: '图纸导出', desc: '导出标准图纸，便于线下按格拼装。' },
+          { Icon: Sparkles, title: '成品预览', desc: '提供细腻的成品效果和熨烫预览。' },
+        ] as const).map(({ Icon, title, desc }) => (
+          <div key={title} className="bg-paper-soft border border-edge-sand rounded-surface p-4 sm:p-5">
+            <div className="w-10 h-10 bg-paper-deep rounded-control flex items-center justify-center mb-3" aria-hidden="true">
+              <Icon className="w-5 h-5 text-moss" />
+            </div>
+            <h3 className="font-semibold mb-1 text-ink-warm">{title}</h3>
+            <p className="text-sm text-ink-soft leading-relaxed">{desc}</p>
           </div>
-          <h3 className="font-semibold mb-1 text-[#1f2937]">智能转换</h3>
-          <p className="text-sm text-[#66707d] leading-relaxed">高精度颜色匹配，适配多种拼豆色号。</p>
-        </div>
-
-        <div className="bg-white rounded-lg p-5 border border-[#ddd6c8]">
-          <div className="w-10 h-10 bg-[#eef6f5] rounded-md flex items-center justify-center mb-3">
-            <Palette className="w-5 h-5 text-[#1f5c57]" />
-          </div>
-          <h3 className="font-semibold mb-1 text-[#1f2937]">模拟创作</h3>
-          <p className="text-sm text-[#66707d] leading-relaxed">在线预览拼豆排布，支持后续细节调整。</p>
-        </div>
-
-        <div className="bg-white rounded-lg p-5 border border-[#ddd6c8]">
-          <div className="w-10 h-10 bg-[#eef6f5] rounded-md flex items-center justify-center mb-3">
-            <FileDown className="w-5 h-5 text-[#1f5c57]" />
-          </div>
-          <h3 className="font-semibold mb-1 text-[#1f2937]">图纸导出</h3>
-          <p className="text-sm text-[#66707d] leading-relaxed">导出标准图纸，便于线下按格拼装。</p>
-        </div>
-
-        <div className="bg-white rounded-lg p-5 border border-[#ddd6c8]">
-          <div className="w-10 h-10 bg-[#eef6f5] rounded-md flex items-center justify-center mb-3">
-            <Sparkles className="w-5 h-5 text-[#1f5c57]" />
-          </div>
-          <h3 className="font-semibold mb-1 text-[#1f2937]">成品预览</h3>
-          <p className="text-sm text-[#66707d] leading-relaxed">提供细腻的成品效果和熨烫预览。</p>
-        </div>
+        ))}
       </div>
     </div>
   );

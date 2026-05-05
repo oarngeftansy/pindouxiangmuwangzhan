@@ -8,29 +8,36 @@ interface ViewModeToggleProps {
 
 export function ViewModeToggle({ viewMode, onChange }: ViewModeToggleProps) {
   return (
-    <div className="flex gap-1 bg-gray-100 rounded-lg p-1" title="视图模式">
+    <div
+      className="inline-flex gap-1 bg-paper-deep border border-edge-sand rounded-control p-1"
+      title="视图模式"
+      role="group"
+      aria-label="视图模式"
+    >
       <button
         onClick={() => onChange('simple')}
-        className={`px-3 py-1.5 rounded-md text-sm font-medium transition-all flex items-center gap-1.5 ${
+        className={`inline-flex items-center gap-1.5 min-h-[36px] px-3 py-1.5 rounded-chip text-sm font-semibold transition-colors focus-visible:outline-2 focus-visible:outline-moss focus-visible:outline-offset-2 ${
           viewMode === 'simple'
-            ? 'bg-white text-purple-700 shadow-sm'
-            : 'text-gray-600 hover:text-gray-900'
+            ? 'bg-paper-bg text-moss border border-moss'
+            : 'text-ink-soft hover:text-ink-warm'
         }`}
         title="简洁模式"
+        aria-pressed={viewMode === 'simple'}
       >
-        <Square className="w-4 h-4" />
+        <Square className="w-4 h-4" aria-hidden="true" />
         <span className="hidden sm:inline text-xs">简洁</span>
       </button>
       <button
         onClick={() => onChange('pegboard')}
-        className={`px-3 py-1.5 rounded-md text-sm font-medium transition-all flex items-center gap-1.5 ${
+        className={`inline-flex items-center gap-1.5 min-h-[36px] px-3 py-1.5 rounded-chip text-sm font-semibold transition-colors focus-visible:outline-2 focus-visible:outline-moss focus-visible:outline-offset-2 ${
           viewMode === 'pegboard'
-            ? 'bg-white text-purple-700 shadow-sm'
-            : 'text-gray-600 hover:text-gray-900'
+            ? 'bg-paper-bg text-moss border border-moss'
+            : 'text-ink-soft hover:text-ink-warm'
         }`}
         title="拼豆板模式"
+        aria-pressed={viewMode === 'pegboard'}
       >
-        <Grid className="w-4 h-4" />
+        <Grid className="w-4 h-4" aria-hidden="true" />
         <span className="hidden sm:inline text-xs">拼豆板</span>
       </button>
     </div>
