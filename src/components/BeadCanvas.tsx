@@ -24,7 +24,7 @@ import {
   ZoomIn,
   ZoomOut,
 } from "lucide-react";
-import { useState, useRef, useEffect, useMemo } from "react";
+import { useState, useRef, useEffect, useMemo, useCallback } from "react";
 import { BeadGrid, BeadColor, ColorSystem } from "../App";
 import { generateIronedImage, IRONING_METHODS, IroningMethod } from "./IroningHelpers";
 import { generateHDImage } from "./HDRenderHelpers";
@@ -359,38 +359,47 @@ export function BeadCanvas({
     return sum;
   };
 
-  const handleCellClick = (x: number, y: number) => {
-    if (lockedColor) {
-      // 锁定颜色模式：只能在对应颜色位置放置
-      const referenceColor = referenceGrid[y][x];
-      if (referenceColor !== lockedColor) {
-        return; // 不允许放置
-      }
+  // ★ Perf: handler 通过 ref 读最新 state，永远稳定引用——这样 PegboardCell 的
+  // React.memo 才不会被 inline lambda 引用变化打废，6400 个 cell 不会全部重渲。
+  // ref 内是每次 render 同步的 state 快照，避免 stale closure。
+  const stateRef = useRef({
+    lockedColor, referenceGrid, workingGrid, activeTool,
+    selectedColor, celebratedColors, colorSystem,
+    pourMode, isDrawing,
+  });
+  useEffect(() => {
+    stateRef.current = {
+      lockedColor, referenceGrid, workingGrid, activeTool,
+      selectedColor, celebratedColors, colorSystem,
+      pourMode, isDrawing,
+    };
+  });
+
+  const handleCellClick = useCallback((x: number, y: number) => {
+    const s = stateRef.current;
+    if (s.lockedColor) {
+      const referenceColor = s.referenceGrid[y][x];
+      if (referenceColor !== s.lockedColor) return;
     }
 
-    const newGrid = workingGrid.map((row) => [...row]);
-    if (activeTool === "brush") {
-      if (lockedColor) {
-        newGrid[y][x] = lockedColor;
-      } else {
-        newGrid[y][x] =
-          selectedColor === "#00000000" ? null : selectedColor;
-      }
+    const newGrid = s.workingGrid.map((row) => [...row]);
+    if (s.activeTool === "brush") {
+      newGrid[y][x] = s.lockedColor
+        ? s.lockedColor
+        : (s.selectedColor === "#00000000" ? null : s.selectedColor);
     } else {
       newGrid[y][x] = null;
     }
     setWorkingGrid(newGrid);
     setBeadGrid(newGrid);
 
-    // 检测单色完成
-    if (activeTool === 'brush') {
-      const placedColor = lockedColor || (selectedColor !== '#00000000' ? selectedColor : null);
-      if (placedColor && !celebratedColors.has(placedColor)) {
-        // 统计这个颜色在参考图里的总数 vs 已放置数
+    if (s.activeTool === 'brush') {
+      const placedColor = s.lockedColor || (s.selectedColor !== '#00000000' ? s.selectedColor : null);
+      if (placedColor && !s.celebratedColors.has(placedColor)) {
         let total = 0, placed = 0;
-        for (let ry = 0; ry < referenceGrid.length; ry++) {
-          for (let rx = 0; rx < referenceGrid[0].length; rx++) {
-            if (referenceGrid[ry][rx] === placedColor) {
+        for (let ry = 0; ry < s.referenceGrid.length; ry++) {
+          for (let rx = 0; rx < s.referenceGrid[0].length; rx++) {
+            if (s.referenceGrid[ry][rx] === placedColor) {
               total++;
               if (newGrid[ry][rx] === placedColor) placed++;
             }
@@ -401,30 +410,29 @@ export function BeadCanvas({
           const colorInfo = beadColors.find(c => c.hex === placedColor);
           setCelebratingColor({
             hex: placedColor,
-            code: colorInfo?.[colorSystem] || colorInfo?.mard || '?',
+            code: colorInfo?.[s.colorSystem] || colorInfo?.mard || '?',
             name: colorInfo?.name || '',
           });
           setTimeout(() => setCelebratingColor(null), 2800);
         }
       }
     }
-  };
+  }, []);
 
-  const handleMouseDown = (x: number, y: number) => {
+  const handleMouseDown = useCallback((x: number, y: number) => {
     setIsDrawing(true);
     handleCellClick(x, y);
-  };
+  }, [handleCellClick]);
 
-  const handleMouseEnter = (x: number, y: number) => {
+  const handleMouseEnter = useCallback((x: number, y: number) => {
     setHoveredCell({ x, y });
-    // 滑豆模式：只在锁定颜色且开启滑豆模式时，鼠标滑过即上色
-    if (pourMode && lockedColor) {
+    const s = stateRef.current;
+    if (s.pourMode && s.lockedColor) {
       handleCellClick(x, y);
-    } else if (isDrawing) {
-      // 普通模式：需要按住鼠标拖动
+    } else if (s.isDrawing) {
       handleCellClick(x, y);
     }
-  };
+  }, [handleCellClick]);
 
   const handleMouseUp = () => {
     setIsDrawing(false);
@@ -1395,8 +1403,8 @@ export function BeadCanvas({
                             shouldHighlight={shouldHighlight}
                             canPlace={canPlace}
                             isEmpty={isEmpty}
-                            onMouseDown={() => canPlace && handleMouseDown(x, y)}
-                            onMouseEnter={() => handleMouseEnter(x, y)}
+                            onMouseDown={handleMouseDown}
+                            onMouseEnter={handleMouseEnter}
                             canvasParams={canvasParams}
                           />
                         );
@@ -1530,8 +1538,8 @@ export function BeadCanvas({
                               shouldHighlight={shouldHighlight}
                               canPlace={canPlace}
                               isEmpty={isEmpty}
-                              onMouseDown={() => canPlace && handleMouseDown(x, y)}
-                              onMouseEnter={() => handleMouseEnter(x, y)}
+                              onMouseDown={handleMouseDown}
+                              onMouseEnter={handleMouseEnter}
                               canvasParams={canvasParams}
                             />
                           );

@@ -1,4 +1,6 @@
 // 拼豆板单元格组件 - 渲染单个拼豆位置
+// 用 React.memo 包裹避免 6400+ cell 在每次 BeadCanvas state 变化时全部重渲；
+// 配合 BeadCanvas 用 useCallback + useRef 提供稳定的 onMouseDown/Enter 引用，memo 才真生效。
 import React from 'react';
 import type { CanvasParams } from '../data/canvasParams';
 
@@ -12,8 +14,9 @@ interface PegboardCellProps {
   shouldHighlight?: boolean;
   canPlace?: boolean;
   isEmpty?: boolean;
-  onMouseDown?: () => void;
-  onMouseEnter?: () => void;
+  // 接收坐标——让父传稳定的函数引用而非每次 inline lambda
+  onMouseDown?: (x: number, y: number) => void;
+  onMouseEnter?: (x: number, y: number) => void;
   canvasParams?: CanvasParams;
 }
 
@@ -26,7 +29,7 @@ function surfaceFilter(sat: number, bright: number): string | undefined {
   return parts.join(' ');
 }
 
-export function PegboardCell({
+function PegboardCellComponent({
   x,
   y,
   color,
@@ -40,6 +43,9 @@ export function PegboardCell({
   onMouseEnter,
   canvasParams,
 }: PegboardCellProps) {
+  // 内部 lambda：canPlace 检查 + 调用父稳定的 callback
+  const handleDown = onMouseDown ? () => { if (canPlace) onMouseDown(x, y); } : undefined;
+  const handleEnter = onMouseEnter ? () => onMouseEnter(x, y) : undefined;
 
   // ── 简洁模式 ──────────────────────────────────────────
   if (viewMode === 'simple') {
@@ -68,8 +74,8 @@ export function PegboardCell({
             ? `1px solid rgba(168, 130, 90, ${borderAlpha * 0.6})`
             : '1px solid transparent',
         }}
-        onMouseDown={onMouseDown}
-        onMouseEnter={onMouseEnter}
+        onMouseDown={handleDown}
+        onMouseEnter={handleEnter}
       >
         {color && (
           <div
@@ -182,8 +188,8 @@ export function PegboardCell({
           ? `rgba(0,0,0,${emptyBgAlpha})`
           : "transparent",
       }}
-      onMouseDown={onMouseDown}
-      onMouseEnter={onMouseEnter}
+      onMouseDown={handleDown}
+      onMouseEnter={handleEnter}
     >
       {/* 拼豆板的钉子 */}
       <div
@@ -295,3 +301,19 @@ export function PegboardCell({
     </div>
   );
 }
+
+// 自定义浅比较：跳过 onMouseDown / onMouseEnter 引用比较（父用 useCallback + useRef
+// 保证 callback 行为正确；这里只关心视觉相关 props 变化才重渲）。
+// canvasParams 比引用，state 不变就稳定。
+export const PegboardCell = React.memo(PegboardCellComponent, (prev, next) =>
+  prev.x === next.x &&
+  prev.y === next.y &&
+  prev.color === next.color &&
+  prev.beadSize === next.beadSize &&
+  prev.viewMode === next.viewMode &&
+  prev.showGrid === next.showGrid &&
+  prev.shouldHighlight === next.shouldHighlight &&
+  prev.canPlace === next.canPlace &&
+  prev.isEmpty === next.isEmpty &&
+  prev.canvasParams === next.canvasParams,
+);
