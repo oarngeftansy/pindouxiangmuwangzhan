@@ -566,7 +566,7 @@ export function BeadPattern({
               </div>
             </div>
 
-            <div className="bg-paper-deep rounded-surface p-3 sm:p-6 overflow-auto touch-pan-x touch-pan-y">
+            <div className="bg-paper-deep rounded-surface p-3 sm:p-6 overflow-auto">
               <div className="inline-block">
                 <div
                   className="grid gap-0 bg-paper-bg rounded-control overflow-hidden border border-edge-sand"
