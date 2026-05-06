@@ -256,12 +256,14 @@ export function IroningDevTool() {
   const [afterImg, setAfterImg] = useState<string>("");
   const [rendering, setRendering] = useState(false);
   const [ironingSaved, setIroningSaved] = useState(false);
+  const [ironingCopied, setIroningCopied] = useState(false);
   const sampleGrid = useRef(makeSampleGrid());
   const renderTimer = useRef<ReturnType<typeof setTimeout>>();
 
   // canvas state
   const [canvasParams, setCanvasParams] = useState<CanvasParams>(loadCanvasParams);
   const [canvasSaved, setCanvasSaved] = useState(false);
+  const [canvasCopied, setCanvasCopied] = useState(false);
   const [canvasViewMode, setCanvasViewMode] = useState<'simple' | 'pegboard'>('pegboard');
 
   // ── Ironing rendering ─────────────────────────────────
@@ -303,6 +305,21 @@ export function IroningDevTool() {
     setTimeout(() => setIroningSaved(false), 2000);
   };
 
+  // 把当前参数格式化为可粘回 ironingParams.ts 的 TS 代码，写到剪贴板
+  const handleCopyIroningAsDefault = async () => {
+    const code = `// 粘给 Claude → 让它写回 src/data/ironingParams.ts 的 DEFAULT_IRONING_PARAMS + 升 STORAGE_KEY 到下一版 + commit + push
+export const DEFAULT_IRONING_PARAMS: IroningParams = ${JSON.stringify(ironingParams, null, 2)};
+`;
+    try {
+      await navigator.clipboard.writeText(code);
+      setIroningCopied(true);
+      setTimeout(() => setIroningCopied(false), 2000);
+    } catch {
+      // 浏览器拦截 clipboard 时降级到 prompt 让用户手动复制
+      window.prompt('自动复制失败，请手动 Ctrl/Cmd+C 复制下面内容：', code);
+    }
+  };
+
   const handleResetIroning = () => {
     setIroningParams(structuredClone(DEFAULT_IRONING_PARAMS));
     setIroningSaved(false);
@@ -327,6 +344,19 @@ export function IroningDevTool() {
     saveCanvasParams(canvasParams);
     setCanvasSaved(true);
     setTimeout(() => setCanvasSaved(false), 2000);
+  };
+
+  const handleCopyCanvasAsDefault = async () => {
+    const code = `// 粘给 Claude → 让它写回 src/data/canvasParams.ts 的 DEFAULT_CANVAS_PARAMS + 升 STORAGE_KEY 到下一版 + commit + push
+export const DEFAULT_CANVAS_PARAMS: CanvasParams = ${JSON.stringify(canvasParams, null, 2)};
+`;
+    try {
+      await navigator.clipboard.writeText(code);
+      setCanvasCopied(true);
+      setTimeout(() => setCanvasCopied(false), 2000);
+    } catch {
+      window.prompt('自动复制失败，请手动 Ctrl/Cmd+C 复制下面内容：', code);
+    }
   };
 
   const handleResetCanvas = () => {
@@ -371,6 +401,15 @@ export function IroningDevTool() {
                 >
                   {ironingSaved ? "已保存!" : "保存烫豆参数"}
                 </button>
+                <button
+                  onClick={handleCopyIroningAsDefault}
+                  title="把当前参数格式化为代码复制到剪贴板，粘给 Claude 让它写回源码 + 部署给所有访客"
+                  className={`px-4 py-2 rounded-lg font-semibold text-sm transition-all ${
+                    ironingCopied ? "bg-green-600 text-white" : "bg-purple-600 text-white hover:bg-purple-500"
+                  }`}
+                >
+                  {ironingCopied ? "✓ 已复制" : "📋 复制为默认值"}
+                </button>
               </>
             ) : (
               <>
@@ -384,6 +423,15 @@ export function IroningDevTool() {
                   }`}
                 >
                   {canvasSaved ? "已保存!" : "保存创作台参数"}
+                </button>
+                <button
+                  onClick={handleCopyCanvasAsDefault}
+                  title="把当前参数格式化为代码复制到剪贴板，粘给 Claude 让它写回源码 + 部署给所有访客"
+                  className={`px-4 py-2 rounded-lg font-semibold text-sm transition-all ${
+                    canvasCopied ? "bg-green-600 text-white" : "bg-purple-600 text-white hover:bg-purple-500"
+                  }`}
+                >
+                  {canvasCopied ? "✓ 已复制" : "📋 复制为默认值"}
                 </button>
               </>
             )}
