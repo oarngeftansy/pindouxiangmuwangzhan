@@ -677,7 +677,7 @@ export function BeadCanvas({
   };
 
   return (
-    <div className="flex flex-col gap-3">
+    <div className="flex flex-col gap-3" style={{ minHeight: 'calc(100dvh - 80px)' }}>
       {/* 工具栏 */}
       <div className="bg-paper-soft border border-edge-sand rounded-card p-3 sm:p-4 shrink-0">
         <div className={`flex items-center gap-2 ${isMobile ? 'flex-wrap gap-y-2' : 'flex-wrap gap-3'}`}>
