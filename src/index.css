@@ -32,12 +32,18 @@
 }
 
 @layer base {
-  html, body, #root { min-height: 100vh; height: 100%; margin: 0; }
+  /* iOS Safari URL bar 出现/消失会让 100vh 跳变，必须用 100dvh（动态 viewport）；
+     overscroll-behavior:none 阻止 rubber-band 触发祖先滚动，避免 rubber-band 后 layout 错乱 */
+  html, body, #root { min-height: 100dvh; height: 100%; margin: 0; }
+  html, body { overscroll-behavior: none; }
   body {
     font-family: 'Noto Sans SC', 'Nunito', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
   }
   /* 消除手机按钮 300ms 点击延迟，提升触摸响应 */
   button, a, [role="button"] { touch-action: manipulation; }
+  /* iPad Safari: button 内 child 元素有时拦截 touch 让 onClick 失效（已知 bug，
+     之前 ImageUploader 三个预设按钮就栽这上面）。全局让所有 button 子元素穿透 pointer 事件 */
+  button > * { pointer-events: none; }
   /* 防止长按弹出系统菜单（在画布区域已单独设置） */
   img { -webkit-user-drag: none; user-select: none; }
 }
