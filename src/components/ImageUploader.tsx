@@ -370,7 +370,7 @@ export function ImageUploader({ onImageProcessed, onCreateBlank }: ImageUploader
                       setColorMergeThreshold(10);
                       setMaxColors(30);
                     }}
-                    className="inline-flex flex-col items-center justify-center gap-1 min-h-[64px] px-3 py-3 bg-paper-bg border border-edge-sand rounded-control text-sm font-semibold text-ink-warm hover:bg-paper-deep transition-colors focus-visible:outline-2 focus-visible:outline-moss focus-visible:outline-offset-2"
+                    className="inline-flex flex-col items-center justify-center gap-1 min-h-[64px] px-3 py-3 bg-paper-bg border border-edge-sand rounded-control text-sm font-semibold text-ink-warm hover:bg-paper-deep transition-colors focus-visible:outline-2 focus-visible:outline-moss focus-visible:outline-offset-2 [&>*]:pointer-events-none"
                   >
                     <span>简单图案</span>
                     <span className="text-xs font-normal text-ink-soft">低豆子数</span>
@@ -392,7 +392,7 @@ export function ImageUploader({ onImageProcessed, onCreateBlank }: ImageUploader
                       setColorMergeThreshold(15);
                       setMaxColors(40);
                     }}
-                    className="inline-flex flex-col items-center justify-center gap-1 min-h-[64px] px-3 py-3 bg-paper-bg border border-edge-sand rounded-control text-sm font-semibold text-ink-warm hover:bg-paper-deep transition-colors focus-visible:outline-2 focus-visible:outline-moss focus-visible:outline-offset-2"
+                    className="inline-flex flex-col items-center justify-center gap-1 min-h-[64px] px-3 py-3 bg-paper-bg border border-edge-sand rounded-control text-sm font-semibold text-ink-warm hover:bg-paper-deep transition-colors focus-visible:outline-2 focus-visible:outline-moss focus-visible:outline-offset-2 [&>*]:pointer-events-none"
                   >
                     <span>普通照片</span>
                     <span className="text-xs font-normal text-ink-soft">推荐</span>
@@ -414,7 +414,7 @@ export function ImageUploader({ onImageProcessed, onCreateBlank }: ImageUploader
                       setColorMergeThreshold(5);
                       setMaxColors(60);
                     }}
-                    className="inline-flex flex-col items-center justify-center gap-1 min-h-[64px] px-3 py-3 bg-paper-bg border border-edge-sand rounded-control text-sm font-semibold text-ink-warm hover:bg-paper-deep transition-colors focus-visible:outline-2 focus-visible:outline-moss focus-visible:outline-offset-2"
+                    className="inline-flex flex-col items-center justify-center gap-1 min-h-[64px] px-3 py-3 bg-paper-bg border border-edge-sand rounded-control text-sm font-semibold text-ink-warm hover:bg-paper-deep transition-colors focus-visible:outline-2 focus-visible:outline-moss focus-visible:outline-offset-2 [&>*]:pointer-events-none"
                   >
                     <span>高清照片</span>
                     <span className="text-xs font-normal text-ink-soft">保留细节</span>
