@@ -224,4 +224,7 @@
 
 html {
   font-size: var(--font-size);
+  /* iOS Safari rubber-band（过度下拉/上滑回弹）会暴露 html 的背景色而非 body 的，
+     不设的话默认是白色——会出现"下拉/上滑后变成纯色"的视觉跳变。给 html 也染上 paper-bg 让两层无缝衔接。 */
+  background-color: var(--bead-paper-bg);
 }
