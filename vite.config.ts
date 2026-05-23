@@ -61,6 +61,8 @@
           main: path.resolve(__dirname, 'index.html'),
           dev: path.resolve(__dirname, 'dev.html'),
           ironingDev: path.resolve(__dirname, 'ironing-dev.html'),
+          // app/ 子路径 — 手机 app 风格的独立入口（与 web 端代码完全分离）
+          app: path.resolve(__dirname, 'app/index.html'),
         },
       },
     },
