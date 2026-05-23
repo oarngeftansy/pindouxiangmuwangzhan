@@ -12,15 +12,15 @@
 # 1. Xcode：去 App Store 搜 "Xcode" 安装（约 8 GB，需要 Apple ID）
 xcode-select --install            # 装 command line tools
 
-# 2. CocoaPods：iOS 原生依赖管理器
-sudo gem install cocoapods
-
-# 3. Node 18+（如果没装）
+# 2. Node 18+（如果没装）
 brew install node
 
-# 4. Claude Code（如果想接着用 AI 改代码）
+# 3. Claude Code（如果想接着用 AI 改代码）
 npm install -g @anthropic-ai/claude-code
 ```
+
+> ✅ **CocoaPods 不需要**——Capacitor 8 改用 Swift Package Manager（SPM），所有
+>    native 依赖由 Xcode 自动管理。
 
 ---
 
@@ -43,16 +43,17 @@ grep '"@capacitor' package.json
 
 ---
 
-## 2. 第一次创建 iOS 工程
+## 2. iOS 工程
+
+> ✅ **`ios/` 目录已经在仓库里**（在 Windows 上预生成好了，Capacitor 8 + SPM 跨平台 OK）。
+>    Mac 上 `git clone` 之后直接进 3 节，不用跑 `ios:add`。
+
+如果哪天 `ios/` 出问题需要重生成：
 
 ```bash
-npm run ios:add
-# 等价于 npx cap add ios
+rm -rf ios/
+npm run ios:add    # 等价于 npx cap add ios，本机会重建工程
 ```
-
-这会生成 `ios/` 目录（包含 Xcode 工程 + CocoaPods 配置）。**第一次跑会下载所有 native pods，约 2–5 分钟**。
-
-> ⚠️ `ios/` 目录会进 git。Pods 已经在 .gitignore 里排除，每次 clone 后需要 `cd ios/App && pod install` 重新装一次。
 
 ---
 
@@ -214,7 +215,7 @@ npm run ios:run    # sync 后直接在连接的设备/模拟器上跑
 
 | 症状 | 解决 |
 |---|---|
-| `pod install` 报错 | `sudo gem uninstall cocoapods && sudo gem install cocoapods` |
+| SPM 依赖解析慢 | Xcode 第一次会下载所有 Package.swift 依赖，3-5 分钟，耐心等 |
 | Xcode 显示 "No Provisioning Profile" | Signing 里勾上 "Automatically manage signing" |
 | 模拟器白屏 | 看 Xcode console 是否有 JS error；可能 Vite build 失败 |
 | Haptics 不响 | 模拟器没震动硬件，必须真机测 |
