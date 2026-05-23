@@ -71,6 +71,11 @@
     "ios:add": "cap add ios",
     "ios:sync": "npm run build && cap sync ios",
     "ios:open": "npm run ios:sync && cap open ios",
-    "ios:run": "npm run ios:sync && cap run ios"
+    "ios:run": "npm run ios:sync && cap run ios",
+    "android:add": "cap add android",
+    "android:sync": "npm run build && cap sync android",
+    "android:open": "npm run android:sync && cap open android",
+    "android:run": "npm run android:sync && cap run android",
+    "android:apk": "npm run android:sync && cd android && gradlew assembleDebug"
   }
 }
