@@ -6,3 +6,11 @@ dist/
 .env
 .env.local
 .vite/
+
+# Capacitor / iOS — 不提交 Pods 和构建产物，工程文件保留进 git
+ios/App/Pods/
+ios/App/build/
+ios/DerivedData/
+ios/App/App/public/
+*.xcuserstate
+xcuserdata/

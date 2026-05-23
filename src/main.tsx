@@ -2,6 +2,7 @@
   import { createRoot } from "react-dom/client";
   import App from "./App.tsx";
   import "./index.css";
+  import { setupNativeUI } from "./utils/native";
 
   // 首次访问时，从静态 JSON 加载默认图纸数据到 localStorage
   async function seedDefaults() {
@@ -26,4 +27,6 @@
 
   seedDefaults().then(() => {
     createRoot(document.getElementById("root")!).render(<App />);
+    // iOS 上隐藏 splash + 配置状态栏；Web 端 no-op
+    setupNativeUI();
   });

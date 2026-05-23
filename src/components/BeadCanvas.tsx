@@ -32,6 +32,7 @@ import { addToGallery } from "../utils/galleryUtils";
 import { PegboardCell } from "./PegboardCell";
 import { ViewModeToggle } from "./ViewModeToggle";
 import { loadCanvasParams, type CanvasParams } from "../data/canvasParams";
+import { saveOrShareImage, tapHaptic } from "../utils/native";
 
 // 暂时隐藏高清渲染入口；将来重启用时翻成 true，工具栏 / 手机底栏 / 完成 modal 三处会一起恢复。
 const SHOW_HD_RENDER = false;
@@ -393,6 +394,9 @@ export function BeadCanvas({
     setWorkingGrid(newGrid);
     setBeadGrid(newGrid);
 
+    // iOS: 每放/擦一颗豆子轻触感反馈；Web no-op
+    tapHaptic(false);
+
     if (s.activeTool === 'brush') {
       const placedColor = s.lockedColor || (s.selectedColor !== '#00000000' ? s.selectedColor : null);
       if (placedColor && !s.celebratedColors.has(placedColor)) {
@@ -414,6 +418,8 @@ export function BeadCanvas({
             name: colorInfo?.name || '',
           });
           setTimeout(() => setCelebratingColor(null), 2800);
+          // 完成单色：强一档触感作为"成就"反馈
+          tapHaptic(true);
         }
       }
     }
@@ -488,12 +494,11 @@ export function BeadCanvas({
   };
 
   const downloadCanvas = () => {
-    const link = document.createElement("a");
     const w = workingGrid[0]?.length ?? 0;
     const h = workingGrid.length;
-    link.download = `拼豆图纸-${w}x${h}.png`;
-    link.href = generateCanvasDataURL();
-    link.click();
+    // iOS app: 触发原生分享菜单（保存到照片 / AirDrop / 微信 等）
+    // Web: 浏览器下载
+    saveOrShareImage(generateCanvasDataURL(), `拼豆图纸-${w}x${h}.png`);
   };
 
   // 高精度渲染
