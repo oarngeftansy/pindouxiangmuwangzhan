@@ -157,6 +157,7 @@ export function ArcadeButton({ size = 16, color = 'var(--bead-terracotta)', clas
 }
 
 // 1UP / PLAY / READY 像素徽章（街机文字标签）
+// 外框统一 navy chrome（不再用 hue-70 暖棕 ink，避免读起来"土陶"）
 export function PixelBadge({
   text = '1UP',
   color = 'var(--bead-terracotta)',
@@ -173,11 +174,11 @@ export function PixelBadge({
         padding: '3px 5px',
         letterSpacing: '0.05em',
         boxShadow: [
-          '0 -1px 0 var(--bead-ink)',
-          '0 1px 0 var(--bead-ink)',
-          '-1px 0 0 var(--bead-ink)',
-          '1px 0 0 var(--bead-ink)',
-          '2px 2px 0 var(--bead-ink)',
+          '0 -1px 0 var(--y2k-navy)',
+          '0 1px 0 var(--y2k-navy)',
+          '-1px 0 0 var(--y2k-navy)',
+          '1px 0 0 var(--y2k-navy)',
+          '2px 2px 0 var(--y2k-navy-deep)',
         ].join(', '),
         ...style,
       }}

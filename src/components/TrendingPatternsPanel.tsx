@@ -64,21 +64,22 @@ function PatternThumbnail({ grid, size = 100 }: { grid: BeadGrid; size?: number 
   return <canvas ref={canvasRef} className="pixel-render" />;
 }
 
-// 像素 1px 步阶外框 + navy 硬阴影 — 跟 UPLOAD.EXE 一致 chrome
+// 像素 1px 步阶外框 + 4px 偏移硬阴 — 整套 chrome 全部 navy，
+// 不再用 bead-ink（hue 70 暖棕）做外框，避免卡片读起来"土陶"
 const PIXEL_WINDOW_SHADOW = [
-  '0 -2px 0 var(--bead-ink)',
-  '0 2px 0 var(--bead-ink)',
-  '-2px 0 0 var(--bead-ink)',
-  '2px 0 0 var(--bead-ink)',
-  '4px 4px 0 var(--y2k-navy)',
+  '0 -2px 0 var(--y2k-navy)',
+  '0 2px 0 var(--y2k-navy)',
+  '-2px 0 0 var(--y2k-navy)',
+  '2px 0 0 var(--y2k-navy)',
+  '4px 4px 0 var(--y2k-navy-deep)',
 ].join(', ');
 
-// 选中态用 coral 硬阴影做对比 pop
+// 选中态用 coral 偏移做对比 pop
 const PIXEL_WINDOW_SHADOW_ACTIVE = [
-  '0 -2px 0 var(--bead-ink)',
-  '0 2px 0 var(--bead-ink)',
-  '-2px 0 0 var(--bead-ink)',
-  '2px 0 0 var(--bead-ink)',
+  '0 -2px 0 var(--y2k-navy)',
+  '0 2px 0 var(--y2k-navy)',
+  '-2px 0 0 var(--y2k-navy)',
+  '2px 0 0 var(--y2k-navy)',
   '4px 4px 0 var(--y2k-coral)',
 ].join(', ');
 
@@ -186,14 +187,14 @@ export function TrendingPatternsPanel({ onUsePattern }: TrendingPatternsPanelPro
                   boxShadow: PIXEL_WINDOW_SHADOW,
                 }}
               >
-                {/* 主图区 — paper-soft 暖底 + dot grid */}
+                {/* 主图区 — paper-soft 暖底 + 冷 navy dot grid + 底部 navy 分隔 */}
                 <div
                   className="relative flex items-center justify-center bg-paper-soft p-3 aspect-[4/3]"
                   style={{
                     backgroundImage:
-                      'radial-gradient(circle, rgba(58, 52, 42, 0.06) 1px, transparent 1px)',
+                      'radial-gradient(circle, rgba(44, 58, 94, 0.08) 1px, transparent 1px)',
                     backgroundSize: '10px 10px',
-                    boxShadow: 'inset 0 -2px 0 var(--bead-ink)',
+                    boxShadow: 'inset 0 -2px 0 var(--y2k-navy)',
                   }}
                 >
                   {p.previewImage ? (

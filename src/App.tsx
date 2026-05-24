@@ -200,9 +200,9 @@ function App() {
         />
       )}
       {/* Header — 完全融入渐变（无 bg、无 border、无 blur），
-          靠 logo + 两颗带 chrome 硬阴的按钮自己浮起来 */}
+          全宽布局，logo 紧贴左边 / 按钮紧贴右边，呼应 NJ kiosk 边缘对齐 */}
       <header className="relative z-10">
-        <div className="max-w-7xl mx-auto px-4 py-3 sm:py-4 sm:px-6 lg:px-8">
+        <div className="w-full px-4 py-3 sm:py-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between gap-2">
             <div className="flex items-center gap-2 sm:gap-3 min-w-0">
               <BeadLogoMark className="w-9 h-9 sm:w-10 sm:h-10 shrink-0" />
