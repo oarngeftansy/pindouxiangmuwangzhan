@@ -72,6 +72,8 @@ const STEPS: TourStep[] = [
   },
 ];
 
+// ⚠️ 不要随便改这个 key —— 改了所有老用户都会被强制重看一遍引导。
+// 只有真改了步骤数量/顺序/逻辑才升版本号。纯文案 tweaks 保持 v3 不变。
 const STORAGE_KEY = 'onboarding_done_v3';
 
 interface OnboardingTourProps {
