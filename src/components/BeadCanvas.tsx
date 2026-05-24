@@ -1476,7 +1476,10 @@ export function BeadCanvas({
                     <div
                       className="rounded-control relative inline-block"
                       style={{
-                        backgroundColor: 'oklch(0.985 0.006 80)',
+                        // 板底从近纯白 oklch(0.985) 改成跟页面 paper-bg 一致的暖米色
+                        // 这样圆豆 border-radius 50% 自然不覆盖的 4 角露的是暖米色不是白色
+                        // 视觉上跟页面背景融合，不再看到刺眼"白方格"
+                        backgroundColor: 'var(--bead-paper-bg)',
                         boxShadow: 'inset 0 2px 8px rgba(44, 58, 94, 0.08), 0 4px 16px rgba(44, 58, 94, 0.18)',
                         padding: '8px',
                         border: '4px solid var(--y2k-navy)',
