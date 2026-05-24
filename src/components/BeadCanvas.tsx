@@ -219,7 +219,7 @@ export function BeadCanvas({
   const [ironPosition, setIronPosition] = useState({ x: 0, y: 0 }); // 熨斗位置
   const [ironedResult, setIronedResult] = useState<string | null>(null); // 熨烫结果预览
   const [showIronPreview, setShowIronPreview] = useState(false); // 显示熨烫预览
-  const [removeBackground, setRemoveBackground] = useState(false); // 是否去除背景
+  const [removeBackground, setRemoveBackground] = useState(true); // 是否去除背景 — 默认开
   // 用户简化版熨烫效果调节 — 3 滑块（光泽 / 质感 / 闪片），100 = 默认
   const [effectGloss, setEffectGloss] = useState(100);
   const [effectTexture, setEffectTexture] = useState(100);
@@ -235,7 +235,7 @@ export function BeadCanvas({
   // 高清渲染
   const [showHDModal, setShowHDModal] = useState(false); // 高清渲染模态框
   const [hdScale, setHdScale] = useState(2); // 高清渲染倍数
-  const [hdRemoveBackground, setHdRemoveBackground] = useState(false); // 高清渲染去背景
+  const [hdRemoveBackground, setHdRemoveBackground] = useState(true); // 高清渲染去背景 — 默认开
   const [hdResult, setHdResult] = useState<string | null>(null); // 高清渲染结果
   const [showHDPreview, setShowHDPreview] = useState(false); // 显示高清预览
 
