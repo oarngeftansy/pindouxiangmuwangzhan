@@ -1195,12 +1195,15 @@ export function BeadCanvas({
               </div>
             )}
 
-            {/* 参考图内容 — 方格像素图（保持图纸原样）+ SVG 自适应缩放，整图永远完整可见 */}
+            {/* 参考图内容 — 方格像素图 + SVG 自适应，每 cell 加细 navy stroke 当网格线（图纸样式） */}
             {(() => {
               const refCols = referenceGrid[0].length;
               const refRows = referenceGrid.length;
               return (
-                <div className="bg-paper-bg p-2 flex items-center justify-center">
+                <div
+                  className="bg-paper-bg p-2 flex items-center justify-center"
+                  style={{ boxShadow: 'inset 0 0 0 2px var(--y2k-navy)' }}
+                >
                   <svg
                     viewBox={`0 0 ${refCols} ${refRows}`}
                     preserveAspectRatio="xMidYMid meet"
@@ -1234,6 +1237,8 @@ export function BeadCanvas({
                               width={1}
                               height={1}
                               fill={color}
+                              stroke="rgba(44,58,94,0.22)"
+                              strokeWidth={0.04}
                               opacity={dimmed ? 0.3 : 1}
                             />
                           </g>
@@ -1501,112 +1506,10 @@ export function BeadCanvas({
               <CornerPearls />
             </div>
           ) : (
-            /* 简洁模式：左右分屏 — REFERENCE.EXE + EDIT.EXE */
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {/* REFERENCE.EXE 参考图纸窗口 */}
-              {showReference && (
-                <div className="relative">
-                  <div
-                    className="relative bg-paper-bg p-4 pt-7"
-                    style={{
-                      boxShadow: WIN95_SHADOW,
-                      backgroundImage:
-                        'radial-gradient(circle, rgba(44, 58, 94, 0.05) 1px, transparent 1px)',
-                      backgroundSize: '14px 14px',
-                    }}
-                  >
-                    <TitleBar name="REFERENCE.EXE" />
-                    <div className="flex items-baseline gap-3 mb-3">
-                      <h3 className="font-pixel-cn text-ink-warm" style={{ fontSize: 22, letterSpacing: '0.1em', lineHeight: 1.1 }}>
-                        参考图纸
-                      </h3>
-                      <span className="font-pixel-arcade text-y2k-navy" style={{ fontSize: 12, letterSpacing: '0.15em' }}>
-                        REF
-                      </span>
-                    </div>
-                    {/* 参考图 — 方格像素图（保持图纸原样）+ SVG 自适应缩放，整图永远完整可见 */}
-                    {(() => {
-                      const refCols = referenceGrid[0].length;
-                      const refRows = referenceGrid.length;
-                      return (
-                        <div
-                          className="bg-paper-soft p-3 flex items-center justify-center"
-                          style={{
-                            boxShadow: 'inset 0 0 0 2px var(--y2k-navy)',
-                          }}
-                        >
-                          <svg
-                            viewBox={`0 0 ${refCols} ${refRows}`}
-                            preserveAspectRatio="xMidYMid meet"
-                            shapeRendering="crispEdges"
-                            style={{
-                              width: '100%',
-                              maxHeight: '60vh',
-                              backgroundColor: 'var(--bead-paper-bg)',
-                              boxShadow: 'inset 0 0 0 1px var(--y2k-navy)',
-                              display: 'block',
-                            }}
-                            role="img"
-                            aria-label="参考图纸"
-                          >
-                            {referenceGrid.map((row, y) =>
-                              row.map((color, x) => {
-                                if (!color) return null;
-                                const isHighlight = lockedColor === color;
-                                const isPlaced = !!workingGrid[y][x];
-                                const dimmed = lockedColor && !isHighlight;
-                                return (
-                                  <g
-                                    key={`ref-${x}-${y}`}
-                                    onClick={() => handleColorLock(color)}
-                                    style={{ cursor: 'pointer' }}
-                                  >
-                                    {/* 锁定高亮 — 蜜糖底色铺满 cell */}
-                                    {isHighlight && (
-                                      <rect
-                                        x={x - 0.05}
-                                        y={y - 0.05}
-                                        width={1.1}
-                                        height={1.1}
-                                        fill="var(--bead-honey-glow)"
-                                      />
-                                    )}
-                                    {/* 实际色块 — 方格 1×1 满 cell，像素图样式 */}
-                                    <rect
-                                      x={x}
-                                      y={y}
-                                      width={1}
-                                      height={1}
-                                      fill={color}
-                                      opacity={dimmed ? 0.3 : 1}
-                                    />
-                                    {/* 已放置指示 — 该格上覆盖 navy 半透标记 */}
-                                    {isPlaced && (
-                                      <rect
-                                        x={x + 0.15}
-                                        y={y + 0.15}
-                                        width={0.7}
-                                        height={0.7}
-                                        fill="none"
-                                        stroke="var(--y2k-navy)"
-                                        strokeWidth={0.15}
-                                      />
-                                    )}
-                                  </g>
-                                );
-                              }),
-                            )}
-                          </svg>
-                        </div>
-                      );
-                    })()}
-                  </div>
-                  <CornerPearls />
-                </div>
-              )}
-
+            /* 简洁模式：EDIT.EXE 占满主区，REFERENCE 已移到左侧 STOCK 上面 */
+            <div className="w-full">
               {/* EDIT.EXE 编辑画板窗口 — 跟 PEGBOARD.EXE 同款正方形板 */}
-              <div className={`relative ${showReference ? '' : 'lg:col-span-2'}`}>
+              <div className="relative w-full">
                 <div
                   className="relative bg-paper-bg p-4 pt-7"
                   style={{
@@ -1714,11 +1617,81 @@ export function BeadCanvas({
               }}
             >
               <TitleBar name="STOCK.EXE" />
-              <div className="flex items-baseline gap-3 mb-3">
-                <h3 className="font-pixel-cn text-ink-warm" style={{ fontSize: 22, letterSpacing: '0.1em', lineHeight: 1.1 }}>
+
+              {/* 参考图纸 — 放在 STOCK 顶部，方格像素图 SVG 自适应 */}
+              {showReference && (() => {
+                const refCols = referenceGrid[0].length;
+                const refRows = referenceGrid.length;
+                return (
+                  <div className="mb-4">
+                    <div className="flex items-baseline gap-2 mb-2">
+                      <h3 className="font-pixel-cn text-ink-warm" style={{ fontSize: 16, letterSpacing: '0.08em' }}>
+                        参考图纸
+                      </h3>
+                      <span className="font-pixel-arcade text-y2k-navy" style={{ fontSize: 11, letterSpacing: '0.12em' }}>
+                        REF
+                      </span>
+                    </div>
+                    <div
+                      className="bg-paper-bg p-1.5 flex items-center justify-center"
+                      style={{ boxShadow: 'inset 0 0 0 2px var(--y2k-navy)' }}
+                    >
+                      <svg
+                        viewBox={`0 0 ${refCols} ${refRows}`}
+                        preserveAspectRatio="xMidYMid meet"
+                        shapeRendering="crispEdges"
+                        style={{
+                          width: '100%',
+                          maxHeight: '30vh',
+                          display: 'block',
+                        }}
+                        role="img"
+                        aria-label="参考图纸"
+                      >
+                        {referenceGrid.map((row, y) =>
+                          row.map((color, x) => {
+                            if (!color) return null;
+                            const isHighlight = lockedColor === color;
+                            const isPlaced = !!workingGrid[y][x];
+                            const dimmed = lockedColor && !isHighlight;
+                            return (
+                              <g
+                                key={`ref-mini-${x}-${y}`}
+                                onClick={() => handleColorLock(color)}
+                                style={{ cursor: 'pointer' }}
+                              >
+                                {isHighlight && (
+                                  <rect x={x - 0.05} y={y - 0.05} width={1.1} height={1.1} fill="var(--bead-honey-glow)" />
+                                )}
+                                <rect
+                                  x={x}
+                                  y={y}
+                                  width={1}
+                                  height={1}
+                                  fill={color}
+                                  stroke="rgba(44,58,94,0.22)"
+                                  strokeWidth={0.04}
+                                  opacity={dimmed ? 0.3 : 1}
+                                />
+                                {isPlaced && (
+                                  <rect x={x + 0.2} y={y + 0.2} width={0.6} height={0.6} fill="none" stroke="var(--y2k-navy)" strokeWidth={0.12} />
+                                )}
+                              </g>
+                            );
+                          }),
+                        )}
+                      </svg>
+                    </div>
+                  </div>
+                );
+              })()}
+
+              {/* 分隔 */}
+              <div className="flex items-baseline gap-3 mb-3 mt-2 pt-2" style={{ borderTop: showReference ? '2px dashed var(--y2k-navy)' : undefined }}>
+                <h3 className="font-pixel-cn text-ink-warm" style={{ fontSize: 16, letterSpacing: '0.08em' }}>
                   材料清单
                 </h3>
-                <span className="font-pixel-arcade text-y2k-navy" style={{ fontSize: 12, letterSpacing: '0.15em' }}>
+                <span className="font-pixel-arcade text-y2k-navy" style={{ fontSize: 11, letterSpacing: '0.12em' }}>
                   STOCK
                 </span>
               </div>
