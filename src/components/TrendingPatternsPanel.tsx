@@ -64,21 +64,22 @@ function PatternThumbnail({ grid, size = 100 }: { grid: BeadGrid; size?: number 
   return <canvas ref={canvasRef} className="pixel-render" />;
 }
 
-// 像素 1px 步阶外框 + 暖色硬阴影 — 跟 SplashScreen / UPLOAD.EXE 统一在暖系
+// 像素 1px 步阶外框 + navy 硬阴影 — 跟 UPLOAD.EXE 一致 chrome
 const PIXEL_WINDOW_SHADOW = [
   '0 -2px 0 var(--bead-ink)',
   '0 2px 0 var(--bead-ink)',
   '-2px 0 0 var(--bead-ink)',
   '2px 0 0 var(--bead-ink)',
-  '4px 4px 0 var(--bead-terracotta)',
+  '4px 4px 0 var(--y2k-navy)',
 ].join(', ');
 
+// 选中态用 coral 硬阴影做对比 pop
 const PIXEL_WINDOW_SHADOW_ACTIVE = [
   '0 -2px 0 var(--bead-ink)',
   '0 2px 0 var(--bead-ink)',
   '-2px 0 0 var(--bead-ink)',
   '2px 0 0 var(--bead-ink)',
-  '4px 4px 0 var(--bead-moss)',
+  '4px 4px 0 var(--y2k-coral)',
 ].join(', ');
 
 export function TrendingPatternsPanel({ onUsePattern }: TrendingPatternsPanelProps) {
@@ -104,7 +105,7 @@ export function TrendingPatternsPanel({ onUsePattern }: TrendingPatternsPanelPro
         <div className="flex items-baseline gap-3">
           <PixelStar
             size={16}
-            color="var(--bead-terracotta)"
+            color="var(--y2k-coral)"
             className="pixel-float-fast self-center"
             style={{ marginBottom: 4 }}
           />
@@ -136,7 +137,7 @@ export function TrendingPatternsPanel({ onUsePattern }: TrendingPatternsPanelPro
             onClick={() => setSelectedTag(null)}
             className="font-pixel-cn text-xs px-3 py-1.5 transition-transform hover:-translate-y-0.5 active:translate-x-[1px] active:translate-y-[1px]"
             style={{
-              backgroundColor: selectedTag === null ? 'var(--bead-terracotta)' : 'var(--bead-paper-soft)',
+              backgroundColor: selectedTag === null ? 'var(--y2k-navy)' : 'var(--bead-paper-soft)',
               color: selectedTag === null ? 'var(--bead-paper-bg)' : 'var(--bead-ink)',
               boxShadow: selectedTag === null ? PIXEL_WINDOW_SHADOW_ACTIVE : PIXEL_WINDOW_SHADOW,
               letterSpacing: '0.05em',
@@ -150,7 +151,7 @@ export function TrendingPatternsPanel({ onUsePattern }: TrendingPatternsPanelPro
               onClick={() => setSelectedTag(tag)}
               className="font-pixel-cn text-xs px-3 py-1.5 transition-transform hover:-translate-y-0.5 active:translate-x-[1px] active:translate-y-[1px]"
               style={{
-                backgroundColor: selectedTag === tag ? 'var(--bead-terracotta)' : 'var(--bead-paper-soft)',
+                backgroundColor: selectedTag === tag ? 'var(--y2k-navy)' : 'var(--bead-paper-soft)',
                 color: selectedTag === tag ? 'var(--bead-paper-bg)' : 'var(--bead-ink)',
                 boxShadow: selectedTag === tag ? PIXEL_WINDOW_SHADOW_ACTIVE : PIXEL_WINDOW_SHADOW,
                 letterSpacing: '0.05em',
@@ -248,22 +249,22 @@ export function TrendingPatternsPanel({ onUsePattern }: TrendingPatternsPanelPro
               {/* 4 角像素角珍 (lavender) */}
               <div
                 className="absolute pointer-events-none"
-                style={{ top: -3, left: -3, width: 3, height: 3, backgroundColor: 'var(--bead-terracotta)' }}
+                style={{ top: -3, left: -3, width: 3, height: 3, backgroundColor: 'var(--y2k-navy)' }}
                 aria-hidden="true"
               />
               <div
                 className="absolute pointer-events-none"
-                style={{ top: -3, right: -3, width: 3, height: 3, backgroundColor: 'var(--bead-terracotta)' }}
+                style={{ top: -3, right: -3, width: 3, height: 3, backgroundColor: 'var(--y2k-navy)' }}
                 aria-hidden="true"
               />
               <div
                 className="absolute pointer-events-none"
-                style={{ bottom: -3, left: -3, width: 3, height: 3, backgroundColor: 'var(--bead-terracotta)' }}
+                style={{ bottom: -3, left: -3, width: 3, height: 3, backgroundColor: 'var(--y2k-navy)' }}
                 aria-hidden="true"
               />
               <div
                 className="absolute pointer-events-none"
-                style={{ bottom: -3, right: -3, width: 3, height: 3, backgroundColor: 'var(--bead-terracotta)' }}
+                style={{ bottom: -3, right: -3, width: 3, height: 3, backgroundColor: 'var(--y2k-navy)' }}
                 aria-hidden="true"
               />
             </div>

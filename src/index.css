@@ -319,18 +319,18 @@
   animation: arcadeBlink 1.2s steps(2, end) infinite;
 }
 
-/* chrome italic wordmark — 黄铜渐变（替代之前的冷紫 chrome），跟暖纸底统一 */
+/* chrome italic wordmark — NJ 银色 chrome 渐变（cream → sky → navy → ink），
+   配 sky→cream 渐变底是"阳光下街机 kiosk 金属反光"vibe */
 .font-chrome {
   font-family: 'Playfair Display', 'Georgia', serif;
   font-style: italic;
   font-weight: 700;
   letter-spacing: -0.02em;
-  /* 暖色金属：奶油 → 蜜糖 → 陶土 → 墨 = 黄昏黄铜反光 */
   background: linear-gradient(
     180deg,
     var(--bead-paper-bg) 0%,
-    var(--bead-honey) 30%,
-    var(--bead-terracotta) 62%,
+    var(--y2k-sky) 28%,
+    var(--y2k-navy) 62%,
     var(--bead-ink) 100%
   );
   -webkit-background-clip: text;
@@ -366,7 +366,7 @@
     0 2px 0 var(--bead-ink),
     -2px 0 0 var(--bead-ink),
     2px 0 0 var(--bead-ink),
-    4px 4px 0 var(--bead-honey);
+    4px 4px 0 var(--y2k-coral);
   transition: transform 0.12s ease;
 }
 .arcade-pill:hover {
@@ -378,7 +378,7 @@
     0 2px 0 var(--bead-ink),
     -2px 0 0 var(--bead-ink),
     2px 0 0 var(--bead-ink),
-    5px 5px 0 var(--bead-honey);
+    5px 5px 0 var(--y2k-coral);
 }
 .arcade-pill:active {
   transform: translate(2px, 2px);
@@ -389,5 +389,5 @@
     0 2px 0 var(--bead-ink),
     -2px 0 0 var(--bead-ink),
     2px 0 0 var(--bead-ink),
-    2px 2px 0 var(--bead-honey);
+    2px 2px 0 var(--y2k-coral);
 }

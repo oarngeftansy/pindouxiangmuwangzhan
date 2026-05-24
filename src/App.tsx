@@ -170,12 +170,16 @@ function App() {
 
   return (
     <div
-      className="min-h-screen bg-paper-bg text-ink-warm relative overflow-x-hidden"
+      className="min-h-screen text-ink-warm relative overflow-x-hidden"
       style={{
-        // splash 同款 desktop dot-grid 背景，暗示"在一台像素电脑里"
-        backgroundImage:
-          'radial-gradient(circle, rgba(58, 52, 42, 0.07) 1px, transparent 1px)',
-        backgroundSize: '24px 24px',
+        // NJ.kr 街机 kiosk vibe：sky-blue → cream 竖向渐变 + 暗淡 dot grid 桌面感
+        backgroundColor: 'var(--bead-paper-bg)',
+        backgroundImage: [
+          'radial-gradient(circle, rgba(58, 52, 42, 0.06) 1px, transparent 1px)',
+          'linear-gradient(180deg, var(--y2k-sky) 0%, var(--y2k-sky) 12%, color-mix(in oklch, var(--y2k-sky) 50%, var(--bead-paper-bg)) 42%, var(--bead-paper-bg) 75%)',
+        ].join(', '),
+        backgroundSize: '24px 24px, 100% 100%',
+        backgroundAttachment: 'scroll, fixed',
       }}
     >
       {showGallery && (
@@ -186,8 +190,16 @@ function App() {
           }}
         />
       )}
-      {/* Header — 暖米底 + edge-sand 边线 */}
-      <header className="relative z-10 bg-paper-bg border-b border-edge-sand">
+      {/* Header — 跟随 sky→cream 渐变底（半透磨砂），navy 描边作为冷锚 */}
+      <header
+        className="relative z-10"
+        style={{
+          backgroundColor: 'rgba(252, 248, 230, 0.72)',
+          backdropFilter: 'blur(8px)',
+          WebkitBackdropFilter: 'blur(8px)',
+          borderBottom: '1px solid var(--y2k-navy)',
+        }}
+      >
         <div className="max-w-7xl mx-auto px-4 py-3 sm:py-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between gap-2">
             <div className="flex items-center gap-2 sm:gap-3 min-w-0">
@@ -208,7 +220,7 @@ function App() {
                   boxShadow: [
                     '0 -2px 0 var(--bead-ink)', '0 2px 0 var(--bead-ink)',
                     '-2px 0 0 var(--bead-ink)', '2px 0 0 var(--bead-ink)',
-                    '3px 3px 0 var(--bead-honey)',
+                    '3px 3px 0 var(--y2k-navy)',
                   ].join(', '),
                 }}
                 aria-label="打开作品馆"
@@ -233,7 +245,7 @@ function App() {
                     boxShadow: [
                       '0 -2px 0 var(--bead-ink)', '0 2px 0 var(--bead-ink)',
                       '-2px 0 0 var(--bead-ink)', '2px 0 0 var(--bead-ink)',
-                      '3px 3px 0 var(--bead-honey)',
+                      '3px 3px 0 var(--y2k-navy)',
                     ].join(', '),
                   }}
                   aria-label="返回首页"
@@ -252,35 +264,36 @@ function App() {
         {mode === 'upload' && (
           <div className="space-y-8">
             <section className="relative px-1 pt-10 pb-10 text-center">
-              {/* 浮动 pixel 装饰 — 暖色"晚霞云"调色：honey / terracotta / moss 三色循环，
-                  跟暖纸底完全统一在暖色相系，不再混冷紫冷蓝 */}
+              {/* 浮动 pixel 装饰 — NJ kiosk 全彩 pastel pop（云 sky/lavender、
+                  心 coral/honey、星 mint/terracotta）。配 sky→cream 渐变底，
+                  上半冷色装饰、下半暖色装饰自然融入背景 */}
               <PixelCloud
                 size={48}
-                color="var(--bead-honey)"
+                color="var(--y2k-sky)"
                 className="absolute pixel-float"
                 style={{ top: 8, left: '8%' }}
               />
               <PixelCloud
                 size={36}
-                color="var(--bead-terracotta)"
+                color="var(--y2k-lavender)"
                 className="absolute pixel-float-slow"
                 style={{ top: 28, right: '10%' }}
               />
               <PixelHeart
                 size={20}
-                color="var(--bead-terracotta)"
+                color="var(--y2k-coral)"
                 className="absolute pixel-float-fast"
                 style={{ top: 60, left: '18%' }}
               />
               <PixelStar
                 size={16}
-                color="var(--bead-terracotta-deep)"
+                color="var(--y2k-mint)"
                 className="absolute pixel-float"
                 style={{ top: 90, right: '20%' }}
               />
               <PixelStar
                 size={12}
-                color="var(--bead-moss)"
+                color="var(--bead-terracotta)"
                 className="absolute pixel-float-slow"
                 style={{ bottom: 60, left: '12%' }}
               />
@@ -291,23 +304,23 @@ function App() {
                 style={{ bottom: 40, right: '14%' }}
               />
 
-              {/* 顶部街机机厅闪烁标语 */}
+              {/* 顶部街机机厅闪烁标语 — coral pop */}
               <p
-                className="font-pixel-arcade text-terracotta arcade-blink mb-4"
+                className="font-pixel-arcade text-y2k-coral arcade-blink mb-4"
                 style={{ fontSize: 9, letterSpacing: '0.25em' }}
               >
                 ▶ INSERT COIN ◀
               </p>
 
-              {/* chrome italic wordmark + halo arc — 黄铜金属斜体（暖系） */}
+              {/* chrome italic wordmark + halo arc — NJ 银色 chrome */}
               <div className="relative inline-block">
-                {/* chrome halo 椭圆环 — 暖陶土深色描线 */}
+                {/* chrome halo 椭圆环 — navy 描线（跟 chrome 银色底色一致） */}
                 <ChromeHalo
                   width={420}
                   height={92}
                   className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none"
                   style={{ width: 'clamp(280px, 65vw, 460px)' }}
-                  color="var(--bead-terracotta-deep)"
+                  color="var(--y2k-navy)"
                 />
                 <h1
                   className="font-chrome leading-[0.95] relative"
@@ -317,24 +330,24 @@ function App() {
                 </h1>
                 <span
                   className="sparkle sparkle-lg sparkle-twinkle absolute"
-                  style={{ top: -8, left: -22, ['--sparkle-color' as string]: 'var(--bead-honey)' }}
+                  style={{ top: -8, left: -22, ['--sparkle-color' as string]: 'var(--y2k-sky)' }}
                   aria-hidden="true"
                 />
                 <span
                   className="sparkle sparkle-twinkle absolute"
-                  style={{ top: 4, right: -26, ['--sparkle-color' as string]: 'var(--bead-terracotta)', animationDelay: '600ms' }}
+                  style={{ top: 4, right: -26, ['--sparkle-color' as string]: 'var(--y2k-coral)', animationDelay: '600ms' }}
                   aria-hidden="true"
                 />
                 <span
                   className="sparkle sparkle-sm sparkle-twinkle absolute"
-                  style={{ bottom: -4, left: '40%', ['--sparkle-color' as string]: 'var(--bead-moss)', animationDelay: '1200ms' }}
+                  style={{ bottom: -4, left: '40%', ['--sparkle-color' as string]: 'var(--y2k-mint)', animationDelay: '1200ms' }}
                   aria-hidden="true"
                 />
               </div>
 
-              {/* 主 tagline —— "赛博拼豆"，两侧 1UP/GO 徽章用暖色对照 */}
+              {/* 主 tagline —— "赛博拼豆"，1UP coral / GO! mint pastel pop 徽章 */}
               <div className="relative inline-flex items-center justify-center gap-4 mt-7">
-                <PixelBadge text="1UP" color="var(--bead-terracotta)" />
+                <PixelBadge text="1UP" color="var(--y2k-coral)" />
                 <p
                   className="font-pixel-cn text-ink-warm"
                   style={{
@@ -344,11 +357,11 @@ function App() {
                 >
                   赛博拼豆
                 </p>
-                <PixelBadge text="GO!" color="var(--bead-moss)" />
+                <PixelBadge text="GO!" color="var(--y2k-mint)" />
               </div>
 
               <p
-                className="font-pixel-arcade text-ink-soft mt-4"
+                className="font-pixel-arcade text-y2k-navy mt-4"
                 style={{ fontSize: 9, letterSpacing: '0.2em' }}
               >
                 EST · 2026 · V1.0
