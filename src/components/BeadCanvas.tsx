@@ -1195,53 +1195,59 @@ export function BeadCanvas({
               </div>
             )}
 
-            {/* 参考图内容 */}
-            <div className="bg-paper-bg p-3 overflow-auto touch-pan-x touch-pan-y" style={{ maxHeight: '40vh' }}>
-              <div className="inline-block">
+            {/* 参考图内容 — SVG 自适应缩放，整图永远完整可见，无 scrollbar */}
+            {(() => {
+              const refCols = referenceGrid[0].length;
+              const refRows = referenceGrid.length;
+              return (
                 <div
-                  className="grid gap-0 rounded-control overflow-hidden border border-edge-sand"
+                  className="bg-paper-bg p-2 flex items-center justify-center"
                   style={{
-                    gridTemplateColumns: `repeat(${referenceGrid[0].length}, ${baseSize * zoom * 0.3}px)`,
-                    width: "fit-content",
-                    backgroundColor: 'var(--bead-paper-bg)',
+                    backgroundImage:
+                      'radial-gradient(circle, rgba(44, 58, 94, 0.08) 1px, transparent 1px)',
+                    backgroundSize: '8px 8px',
                   }}
                 >
-                  {referenceGrid.map((row, y) =>
-                    row.map((color, x) => {
-                      const shouldHighlight =
-                        lockedColor &&
-                        color === lockedColor;
-                      const cellSize = baseSize * zoom * 0.3;
-                      
-                      return (
-                        <div
-                          key={`ref-${x}-${y}`}
-                          className={`transition-transform hover:scale-110 ${color ? 'cursor-pointer' : ''}`}
-                          onClick={() => {
-                            if (color) {
-                              handleColorLock(color);
-                            }
-                          }}
-                        >
-                          <PegboardCell
-                            x={x}
-                            y={y}
-                            color={color}
-                            beadSize={cellSize}
-                            viewMode="simple"
-                            showGrid={true}
-                            shouldHighlight={shouldHighlight}
-                            canPlace={true}
-                            isEmpty={!color}
-                            canvasParams={canvasParams}
-                          />
-                        </div>
-                      );
-                    }),
-                  )}
+                  <svg
+                    viewBox={`0 0 ${refCols} ${refRows}`}
+                    preserveAspectRatio="xMidYMid meet"
+                    style={{
+                      width: '100%',
+                      maxHeight: '36vh',
+                      display: 'block',
+                    }}
+                    role="img"
+                    aria-label="参考图纸"
+                  >
+                    {referenceGrid.map((row, y) =>
+                      row.map((color, x) => {
+                        if (!color) return null;
+                        const isHighlight = lockedColor === color;
+                        const dimmed = lockedColor && !isHighlight;
+                        return (
+                          <g
+                            key={`ref-${x}-${y}`}
+                            onClick={() => handleColorLock(color)}
+                            style={{ cursor: 'pointer' }}
+                          >
+                            {isHighlight && (
+                              <rect x={x} y={y} width={1} height={1} fill="var(--bead-honey-glow)" />
+                            )}
+                            <circle
+                              cx={x + 0.5}
+                              cy={y + 0.5}
+                              r={0.42}
+                              fill={color}
+                              opacity={dimmed ? 0.3 : 1}
+                            />
+                          </g>
+                        );
+                      }),
+                    )}
+                  </svg>
                 </div>
-              </div>
-            </div>
+              );
+            })()}
 
             {/* 提示文字 */}
             <div className="px-4 py-2.5 bg-paper-deep border-t border-edge-sand flex items-center justify-center gap-1.5">
@@ -1521,71 +1527,80 @@ export function BeadCanvas({
                         REF
                       </span>
                     </div>
-                    <div
-                      className="bg-paper-soft overflow-auto max-h-[40vh] sm:max-h-[600px]"
-                      style={{
-                        boxShadow: 'inset 0 0 0 2px var(--y2k-navy)',
-                        touchAction: 'pan-x pan-y pinch-zoom',
-                      }}
-                    >
-                      <div className="inline-block p-2">
+                    {/* 参考图 SVG 自适应渲染 — viewBox 把整图自动 scale 到容器，
+                        不需要 scrollbar，永远 100% 完整可见 */}
+                    {(() => {
+                      const refCols = referenceGrid[0].length;
+                      const refRows = referenceGrid.length;
+                      return (
                         <div
-                          className="grid gap-0"
+                          className="bg-paper-soft p-3 flex items-center justify-center"
                           style={{
-                            gridTemplateColumns: `repeat(${referenceGrid[0].length}, ${beadSize}px)`,
-                            width: 'fit-content',
-                            backgroundColor: 'var(--bead-paper-bg)',
-                            boxShadow: 'inset 0 0 0 1px var(--y2k-navy)',
+                            boxShadow: 'inset 0 0 0 2px var(--y2k-navy)',
+                            backgroundImage:
+                              'radial-gradient(circle, rgba(44, 58, 94, 0.08) 1px, transparent 1px)',
+                            backgroundSize: '10px 10px',
                           }}
                         >
-                          {referenceGrid.map((row, y) =>
-                            row.map((color, x) => {
-                              const shouldHighlight =
-                                lockedColor &&
-                                color === lockedColor;
-                              return (
-                                <div
-                                  key={`ref-${x}-${y}`}
-                                  className={`flex items-center justify-center relative ${
-                                    shouldHighlight ? 'ring-2 ring-y2k-coral' : ''
-                                  }`}
-                                  style={{
-                                    width: beadSize,
-                                    height: beadSize,
-                                    backgroundColor: shouldHighlight
-                                      ? 'var(--bead-honey-glow)'
-                                      : color || 'var(--bead-paper-bg)',
-                                    opacity:
-                                      lockedColor && !shouldHighlight ? 0.3 : 1,
-                                    border: '0.15px solid rgba(44, 58, 94, 0.5)',
-                                  }}
-                                >
-                                  {color && (
-                                    <div
-                                      className="absolute inset-0 rounded-bead m-1 pointer-events-none"
-                                      style={{
-                                        backgroundColor: color,
-                                        boxShadow: 'inset 0 1px 3px rgba(44, 58, 94, 0.2)',
-                                      }}
+                          <svg
+                            viewBox={`0 0 ${refCols} ${refRows}`}
+                            preserveAspectRatio="xMidYMid meet"
+                            style={{
+                              width: '100%',
+                              maxHeight: '60vh',
+                              backgroundColor: 'var(--bead-paper-bg)',
+                              boxShadow: 'inset 0 0 0 1px var(--y2k-navy)',
+                              display: 'block',
+                            }}
+                            role="img"
+                            aria-label="参考图纸"
+                          >
+                            {referenceGrid.map((row, y) =>
+                              row.map((color, x) => {
+                                if (!color) return null;
+                                const isHighlight = lockedColor === color;
+                                const isPlaced = !!workingGrid[y][x];
+                                const dimmed = lockedColor && !isHighlight;
+                                return (
+                                  <g
+                                    key={`ref-${x}-${y}`}
+                                    onClick={() => handleColorLock(color)}
+                                    style={{ cursor: 'pointer' }}
+                                  >
+                                    {isHighlight && (
+                                      <rect
+                                        x={x}
+                                        y={y}
+                                        width={1}
+                                        height={1}
+                                        fill="var(--bead-honey-glow)"
+                                      />
+                                    )}
+                                    <circle
+                                      cx={x + 0.5}
+                                      cy={y + 0.5}
+                                      r={0.42}
+                                      fill={color}
+                                      opacity={dimmed ? 0.3 : 1}
                                     />
-                                  )}
-                                  {workingGrid[y][x] && (
-                                    <div
-                                      className="absolute inset-0 rounded-bead m-1 ring-2 ring-y2k-navy pointer-events-none"
-                                      style={{
-                                        backgroundColor: workingGrid[y][x] || '',
-                                        boxShadow:
-                                          'inset 0 1px 3px rgba(44, 58, 94, 0.2), 0 0 8px rgba(44, 58, 94, 0.5)',
-                                      }}
-                                    />
-                                  )}
-                                </div>
-                              );
-                            }),
-                          )}
+                                    {isPlaced && (
+                                      <circle
+                                        cx={x + 0.5}
+                                        cy={y + 0.5}
+                                        r={0.4}
+                                        fill="none"
+                                        stroke="var(--y2k-navy)"
+                                        strokeWidth={0.12}
+                                      />
+                                    )}
+                                  </g>
+                                );
+                              }),
+                            )}
+                          </svg>
                         </div>
-                      </div>
-                    </div>
+                      );
+                    })()}
                   </div>
                   <CornerPearls />
                 </div>
