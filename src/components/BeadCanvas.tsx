@@ -475,8 +475,8 @@ export function BeadCanvas({
     const touch = e.touches[0];
     const cell = getCellFromTouch(touch);
     if (!cell) return;
-    // 内部 handleCellClick 决定放/擦/无视，外层不再 gate
-    handleCellClick(cell.x, cell.y);
+    // touchmove 也不允许擦（同 mouseEnter）
+    handleCellClick(cell.x, cell.y, false);
   };
 
   const handleTouchEnd = () => {
@@ -547,15 +547,17 @@ export function BeadCanvas({
     };
   });
 
-  const handleCellClick = useCallback((x: number, y: number) => {
+  // allowErase 仅在首次按下 / 单击时为 true。拖动/滑豆经过的 cell 设 false，
+  // 避免切色后鼠标划过老豆子被误擦
+  const handleCellClick = useCallback((x: number, y: number, allowErase = true) => {
     const s = stateRef.current;
     let shouldErase = false;
     if (s.lockedColor) {
       const referenceColor = s.referenceGrid[y][x];
       if (referenceColor !== s.lockedColor) {
-        // 非目标 cell：如果上面已经误放豆子，直接擦掉（用户友好的"快速纠错"）
-        // 空的非目标 cell 什么都不做
-        if (s.workingGrid[y][x]) {
+        // 非目标 cell：仅在首次点击 + 已有豆子时才擦（快速纠错单个误放）
+        // 拖动/滑豆经过的非目标 cell 一律忽略，避免大面积误擦
+        if (s.workingGrid[y][x] && allowErase) {
           shouldErase = true;
         } else {
           return;
@@ -639,10 +641,11 @@ export function BeadCanvas({
   const handleMouseEnter = useCallback((x: number, y: number) => {
     setHoveredCell({ x, y });
     const s = stateRef.current;
+    // 拖动/滑豆经过的 cell 不允许擦除（allowErase=false），只放
     if (s.pourMode && s.lockedColor) {
-      handleCellClick(x, y);
+      handleCellClick(x, y, false);
     } else if (s.isDrawing) {
-      handleCellClick(x, y);
+      handleCellClick(x, y, false);
     }
   }, [handleCellClick]);
 
