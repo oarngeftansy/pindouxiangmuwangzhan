@@ -98,22 +98,24 @@ export const DEFAULT_CANVAS_PARAMS: CanvasParams = {
     beadBorderRadius: 50,
     beadFlatness: 0,
 
+    // 立体感参数大幅下调 — 让豆子颜色更接近参考图真实色
+    // 旧值 alpha 太重，亮色豆子被孔洞/内阴拉灰，跟参考图明显色差
     beadInnerDarkBlur: 3,
-    beadInnerDarkAlpha: 0.15,
+    beadInnerDarkAlpha: 0.08, // 0.15 → 0.08
     beadInnerDarkOffsetX: -1,
     beadInnerDarkOffsetY: -1,
     beadInnerLightBlur: 3,
-    beadInnerLightAlpha: 0.25,
+    beadInnerLightAlpha: 0.14, // 0.25 → 0.14
     beadInnerLightOffsetX: 1,
     beadInnerLightOffsetY: 1,
     beadDropShadowBlur: 3,
-    beadDropShadowAlpha: 0.12,
+    beadDropShadowAlpha: 0.06, // 0.12 → 0.06
     beadDropShadowOffsetY: 1,
 
-    highlightSize: 35,
+    highlightSize: 32, // 35 → 32（稍微缩小）
     highlightTop: 12,
     highlightLeft: 15,
-    highlightAlpha: 0.45,
+    highlightAlpha: 0.20, // 0.45 → 0.20（这条最影响颜色，砍一半）
     highlightSpread: 70,
     highlightFocusX: 40,
     highlightFocusY: 40,
@@ -122,9 +124,9 @@ export const DEFAULT_CANVAS_PARAMS: CanvasParams = {
     rimLightWidth: 0.1,
     rimLightAngle: 220,
 
-    holeRatio: 0.28,
-    holeDarkAlpha: 0.3,
-    holeLightAlpha: 0.12,
+    holeRatio: 0.22, // 0.28 → 0.22（孔洞缩小，对色相干扰减少）
+    holeDarkAlpha: 0.12, // 0.30 → 0.12（亮色豆子的灰中心元凶，重点降）
+    holeLightAlpha: 0.06, // 0.12 → 0.06
     holeRingAlpha: 0,
 
     surfaceSaturation: 1,
@@ -132,7 +134,7 @@ export const DEFAULT_CANVAS_PARAMS: CanvasParams = {
 
     glowInnerStop: 65,
     glowOuterStop: 75,
-    glowAlpha: 0.06,
+    glowAlpha: 0.03, // 0.06 → 0.03
 
     beadGap: 0,
 
@@ -145,7 +147,8 @@ export const DEFAULT_CANVAS_PARAMS: CanvasParams = {
   },
 };
 
-const STORAGE_KEY = 'canvas_params_v1';
+// v2: 立体感参数下调，旧缓存自动失效避免用户保留老色差
+const STORAGE_KEY = 'canvas_params_v2';
 
 export function loadCanvasParams(): CanvasParams {
   try {
