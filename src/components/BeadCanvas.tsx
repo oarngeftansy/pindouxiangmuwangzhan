@@ -969,7 +969,7 @@ export function BeadCanvas({
             </button>
             <span
               className="font-pixel-arcade text-y2k-navy text-center"
-              style={{ fontSize: 13, width: 42, letterSpacing: '0.05em' }}
+              style={{ fontSize: 16, width: 50, letterSpacing: '0.05em' }}
             >
               {Math.round(zoom * 100)}%
             </span>
@@ -992,10 +992,10 @@ export function BeadCanvas({
                 即使没锁色也能预先开（开了再选色直接 pour） */}
             <button
               onClick={() => setPourMode(!pourMode)}
-              className="inline-flex items-center gap-2 min-h-[40px] px-3 py-2 font-pixel-cn transition-transform hover:-translate-y-0.5 active:translate-x-[1px] active:translate-y-[1px]"
+              className="inline-flex items-center gap-2 min-h-[44px] px-4 py-2 font-pixel-cn transition-transform hover:-translate-y-0.5 active:translate-x-[1px] active:translate-y-[1px]"
               style={{
                 ...toolBtnStyle(pourMode),
-                fontSize: 13,
+                fontSize: 16,
                 letterSpacing: '0.05em',
               }}
               aria-label="切换滑豆模式"
@@ -1025,13 +1025,13 @@ export function BeadCanvas({
                   }}
                   aria-hidden="true"
                 />
-                <span className="font-pixel-arcade text-y2k-navy" style={{ fontSize: 13, letterSpacing: '0.05em' }}>
+                <span className="font-pixel-arcade text-y2k-navy" style={{ fontSize: 15, letterSpacing: '0.05em' }}>
                   LOCK {getColorCode(lockedColor)}
                 </span>
                 <button
                   onClick={() => { setLockedColor(null); setPourMode(false); }}
                   className="ml-1 font-pixel-arcade text-y2k-coral hover:text-y2k-coral/70 transition-colors"
-                  style={{ fontSize: 13, letterSpacing: '0.05em' }}
+                  style={{ fontSize: 15, letterSpacing: '0.05em' }}
                   aria-label="解锁颜色"
                 >
                   × UNLOCK
@@ -1047,9 +1047,9 @@ export function BeadCanvas({
                 className="arcade-pill font-pixel-cn text-paper-bg cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
                 style={{
                   backgroundColor: 'var(--y2k-navy)',
-                  fontSize: 13,
+                  fontSize: 16,
                   letterSpacing: '0.1em',
-                  padding: '10px 22px',
+                  padding: '12px 26px',
                 }}
                 title="一键熨烫"
               >
@@ -1060,21 +1060,21 @@ export function BeadCanvas({
               {SHOW_HD_RENDER && (
                 <button
                   onClick={() => setShowHDModal(true)}
-                  className="inline-flex items-center gap-2 min-h-[40px] px-4 py-2 font-pixel-cn whitespace-nowrap transition-transform hover:-translate-y-0.5 active:translate-x-[1px] active:translate-y-[1px]"
-                  style={{ ...toolBtnStyle(false), fontSize: 12, letterSpacing: '0.05em' }}
+                  className="inline-flex items-center gap-2 min-h-[44px] px-4 py-2 font-pixel-cn whitespace-nowrap transition-transform hover:-translate-y-0.5 active:translate-x-[1px] active:translate-y-[1px]"
+                  style={{ ...toolBtnStyle(false), fontSize: 16, letterSpacing: '0.05em' }}
                   title="高清渲染"
                 >
-                  <Sparkles className="w-4 h-4" aria-hidden="true" />
+                  <Sparkles className="w-5 h-5" aria-hidden="true" />
                   <span>高清渲染</span>
                 </button>
               )}
               <button
                 onClick={downloadCanvas}
-                className="inline-flex items-center gap-2 min-h-[40px] px-4 py-2 font-pixel-cn whitespace-nowrap transition-transform hover:-translate-y-0.5 active:translate-x-[1px] active:translate-y-[1px]"
-                style={{ ...toolBtnStyle(false), fontSize: 12, letterSpacing: '0.05em' }}
+                className="inline-flex items-center gap-2 min-h-[44px] px-4 py-2 font-pixel-cn whitespace-nowrap transition-transform hover:-translate-y-0.5 active:translate-x-[1px] active:translate-y-[1px]"
+                style={{ ...toolBtnStyle(false), fontSize: 16, letterSpacing: '0.05em' }}
                 title="下载图纸"
               >
-                <Download className="w-4 h-4" aria-hidden="true" />
+                <Download className="w-5 h-5" aria-hidden="true" />
                 <span>下载图纸</span>
               </button>
               {/* 结束作品 — 熨烫后才显示，点击回主页 */}
@@ -1084,13 +1084,13 @@ export function BeadCanvas({
                   className="arcade-pill font-pixel-cn text-paper-bg cursor-pointer whitespace-nowrap"
                   style={{
                     backgroundColor: 'var(--bead-moss)',
-                    fontSize: 13,
+                    fontSize: 16,
                     letterSpacing: '0.1em',
-                    padding: '10px 22px',
+                    padding: '12px 26px',
                   }}
                   title="作品已熨烫并加入作品馆，结束并回主页"
                 >
-                  <Check className="w-4 h-4" aria-hidden="true" />
+                  <Check className="w-5 h-5" aria-hidden="true" />
                   <span>结束作品</span>
                 </button>
               )}
@@ -1109,30 +1109,30 @@ export function BeadCanvas({
             className="flex-1 arcade-pill font-pixel-cn text-paper-bg cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
             style={{
               backgroundColor: 'var(--y2k-navy)',
-              fontSize: 12,
+              fontSize: 15,
               letterSpacing: '0.1em',
-              padding: '12px 16px',
+              padding: '14px 18px',
             }}
           >
-            <Flame className={`w-4 h-4 ${isIroning ? 'animate-pulse' : ''}`} aria-hidden="true" />
+            <Flame className={`w-5 h-5 ${isIroning ? 'animate-pulse' : ''}`} aria-hidden="true" />
             {isIroning ? '熨烫中…' : '一键熨烫'}
           </button>
           {SHOW_HD_RENDER && (
             <button
               onClick={() => setShowHDModal(true)}
               className="flex-1 inline-flex items-center justify-center gap-2 min-h-[48px] py-3 font-pixel-cn"
-              style={{ ...toolBtnStyle(false), fontSize: 12, letterSpacing: '0.05em' }}
+              style={{ ...toolBtnStyle(false), fontSize: 15, letterSpacing: '0.05em' }}
             >
-              <Sparkles className="w-4 h-4" aria-hidden="true" />
+              <Sparkles className="w-5 h-5" aria-hidden="true" />
               高清
             </button>
           )}
           <button
             onClick={downloadCanvas}
             className="flex-1 inline-flex items-center justify-center gap-2 min-h-[48px] py-3 font-pixel-cn"
-            style={{ ...toolBtnStyle(false), fontSize: 12, letterSpacing: '0.05em' }}
+            style={{ ...toolBtnStyle(false), fontSize: 15, letterSpacing: '0.05em' }}
           >
-            <Download className="w-4 h-4" aria-hidden="true" />
+            <Download className="w-5 h-5" aria-hidden="true" />
             下载
           </button>
           {hasIroned && onFinish && (
@@ -1141,12 +1141,12 @@ export function BeadCanvas({
               className="flex-1 arcade-pill font-pixel-cn text-paper-bg cursor-pointer"
               style={{
                 backgroundColor: 'var(--bead-moss)',
-                fontSize: 12,
+                fontSize: 15,
                 letterSpacing: '0.1em',
-                padding: '12px 16px',
+                padding: '14px 18px',
               }}
             >
-              <Check className="w-4 h-4" aria-hidden="true" />
+              <Check className="w-5 h-5" aria-hidden="true" />
               结束
             </button>
           )}
