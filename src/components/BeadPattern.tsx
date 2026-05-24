@@ -707,13 +707,11 @@ export function BeadPattern({
                         >
                           {color && (
                             <>
+                              {/* 图纸渲染：方格满 cell（图纸样式），不是圆豆 */}
                               <div
-                                className="absolute inset-0 rounded-full m-1 pointer-events-none"
+                                className="absolute inset-0 pointer-events-none"
                                 style={{
                                   backgroundColor: color,
-                                  // 暖色调 inset 模拟塑料反光
-                                  boxShadow:
-                                    "inset 0 1px 3px rgba(58, 52, 42, 0.2)",
                                 }}
                               />
                               {beadSize > 15 && (
