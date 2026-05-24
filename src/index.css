@@ -339,8 +339,7 @@
   -webkit-text-fill-color: transparent;
   -webkit-text-stroke: 1px var(--y2k-navy);
   paint-order: stroke fill;
-  /* 轻硬阴 — coral pop 让冷银 chrome 字飘起来 */
-  filter: drop-shadow(2px 2px 0 var(--y2k-coral));
+  /* 不加 drop-shadow — 干净 navy 描边的银 chrome 已经足够立体 */
 }
 
 /* 街机 chunky 胶囊按钮 — NJ "ID Card" / "Pick My Outfits" 同款
