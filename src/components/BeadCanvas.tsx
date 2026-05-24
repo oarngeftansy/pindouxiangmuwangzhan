@@ -1195,26 +1195,21 @@ export function BeadCanvas({
               </div>
             )}
 
-            {/* 参考图内容 — SVG 自适应缩放，整图永远完整可见，无 scrollbar */}
+            {/* 参考图内容 — 方格像素图（保持图纸原样）+ SVG 自适应缩放，整图永远完整可见 */}
             {(() => {
               const refCols = referenceGrid[0].length;
               const refRows = referenceGrid.length;
               return (
-                <div
-                  className="bg-paper-bg p-2 flex items-center justify-center"
-                  style={{
-                    backgroundImage:
-                      'radial-gradient(circle, rgba(44, 58, 94, 0.08) 1px, transparent 1px)',
-                    backgroundSize: '8px 8px',
-                  }}
-                >
+                <div className="bg-paper-bg p-2 flex items-center justify-center">
                   <svg
                     viewBox={`0 0 ${refCols} ${refRows}`}
                     preserveAspectRatio="xMidYMid meet"
+                    shapeRendering="crispEdges"
                     style={{
                       width: '100%',
                       maxHeight: '36vh',
                       display: 'block',
+                      backgroundColor: 'var(--bead-paper-bg)',
                     }}
                     role="img"
                     aria-label="参考图纸"
@@ -1231,12 +1226,13 @@ export function BeadCanvas({
                             style={{ cursor: 'pointer' }}
                           >
                             {isHighlight && (
-                              <rect x={x} y={y} width={1} height={1} fill="var(--bead-honey-glow)" />
+                              <rect x={x - 0.05} y={y - 0.05} width={1.1} height={1.1} fill="var(--bead-honey-glow)" />
                             )}
-                            <circle
-                              cx={x + 0.5}
-                              cy={y + 0.5}
-                              r={0.42}
+                            <rect
+                              x={x}
+                              y={y}
+                              width={1}
+                              height={1}
                               fill={color}
                               opacity={dimmed ? 0.3 : 1}
                             />
@@ -1528,8 +1524,7 @@ export function BeadCanvas({
                         REF
                       </span>
                     </div>
-                    {/* 参考图 SVG 自适应渲染 — viewBox 把整图自动 scale 到容器，
-                        不需要 scrollbar，永远 100% 完整可见 */}
+                    {/* 参考图 — 方格像素图（保持图纸原样）+ SVG 自适应缩放，整图永远完整可见 */}
                     {(() => {
                       const refCols = referenceGrid[0].length;
                       const refRows = referenceGrid.length;
@@ -1538,14 +1533,12 @@ export function BeadCanvas({
                           className="bg-paper-soft p-3 flex items-center justify-center"
                           style={{
                             boxShadow: 'inset 0 0 0 2px var(--y2k-navy)',
-                            backgroundImage:
-                              'radial-gradient(circle, rgba(44, 58, 94, 0.08) 1px, transparent 1px)',
-                            backgroundSize: '10px 10px',
                           }}
                         >
                           <svg
                             viewBox={`0 0 ${refCols} ${refRows}`}
                             preserveAspectRatio="xMidYMid meet"
+                            shapeRendering="crispEdges"
                             style={{
                               width: '100%',
                               maxHeight: '60vh',
@@ -1568,30 +1561,35 @@ export function BeadCanvas({
                                     onClick={() => handleColorLock(color)}
                                     style={{ cursor: 'pointer' }}
                                   >
+                                    {/* 锁定高亮 — 蜜糖底色铺满 cell */}
                                     {isHighlight && (
                                       <rect
-                                        x={x}
-                                        y={y}
-                                        width={1}
-                                        height={1}
+                                        x={x - 0.05}
+                                        y={y - 0.05}
+                                        width={1.1}
+                                        height={1.1}
                                         fill="var(--bead-honey-glow)"
                                       />
                                     )}
-                                    <circle
-                                      cx={x + 0.5}
-                                      cy={y + 0.5}
-                                      r={0.42}
+                                    {/* 实际色块 — 方格 1×1 满 cell，像素图样式 */}
+                                    <rect
+                                      x={x}
+                                      y={y}
+                                      width={1}
+                                      height={1}
                                       fill={color}
                                       opacity={dimmed ? 0.3 : 1}
                                     />
+                                    {/* 已放置指示 — 该格上覆盖 navy 半透标记 */}
                                     {isPlaced && (
-                                      <circle
-                                        cx={x + 0.5}
-                                        cy={y + 0.5}
-                                        r={0.4}
+                                      <rect
+                                        x={x + 0.15}
+                                        y={y + 0.15}
+                                        width={0.7}
+                                        height={0.7}
                                         fill="none"
                                         stroke="var(--y2k-navy)"
-                                        strokeWidth={0.12}
+                                        strokeWidth={0.15}
                                       />
                                     )}
                                   </g>
