@@ -90,10 +90,10 @@ export function HomeScreen({ onAction, onOpenGallery }: HomeScreenProps) {
                 className="text-xl text-paper-bg leading-tight"
                 style={{ fontFamily: 'var(--font-display)' }}
               >
-                上传图片
+                上传一张图
               </div>
               <div className="text-sm text-paper-bg/85 mt-1">
-                一张图变成拼豆图纸
+                先在屏幕里试拼，看效果再买豆
               </div>
             </div>
             <ArrowUpRight
@@ -110,14 +110,14 @@ export function HomeScreen({ onAction, onOpenGallery }: HomeScreenProps) {
         <SecondaryCard
           Icon={Shuffle}
           title="今日盲盒"
-          desc="今天的灵感"
+          desc="今天先拼啥"
           accent="honey"
           onClick={() => onAction?.('blindbox')}
         />
         <SecondaryCard
           Icon={Grid3X3}
           title="空白画布"
-          desc="自由创作"
+          desc="一颗豆开始"
           accent="ghost"
           onClick={() => onAction?.('blank')}
         />

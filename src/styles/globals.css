@@ -22,13 +22,16 @@
   --bead-shadow: oklch(0.78 0.012 70);
   --bead-alert: oklch(0.55 0.18 18);
 
-  /* Y2K Pixel 点缀色（≤10% 出现，仅在像素 chrome / 角珍 / 像素 shadow 上使用）
-     柔紫 + 藏青 + 柔珊瑚，跟 paper-cream 暖色不冲突，比起原 anti-references 里
-     的"霓虹粉/赛博朋克"更温柔 */
+  /* Y2K Pixel 点缀色（≤10% 出现，仅在像素 chrome / 角珍 / 像素 shadow / sparkle 上使用）
+     柔紫 + 藏青 + 柔珊瑚 + 婴儿蓝/薄荷，是 NewJeans Y2K 同款的柔色 polish；
+     跟 paper-cream 暖底搭配 = "温暖手作 + NewJeans 偶像感"混血，
+     比原 anti-references 里的"霓虹/赛博朋克"更治愈 */
   --y2k-lavender:    oklch(0.78 0.075 295);   /* ≈#bda3d9 柔紫 */
   --y2k-lavender-deep: oklch(0.60 0.085 285); /* ≈#7e6dad 紫罗兰 */
   --y2k-navy:        oklch(0.55 0.06 260);    /* ≈#6f7daa 藏青/雾蓝 */
   --y2k-coral:       oklch(0.78 0.10 22);     /* ≈#e8a48c 柔珊瑚 */
+  --y2k-sky:         oklch(0.85 0.06 235);    /* ≈#a8c9e3 婴儿蓝 (NewJeans 大量用) */
+  --y2k-mint:        oklch(0.88 0.055 165);   /* ≈#aedccd 薄荷 */
 
   /* Warm shadow base — used by all elevation tokens */
   --bead-shadow-rgba: 168, 130, 90;
@@ -110,11 +113,13 @@
   --color-bead-shadow: var(--bead-shadow);
   --color-alert-rose: var(--bead-alert);
 
-  /* Y2K accent tokens — bg-y2k-lavender / text-y2k-navy / border-y2k-coral */
+  /* Y2K accent tokens — bg-y2k-lavender / text-y2k-navy / border-y2k-coral / bg-y2k-sky / text-y2k-mint */
   --color-y2k-lavender: var(--y2k-lavender);
   --color-y2k-lavender-deep: var(--y2k-lavender-deep);
   --color-y2k-navy: var(--y2k-navy);
   --color-y2k-coral: var(--y2k-coral);
+  --color-y2k-sky: var(--y2k-sky);
+  --color-y2k-mint: var(--y2k-mint);
 
   /* shadcn-aliased tokens — preserve standard shadcn class API */
   --color-background: var(--background);

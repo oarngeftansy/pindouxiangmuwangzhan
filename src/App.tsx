@@ -221,7 +221,23 @@ function App() {
       <main className="relative z-10 max-w-[1240px] mx-auto px-4 py-6 sm:px-6 sm:py-10 lg:px-8">
         {mode === 'upload' && (
           <div className="space-y-8">
-            <section className="px-1 pt-2 pb-1">
+            <section className="relative px-1 pt-2 pb-1">
+              {/* 顶部 wordmark 小标 — NewJeans 风 serif italic + 像素 sparkle */}
+              <div className="flex items-center gap-2 mb-2">
+                <span className="sparkle sparkle-sm sparkle-twinkle" style={{ ['--sparkle-color' as string]: 'var(--y2k-lavender)' }} aria-hidden="true" />
+                <span
+                  className="font-wordmark text-y2k-navy"
+                  style={{ fontSize: '1.05rem' }}
+                >
+                  pindou.studio
+                </span>
+                <span
+                  className="font-pixel-arcade text-ink-soft"
+                  style={{ fontSize: '8px', letterSpacing: '0.05em' }}
+                >
+                  v1.0
+                </span>
+              </div>
               <h2
                 className="text-ink-warm leading-[1.1]"
                 style={{
@@ -232,10 +248,20 @@ function App() {
                 今天想拼点什么？
               </h2>
               <p className="text-base sm:text-lg text-ink-soft mt-3 max-w-[34em] leading-[1.65]">
-                {SHOW_BLIND_BOX_PANEL
-                  ? '上传一张图、抽个盲盒，或者从下面挑一份图鉴——都从这里开始。'
-                  : '上传一张图，或者从下面挑一份图鉴——都从这里开始。'}
+                <span className="text-ink-warm font-semibold">在线赛博拼豆工坊</span>——
+                不用买真豆子，在浏览器里就能试拼、配色、出图纸。
               </p>
+              {/* 装饰 sparkle 散落（右上） */}
+              <span
+                className="sparkle sparkle-sm sparkle-twinkle absolute"
+                style={{ top: 18, right: 60, ['--sparkle-color' as string]: 'var(--y2k-sky)', animationDelay: '600ms' }}
+                aria-hidden="true"
+              />
+              <span
+                className="sparkle sparkle-twinkle absolute"
+                style={{ top: 50, right: 20, ['--sparkle-color' as string]: 'var(--y2k-coral)', animationDelay: '1200ms' }}
+                aria-hidden="true"
+              />
             </section>
             <TrendingPatternsPanel onUsePattern={handleUseBlindBox} />
             {SHOW_BLIND_BOX_PANEL ? (

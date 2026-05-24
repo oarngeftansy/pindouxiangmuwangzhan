@@ -2,6 +2,8 @@
 @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;600;700&family=ZCOOL+KuaiLe&display=swap');
 /* Y2K 像素字体：Press Start 2P 西文像素 + VT323 软像素备选。中文像素字体 Cubic 11 从 jsdelivr CDN 加载（声明在 @font-face 块里） */
 @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap');
+/* NewJeans 风 serif italic wordmark — Playfair Display 优雅斜体 */
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@1,500;1,700&display=swap');
 
 @font-face {
   font-family: 'Cubic 11';
@@ -198,4 +200,61 @@
 .pixel-render {
   image-rendering: pixelated;
   -ms-interpolation-mode: nearest-neighbor;
+}
+
+/* NewJeans 风 serif italic wordmark（"拼豆模拟器" 旁的英文小标常用） */
+.font-wordmark {
+  font-family: 'Playfair Display', 'Georgia', serif;
+  font-style: italic;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+/* Glossy 圆润按钮 —— Y2K 立体光泽，类似 NewJeans 那种"塑料发亮"按钮 */
+.btn-glossy {
+  position: relative;
+  background-image: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.45) 0%,
+    rgba(255, 255, 255, 0.18) 40%,
+    rgba(0, 0, 0, 0) 41%,
+    rgba(0, 0, 0, 0.08) 100%
+  );
+  border-radius: 14px;
+  /* 像素 + 暖色双阴影 */
+  box-shadow:
+    0 2px 0 rgba(58, 52, 42, 0.4),
+    0 4px 0 rgba(168, 130, 90, 0.25),
+    inset 0 1px 0 rgba(255, 255, 255, 0.6);
+  transition: transform 0.1s ease, box-shadow 0.1s ease;
+}
+.btn-glossy:active {
+  transform: translateY(2px);
+  box-shadow:
+    0 1px 0 rgba(58, 52, 42, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.4);
+}
+
+/* 闪光装饰星 — sparkle / star，CSS 直接画一颗 4 角星，可改色 */
+.sparkle {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  background: var(--sparkle-color, var(--y2k-lavender));
+  clip-path: polygon(
+    50% 0%, 60% 40%, 100% 50%, 60% 60%,
+    50% 100%, 40% 60%, 0% 50%, 40% 40%
+  );
+  pointer-events: none;
+}
+.sparkle-sm { width: 8px; height: 8px; }
+.sparkle-lg { width: 16px; height: 16px; }
+
+/* 慢闪烁动画给装饰星 */
+@keyframes sparkleTwinkle {
+  0%, 100% { opacity: 0.4; transform: scale(0.85) rotate(0deg); }
+  50%      { opacity: 1;   transform: scale(1.1) rotate(45deg); }
+}
+.sparkle-twinkle {
+  animation: sparkleTwinkle 2.4s ease-in-out infinite;
 }

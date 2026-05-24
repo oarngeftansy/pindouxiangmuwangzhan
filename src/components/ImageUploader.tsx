@@ -279,13 +279,16 @@ export function ImageUploader({ onImageProcessed, onCreateBlank }: ImageUploader
 
   return (
     <div className="w-full">
-      {/* 主上传区域 */}
+      {/* 主上传区域 — Y2K pixel 硬阴影 + 4 角珍装饰 */}
       <div
         className={`relative rounded-card border-2 border-dashed p-6 sm:p-12 transition-all cursor-pointer mb-4 bg-paper-soft ${
           isDragging
             ? 'border-terracotta bg-paper-deep'
             : 'border-edge-sand hover:border-terracotta/60 hover:bg-paper-bg'
         }`}
+        style={{
+          boxShadow: '3px 3px 0 var(--bead-ink), 6px 6px 0 var(--y2k-lavender)',
+        }}
         onDragOver={(e) => {
           e.preventDefault();
           setIsDragging(true);
@@ -294,6 +297,22 @@ export function ImageUploader({ onImageProcessed, onCreateBlank }: ImageUploader
         onDrop={handleDrop}
         onClick={() => fileInputRef.current?.click()}
       >
+        {/* 4 角像素角珍 */}
+        <span className="absolute -top-1 -left-1 w-2 h-2 bg-y2k-sky pointer-events-none" aria-hidden="true" />
+        <span className="absolute -top-1 -right-1 w-2 h-2 bg-y2k-coral pointer-events-none" aria-hidden="true" />
+        <span className="absolute -bottom-1 -left-1 w-2 h-2 bg-y2k-coral pointer-events-none" aria-hidden="true" />
+        <span className="absolute -bottom-1 -right-1 w-2 h-2 bg-y2k-lavender pointer-events-none" aria-hidden="true" />
+        {/* 飘 sparkle 装饰 */}
+        <span
+          className="sparkle sparkle-sm sparkle-twinkle absolute"
+          style={{ top: 18, right: 30, ['--sparkle-color' as string]: 'var(--y2k-lavender)' }}
+          aria-hidden="true"
+        />
+        <span
+          className="sparkle sparkle-twinkle absolute"
+          style={{ bottom: 28, left: 36, ['--sparkle-color' as string]: 'var(--y2k-sky)', animationDelay: '800ms' }}
+          aria-hidden="true"
+        />
         <input
           ref={fileInputRef}
           type="file"
@@ -323,10 +342,10 @@ export function ImageUploader({ onImageProcessed, onCreateBlank }: ImageUploader
           ) : (
             <>
               <h3 className="text-2xl text-ink-warm mb-2" style={{ fontFamily: 'var(--font-headline)', fontWeight: 600 }}>
-                上传你的图
+                把你的图变成可拼的豆图
               </h3>
               <p className="text-ink-soft text-base sm:text-lg leading-relaxed">
-                拖到这里，或点一下选张图。
+                拖一张图过来，或点一下选——先在屏幕里拼，看效果再决定要不要买豆。
               </p>
               <p className="text-xs text-ink-soft mt-2 opacity-70" style={{ fontFamily: 'var(--font-num)' }}>
                 JPG · PNG · GIF

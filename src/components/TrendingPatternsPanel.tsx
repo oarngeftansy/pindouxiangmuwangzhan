@@ -134,11 +134,25 @@ export function TrendingPatternsPanel({ onUsePattern }: TrendingPatternsPanelPro
           <button
             key={p.id}
             onClick={() => onUsePattern(p.grid)}
-            className="group text-left rounded-surface bg-paper-soft border border-edge-sand p-3 transition-all hover:-translate-y-0.5 hover:bg-paper-bg cursor-pointer focus-visible:outline-2 focus-visible:outline-moss focus-visible:outline-offset-2"
-            style={{ boxShadow: 'none' }}
-            onMouseEnter={(e) => { e.currentTarget.style.boxShadow = 'var(--shadow-card)'; }}
-            onMouseLeave={(e) => { e.currentTarget.style.boxShadow = 'none'; }}
+            className="group relative text-left rounded-surface bg-paper-soft border border-edge-sand p-3 cursor-pointer focus-visible:outline-2 focus-visible:outline-moss focus-visible:outline-offset-2 transition-transform hover:-translate-y-0.5"
+            style={{
+              // Y2K pixel 硬阴影：下方 + 右方 2px 暖墨 + 4px lavender 错位
+              boxShadow: '2px 2px 0 var(--bead-ink), 4px 4px 0 var(--y2k-lavender)',
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.boxShadow =
+                '2px 2px 0 var(--bead-ink), 4px 4px 0 var(--y2k-sky)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.boxShadow =
+                '2px 2px 0 var(--bead-ink), 4px 4px 0 var(--y2k-lavender)';
+            }}
           >
+            {/* 4 角像素角珍 — Y2K NewJeans 风装饰 */}
+            <span className="absolute -top-0.5 -left-0.5 w-1 h-1 bg-y2k-lavender pointer-events-none" aria-hidden="true" />
+            <span className="absolute -top-0.5 -right-0.5 w-1 h-1 bg-y2k-sky pointer-events-none" aria-hidden="true" />
+            <span className="absolute -bottom-0.5 -left-0.5 w-1 h-1 bg-y2k-sky pointer-events-none" aria-hidden="true" />
+            <span className="absolute -bottom-0.5 -right-0.5 w-1 h-1 bg-y2k-lavender pointer-events-none" aria-hidden="true" />
             <div className="relative flex items-center justify-center bg-paper-bg rounded-control p-2 mb-2.5 min-h-[96px] sm:min-h-[120px] border border-edge-sand/60">
               {p.previewImage ? (
                 <img src={p.previewImage} alt={p.name} className="max-h-[88px] sm:max-h-[110px] max-w-full object-contain" />
