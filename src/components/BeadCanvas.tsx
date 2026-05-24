@@ -1405,13 +1405,13 @@ export function BeadCanvas({
           </div>
         )}
 
-        {/* 主画布区域 */}
-        <div className="flex-1 min-w-0 min-h-0 flex flex-col">
-          {/* PEGBOARD.EXE 拼豆板模式：全屏主画布 */}
+        {/* 主画布区域 — fit-content 不再 flex-1，chrome 包到 pegboard 大小 */}
+        <div className="flex-1 min-w-0 flex flex-col items-start">
+          {/* PEGBOARD.EXE 拼豆板模式：chrome 适配 pegboard 大小，不再强制撑满 */}
           {viewMode === 'pegboard' ? (
-            <div className="relative flex-1 flex flex-col min-h-0">
+            <div className="relative">
               <div
-                className="relative bg-paper-bg p-3 pt-7 sm:p-4 sm:pt-8 flex-1 flex flex-col min-h-0"
+                className="relative bg-paper-bg p-3 pt-7 sm:p-4 sm:pt-8"
                 style={{
                   boxShadow: WIN95_SHADOW,
                   backgroundImage:
@@ -1458,10 +1458,11 @@ export function BeadCanvas({
                 </div>
               )}
               <div
-                className="bg-paper-deep rounded-surface p-2 flex-1 overflow-auto min-h-0"
+                className="bg-paper-deep rounded-surface p-2 overflow-auto"
                 style={{
-                  // 关键：scroll 容器允许 pan 滚动，让用户能滑到正方形板的任何位置
-                  // 不再 flex justify-center（中心化会让超大板对称溢出 = 触不到左缘）
+                  // chrome 自适应 pegboard 大小，不再 flex-1。
+                  // 限定 max-height 防超大板撑出视口，scroll 还能用
+                  maxHeight: 'calc(100dvh - 220px)',
                   touchAction: 'pan-x pan-y pinch-zoom',
                 }}
               >
