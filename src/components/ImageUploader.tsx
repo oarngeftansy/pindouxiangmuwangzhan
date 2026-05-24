@@ -186,9 +186,61 @@ export function ImageUploader({ onImageProcessed, onCreateBlank }: ImageUploader
         ctx.imageSmoothingQuality = 'high';
 
         ctx.drawImage(img, 0, 0, gridWidth, gridHeight);
-        
+
         const imageData = ctx.getImageData(0, 0, gridWidth, gridHeight);
         const pixels = imageData.data;
+
+        // ── 自动背景检测（采样 4 角 + 边线，相似就当背景 mask）──
+        // 让图纸边缘过渡自然，不被整张图的方形背景包住
+        const pickPx = (px: number, py: number) => {
+          const i = (py * gridWidth + px) * 4;
+          return { r: pixels[i], g: pixels[i + 1], b: pixels[i + 2], a: pixels[i + 3] };
+        };
+        const colorDist = (a: { r: number; g: number; b: number }, b: { r: number; g: number; b: number }) =>
+          Math.sqrt((a.r - b.r) ** 2 + (a.g - b.g) ** 2 + (a.b - b.b) ** 2);
+
+        // 采样 4 角 + 4 边中点，取颜色聚类的"主背景色"
+        const samples = [
+          pickPx(0, 0), pickPx(gridWidth - 1, 0),
+          pickPx(0, gridHeight - 1), pickPx(gridWidth - 1, gridHeight - 1),
+          pickPx(Math.floor(gridWidth / 2), 0),
+          pickPx(Math.floor(gridWidth / 2), gridHeight - 1),
+          pickPx(0, Math.floor(gridHeight / 2)),
+          pickPx(gridWidth - 1, Math.floor(gridHeight / 2)),
+        ].filter(s => s.a >= 128);
+
+        let bgColor: { r: number; g: number; b: number } | null = null;
+        if (samples.length >= 5) {
+          // 简单聚类：所有采样两两比对，找最大相似组（>=4 个相似就当背景）
+          let bestGroup: typeof samples = [];
+          for (const s of samples) {
+            const similar = samples.filter(x => colorDist(s, x) < 35);
+            if (similar.length > bestGroup.length) bestGroup = similar;
+          }
+          if (bestGroup.length >= 4) {
+            const avgR = bestGroup.reduce((a, b) => a + b.r, 0) / bestGroup.length;
+            const avgG = bestGroup.reduce((a, b) => a + b.g, 0) / bestGroup.length;
+            const avgB = bestGroup.reduce((a, b) => a + b.b, 0) / bestGroup.length;
+            bgColor = { r: avgR, g: avgG, b: avgB };
+          }
+        }
+
+        // 把所有"接近背景色"的像素 alpha 设 0（透明）→ 后续生成网格时 = null
+        if (bgColor) {
+          const BG_TOLERANCE = 45;
+          for (let py = 0; py < gridHeight; py++) {
+            for (let px = 0; px < gridWidth; px++) {
+              const i = (py * gridWidth + px) * 4;
+              const dist = colorDist(
+                { r: pixels[i], g: pixels[i + 1], b: pixels[i + 2] },
+                bgColor,
+              );
+              if (dist < BG_TOLERANCE) {
+                pixels[i + 3] = 0; // mark transparent
+              }
+            }
+          }
+        }
 
         // 应用Floyd-Steinberg抖动算法改善颜色过渡（仅照片模式）
         let workingPixels = new Uint8ClampedArray(pixels);
