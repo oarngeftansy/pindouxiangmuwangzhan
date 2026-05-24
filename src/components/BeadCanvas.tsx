@@ -460,12 +460,10 @@ export function BeadCanvas({
     const touch = e.touches[0];
     const cell = getCellFromTouch(touch);
     if (!cell) return;
-    const canPlace = !lockedColor || referenceGrid[cell.y]?.[cell.x] === lockedColor;
-    if (canPlace) {
-      pushHistory();
-      setIsDrawing(true);
-      handleCellClick(cell.x, cell.y);
-    }
+    // 允许触摸任何 cell（handleCellClick 内部决定放/擦/无视）
+    pushHistory();
+    setIsDrawing(true);
+    handleCellClick(cell.x, cell.y);
   };
 
   const handleTouchMove = (e: React.TouchEvent) => {
@@ -480,10 +478,8 @@ export function BeadCanvas({
     const touch = e.touches[0];
     const cell = getCellFromTouch(touch);
     if (!cell) return;
-    const canPlace = !lockedColor || referenceGrid[cell.y]?.[cell.x] === lockedColor;
-    if (canPlace) {
-      handleCellClick(cell.x, cell.y);
-    }
+    // 内部 handleCellClick 决定放/擦/无视，外层不再 gate
+    handleCellClick(cell.x, cell.y);
   };
 
   const handleTouchEnd = () => {
@@ -556,13 +552,24 @@ export function BeadCanvas({
 
   const handleCellClick = useCallback((x: number, y: number) => {
     const s = stateRef.current;
+    let shouldErase = false;
     if (s.lockedColor) {
       const referenceColor = s.referenceGrid[y][x];
-      if (referenceColor !== s.lockedColor) return;
+      if (referenceColor !== s.lockedColor) {
+        // 非目标 cell：如果上面已经误放豆子，直接擦掉（用户友好的"快速纠错"）
+        // 空的非目标 cell 什么都不做
+        if (s.workingGrid[y][x]) {
+          shouldErase = true;
+        } else {
+          return;
+        }
+      }
     }
 
     const newGrid = s.workingGrid.map((row) => [...row]);
-    if (s.activeTool === "brush") {
+    if (shouldErase || s.activeTool === "eraser") {
+      newGrid[y][x] = null;
+    } else if (s.activeTool === "brush") {
       newGrid[y][x] = s.lockedColor
         ? s.lockedColor
         : (s.selectedColor === "#00000000" ? null : s.selectedColor);
@@ -1562,7 +1569,8 @@ export function BeadCanvas({
                           const color = inBounds ? workingGrid[dy][dx] : null;
                           const referenceColor = inBounds ? referenceGrid[dy]?.[dx] : null;
                           const shouldHighlight = lockedColor && referenceColor === lockedColor;
-                          const canPlace = inBounds && (!lockedColor || referenceColor === lockedColor);
+                          // canPlace 也包括"有误放豆子可擦"的情况
+                          const canPlace = inBounds && (!lockedColor || referenceColor === lockedColor || !!color);
                           const isEmpty = !color;
                           return (
                             <PegboardCell
@@ -1657,7 +1665,7 @@ export function BeadCanvas({
                               const color = inBounds ? workingGrid[dy][dx] : null;
                               const referenceColor = inBounds ? referenceGrid[dy]?.[dx] : null;
                               const shouldHighlight = lockedColor && referenceColor === lockedColor;
-                              const canPlace = inBounds && (!lockedColor || referenceColor === lockedColor);
+                              const canPlace = inBounds && (!lockedColor || referenceColor === lockedColor || !!color);
                               const isEmpty = !color;
                               return (
                                 <PegboardCell
