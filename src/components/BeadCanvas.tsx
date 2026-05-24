@@ -180,9 +180,7 @@ function ReferenceGridDisplay({
                   fill={color}
                   opacity={dimmed ? 0.3 : 1}
                 />
-                {showPlacedIndicator && isPlaced && (
-                  <rect x={x + 0.2} y={y + 0.2} width={0.6} height={0.6} fill="none" stroke="var(--y2k-navy)" strokeWidth={0.12} />
-                )}
+                {/* 已放置指示移除 — 用户拼完后每格都有 stroke 看起来像奇怪的网格描边 */}
               </g>
             );
           }),
