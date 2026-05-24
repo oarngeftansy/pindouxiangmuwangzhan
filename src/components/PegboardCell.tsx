@@ -104,30 +104,35 @@ function PegboardCellComponent({
   const pegLight = pp?.pegLightColor ?? "#e6dfce"; // ≈ paper-deep
   const pegDark = pp?.pegDarkColor ?? "#c5bcae";   // ≈ bead-shadow
   const pegShadowAlpha = pp?.pegShadowAlpha ?? 0.25;
-  const pegRadius = beadSize * pegRadiusRatio;
+  const pegRadius = Math.max(1, Math.round(beadSize * pegRadiusRatio));
 
-  // 豆子形状
+  // 豆子形状 — 整数像素，防子像素错位
   const beadRadiusRatio = pp?.beadRadiusRatio ?? 0.495;
   const beadBorderRadius = pp?.beadBorderRadius ?? 50;
   const beadFlatness = pp?.beadFlatness ?? 0;
-  const beadRadius = beadSize * beadRadiusRatio;
-  const beadW = beadRadius * 2;
-  const beadH = beadRadius * 2 * (1 - beadFlatness * 0.3); // flatness 压缩高度
+  // 关键：beadW/H 取整，且必须为偶数才能在 flex 居中时正好落格
+  const rawBeadW = beadSize * beadRadiusRatio * 2;
+  const evenW = Math.max(2, Math.round(rawBeadW / 2) * 2);
+  const beadW = evenW;
+  const beadH = Math.max(2, Math.round(evenW * (1 - beadFlatness * 0.3) / 2) * 2);
+  const beadRadius = beadW / 2;
 
   // 间距
   const beadGap = pp?.beadGap ?? 0;
 
-  // 内阴影
-  const idBlur = pp?.beadInnerDarkBlur ?? 3;
+  // 内阴影 — 小 cellSize 下按比例缩 blur，否则 3px halo 在 12px 豆上等于 25% 直径，
+  // 相邻豆子 halo 重叠造成视觉"参差"
+  const blurScale = Math.min(1, beadSize / 24);
+  const idBlur = (pp?.beadInnerDarkBlur ?? 3) * blurScale;
   const idAlpha = pp?.beadInnerDarkAlpha ?? 0.15;
   const idOx = pp?.beadInnerDarkOffsetX ?? -1;
   const idOy = pp?.beadInnerDarkOffsetY ?? -1;
-  const ilBlur = pp?.beadInnerLightBlur ?? 3;
+  const ilBlur = (pp?.beadInnerLightBlur ?? 3) * blurScale;
   const ilAlpha = pp?.beadInnerLightAlpha ?? 0.25;
   const ilOx = pp?.beadInnerLightOffsetX ?? 1;
   const ilOy = pp?.beadInnerLightOffsetY ?? 1;
-  const dsBlur = pp?.beadDropShadowBlur ?? 3;
-  const dsAlpha = pp?.beadDropShadowAlpha ?? 0.12;
+  const dsBlur = (pp?.beadDropShadowBlur ?? 3) * blurScale;
+  const dsAlpha = (pp?.beadDropShadowAlpha ?? 0.12) * blurScale; // 小豆下连透明度也降，halo 几乎不可见
   const dsOy = pp?.beadDropShadowOffsetY ?? 1;
 
   // 高光点
@@ -269,18 +274,20 @@ function PegboardCellComponent({
             />
           </div>
 
-          {/* 豆子投��� */}
-          <div
-            className="absolute"
-            style={{
-              width: beadW * 1.05,
-              height: beadH * 1.05,
-              borderRadius: `${beadBorderRadius}%`,
-              background:
-                `radial-gradient(circle, transparent ${glowInner}%, rgba(0,0,0,${glowAlpha}) ${glowOuter}%, transparent 85%)`,
-              pointerEvents: "none",
-            }}
-          />
+          {/* 豆子投影 — 小 cellSize 下省略避免邻居 halo 互相溢出 */}
+          {beadSize >= 16 && glowAlpha > 0 && (
+            <div
+              className="absolute"
+              style={{
+                width: beadW + 2,
+                height: beadH + 2,
+                borderRadius: `${beadBorderRadius}%`,
+                background:
+                  `radial-gradient(circle, transparent ${glowInner}%, rgba(0,0,0,${glowAlpha}) ${glowOuter}%, transparent 85%)`,
+                pointerEvents: "none",
+              }}
+            />
+          )}
         </>
       )}
 

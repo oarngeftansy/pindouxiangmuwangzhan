@@ -1436,7 +1436,8 @@ export function BeadCanvas({
                 {(() => {
                   // 智能 boardLayout —— 板尺寸 + 居中偏移
                   const { boardDim, offsetX, offsetY, cols, rows } = boardLayout;
-                  const cellSize = baseSize * pegboardScale * zoom;
+                  // 关键：cellSize 必须取整 pixel，否则 60 列累积子像素误差让每行豆子位置都偏一点
+                  const cellSize = Math.max(4, Math.round(baseSize * pegboardScale * zoom));
                   const boardPx = boardDim * cellSize;
                   return (
                     <div
@@ -1639,7 +1640,8 @@ export function BeadCanvas({
                     {(() => {
                       // 智能 boardLayout —— 跟 pegboard 模式同款居中
                       const { boardDim, offsetX, offsetY, cols, rows } = boardLayout;
-                      const cellSize = beadSize;
+                      // 同 PEGBOARD.EXE 取整防子像素错位
+                      const cellSize = Math.max(4, Math.round(beadSize));
                       return (
                         <div className="inline-block p-2">
                           <div
