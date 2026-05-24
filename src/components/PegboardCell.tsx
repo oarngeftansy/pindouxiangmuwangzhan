@@ -68,11 +68,7 @@ function PegboardCellComponent({
           backgroundColor: shouldHighlight && isEmpty
             ? 'var(--bead-honey-glow)'
             : color || 'var(--bead-paper-bg)',
-          // 网格线用极淡的暖沙色（与原版 rgba(156,163,175,X) 浅冷灰同等饱和度，但暖调）
-          // 之前用 rgba(58,52,42,X) 暖墨色太深，在小格子上线条占比大，看起来格子互相分开
-          border: showGrid
-            ? `1px solid rgba(168, 130, 90, ${borderAlpha * 0.6})`
-            : '1px solid transparent',
+          // 边框去掉 — 用户反馈金色描边视觉不好。色块直接相邻 = 干净像素图
         }}
         onMouseDown={handleDown}
         onMouseEnter={handleEnter}
