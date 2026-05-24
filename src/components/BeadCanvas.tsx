@@ -224,14 +224,27 @@ export function BeadCanvas({
   const baseSize = 20; // 基础尺寸20px，更合理的拼豆板大小
   const beadSize = baseSize * zoom;
 
+  // 智能拼豆板布局 —— 计算板尺寸 + 图案居中偏移
+  // 规则：
+  //   - 板永远正方形
+  //   - 板尺寸 = max(maxImageDim + 4, 29) — 起码 29×29（一块标准小板），或图边 + 4 cells padding
+  //   - 图案居中放置（offsetX/Y 表示图左上角在板内坐标）
+  const boardLayout = useMemo(() => {
+    const cols = workingGrid[0]?.length || 30;
+    const rows = workingGrid.length || 30;
+    const maxImageDim = Math.max(cols, rows);
+    const boardDim = Math.max(maxImageDim + 4, 29);
+    const offsetX = Math.floor((boardDim - cols) / 2);
+    const offsetY = Math.floor((boardDim - rows) / 2);
+    return { boardDim, offsetX, offsetY, cols, rows };
+  }, [workingGrid.length, workingGrid[0]?.length]);
+
   // 自适应计算拼豆板缩放 — 让正方形拼豆板充满工作区
   useEffect(() => {
     if (viewMode === 'pegboard') {
       const updateScale = () => {
-        const gridWidth = workingGrid[0]?.length || referenceGrid[0]?.length || 30;
-        const gridHeight = workingGrid.length || referenceGrid.length || 30;
-        // 板永远是正方形，边长 = max(cols, rows)
-        const boardDim = Math.max(gridWidth, gridHeight);
+        // 用智能 boardLayout.boardDim 作两轴尺寸（已含 padding + min 29）
+        const boardDim = boardLayout.boardDim;
 
         const padding = 8;
         const border = 4;
@@ -244,7 +257,6 @@ export function BeadCanvas({
         const availableWidth = window.innerWidth - sidebarW - 80;
         const availableHeight = window.innerHeight - 160;
 
-        // 正方形板用 boardDim 作两轴尺寸
         const maxCellByWidth = (availableWidth - extra) / boardDim;
         const maxCellByHeight = (availableHeight - extra) / boardDim;
         const optimalCell = Math.min(maxCellByWidth, maxCellByHeight);
@@ -259,7 +271,7 @@ export function BeadCanvas({
       window.addEventListener('resize', handleResize);
       return () => window.removeEventListener('resize', handleResize);
     }
-  }, [viewMode, workingGrid.length, workingGrid[0]?.length, referenceGrid.length, referenceGrid[0]?.length, baseSize]);
+  }, [viewMode, boardLayout.boardDim, baseSize]);
 
   // 移动端/平板检测：横屏时视为桌面
   // 注意：不再强制设置 showReference / showMaterialList。
@@ -280,12 +292,17 @@ export function BeadCanvas({
   }, []);
 
   // 触摸绘制支持（iPad / 手机）
+  // 注意：触摸坐标对应"板内 cell"，需要减去 boardLayout.offsetX/Y 才映射到
+  // workingGrid 实际行列。板的 padding 区只显示空 peg，不响应触摸。
   const getCellFromTouch = (touch: Touch): { x: number; y: number } | null => {
     if (!canvasRef.current) return null;
     const rect = canvasRef.current.getBoundingClientRect();
     const visualCellSize = viewMode === 'pegboard' ? beadSize * pegboardScale : beadSize;
-    const cellX = Math.floor((touch.clientX - rect.left) / visualCellSize);
-    const cellY = Math.floor((touch.clientY - rect.top) / visualCellSize);
+    const boardCellX = Math.floor((touch.clientX - rect.left) / visualCellSize);
+    const boardCellY = Math.floor((touch.clientY - rect.top) / visualCellSize);
+    // 板坐标 → workingGrid 坐标
+    const cellX = boardCellX - boardLayout.offsetX;
+    const cellY = boardCellY - boardLayout.offsetY;
     if (
       cellX >= 0 && cellX < workingGrid[0].length &&
       cellY >= 0 && cellY < workingGrid.length
@@ -1387,10 +1404,8 @@ export function BeadCanvas({
                 }}
               >
                 {(() => {
-                  const cols = workingGrid[0].length;
-                  const rows = workingGrid.length;
-                  // 拼豆板永远正方形 — 取宽高较大值作为边长，多余位置填空 peg
-                  const boardDim = Math.max(cols, rows);
+                  // 智能 boardLayout —— 板尺寸 + 居中偏移
+                  const { boardDim, offsetX, offsetY, cols, rows } = boardLayout;
                   const cellSize = baseSize * pegboardScale * zoom;
                   const boardPx = boardDim * cellSize;
                   return (
@@ -1412,8 +1427,6 @@ export function BeadCanvas({
                           width: boardPx,
                           height: boardPx,
                           backgroundColor: 'transparent',
-                          // 画布本体不响应浏览器 pan/swipe，把 touch 完全交给 React
-                          // 滚动靠外层 scroll 容器 + 用户触摸外围 padding 区域实现
                           touchAction: 'none',
                           overscrollBehavior: 'contain',
                           userSelect: 'none',
@@ -1423,19 +1436,22 @@ export function BeadCanvas({
                         onTouchEnd={handleTouchEnd}
                       >
                         {Array.from({ length: boardDim * boardDim }).map((_, i) => {
-                          const x = i % boardDim;
-                          const y = Math.floor(i / boardDim);
-                          const inBounds = x < cols && y < rows;
-                          const color = inBounds ? workingGrid[y][x] : null;
-                          const referenceColor = inBounds ? referenceGrid[y]?.[x] : null;
+                          const bx = i % boardDim;
+                          const by = Math.floor(i / boardDim);
+                          // 板坐标 → workingGrid 坐标（图案居中放在板中间）
+                          const dx = bx - offsetX;
+                          const dy = by - offsetY;
+                          const inBounds = dx >= 0 && dx < cols && dy >= 0 && dy < rows;
+                          const color = inBounds ? workingGrid[dy][dx] : null;
+                          const referenceColor = inBounds ? referenceGrid[dy]?.[dx] : null;
                           const shouldHighlight = lockedColor && referenceColor === lockedColor;
                           const canPlace = inBounds && (!lockedColor || referenceColor === lockedColor);
                           const isEmpty = !color;
                           return (
                             <PegboardCell
-                              key={`work-${x}-${y}`}
-                              x={x}
-                              y={y}
+                              key={`work-${bx}-${by}`}
+                              x={inBounds ? dx : bx}
+                              y={inBounds ? dy : by}
                               color={color}
                               beadSize={cellSize}
                               viewMode={viewMode}
@@ -1582,10 +1598,8 @@ export function BeadCanvas({
                     }}
                   >
                     {(() => {
-                      const cols = workingGrid[0].length;
-                      const rows = workingGrid.length;
-                      // 简洁模式画布也正方形，跟 PEGBOARD.EXE 一致
-                      const boardDim = Math.max(cols, rows);
+                      // 智能 boardLayout —— 跟 pegboard 模式同款居中
+                      const { boardDim, offsetX, offsetY, cols, rows } = boardLayout;
                       const cellSize = beadSize;
                       return (
                         <div className="inline-block p-2">
@@ -1608,19 +1622,21 @@ export function BeadCanvas({
                             onTouchEnd={handleTouchEnd}
                           >
                             {Array.from({ length: boardDim * boardDim }).map((_, i) => {
-                              const x = i % boardDim;
-                              const y = Math.floor(i / boardDim);
-                              const inBounds = x < cols && y < rows;
-                              const color = inBounds ? workingGrid[y][x] : null;
-                              const referenceColor = inBounds ? referenceGrid[y]?.[x] : null;
+                              const bx = i % boardDim;
+                              const by = Math.floor(i / boardDim);
+                              const dx = bx - offsetX;
+                              const dy = by - offsetY;
+                              const inBounds = dx >= 0 && dx < cols && dy >= 0 && dy < rows;
+                              const color = inBounds ? workingGrid[dy][dx] : null;
+                              const referenceColor = inBounds ? referenceGrid[dy]?.[dx] : null;
                               const shouldHighlight = lockedColor && referenceColor === lockedColor;
                               const canPlace = inBounds && (!lockedColor || referenceColor === lockedColor);
                               const isEmpty = !color;
                               return (
                                 <PegboardCell
-                                  key={`edit-${x}-${y}`}
-                                  x={x}
-                                  y={y}
+                                  key={`edit-${bx}-${by}`}
+                                  x={inBounds ? dx : bx}
+                                  y={inBounds ? dy : by}
                                   color={color}
                                   beadSize={cellSize}
                                   viewMode={viewMode}
