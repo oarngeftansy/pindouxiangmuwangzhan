@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Library, ArrowLeft } from 'lucide-react';
+import { Library, ArrowLeft, Mail } from 'lucide-react';
 import { ImageUploader } from './components/ImageUploader';
 import { BeadCanvas } from './components/BeadCanvas';
 import { BeadPattern } from './components/BeadPattern';
@@ -169,12 +169,26 @@ function App() {
 
   return (
     <div
-      className="min-h-screen bg-paper-bg text-ink-warm relative overflow-x-hidden"
+      className="min-h-screen text-ink-warm relative overflow-x-hidden"
       style={{
-        // 纯 cream paper 底 + 暗淡 dot grid 桌面感（跟开屏一致）
-        backgroundImage:
+        // 蓝 + 暖陶土 165° 对角渐变：顶左 sky → 中段 cream 缓冲 → 底右淡 terracotta wash
+        // 配 dot grid 保留 OS 桌面感
+        backgroundColor: 'var(--bead-paper-bg)',
+        backgroundImage: [
           'radial-gradient(circle, rgba(58, 52, 42, 0.06) 1px, transparent 1px)',
-        backgroundSize: '24px 24px',
+          [
+            'linear-gradient(165deg,',
+            'var(--y2k-sky) 0%,',
+            'var(--y2k-sky) 8%,',
+            'color-mix(in oklch, var(--y2k-sky) 50%, var(--bead-paper-bg)) 22%,',
+            'var(--bead-paper-bg) 42%,',
+            'var(--bead-paper-bg) 60%,',
+            'color-mix(in oklch, var(--bead-terracotta) 18%, var(--bead-paper-bg)) 82%,',
+            'color-mix(in oklch, var(--bead-terracotta) 32%, var(--bead-paper-bg)) 100%)',
+          ].join(' '),
+        ].join(', '),
+        backgroundSize: '24px 24px, 100% 100%',
+        backgroundAttachment: 'scroll, fixed',
       }}
     >
       {showGallery && (
@@ -242,6 +256,24 @@ function App() {
                   <span className="hidden sm:inline">返回首页</span>
                 </button>
               )}
+              {/* 联系作者 — 跳转小红书 */}
+              <a
+                href="https://xhslink.com/m/3cPlwI6sB4z"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center justify-center gap-1.5 min-h-[44px] min-w-[44px] sm:min-w-0 px-3 sm:px-4 py-2 bg-paper-soft text-sm font-semibold text-ink-warm hover:bg-paper-deep transition-colors no-underline"
+                style={{
+                  boxShadow: [
+                    '0 -2px 0 var(--bead-ink)', '0 2px 0 var(--bead-ink)',
+                    '-2px 0 0 var(--bead-ink)', '2px 0 0 var(--bead-ink)',
+                    '3px 3px 0 var(--y2k-coral)',
+                  ].join(', '),
+                }}
+                aria-label="联系作者（小红书）"
+              >
+                <Mail className="w-5 h-5 sm:w-4 sm:h-4 text-y2k-coral" aria-hidden="true" />
+                <span className="hidden sm:inline">联系作者</span>
+              </a>
             </div>
           </div>
         </div>
