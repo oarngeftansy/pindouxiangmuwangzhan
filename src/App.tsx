@@ -222,46 +222,24 @@ function App() {
         {mode === 'upload' && (
           <div className="space-y-8">
             <section className="relative px-1 pt-2 pb-1">
-              {/* 顶部 wordmark 小标 — NewJeans 风 serif italic + 像素 sparkle */}
-              <div className="flex items-center gap-2 mb-2">
-                <span className="sparkle sparkle-sm sparkle-twinkle" style={{ ['--sparkle-color' as string]: 'var(--y2k-lavender)' }} aria-hidden="true" />
+              {/* NewJeans 风大 wordmark — 居中、serif italic、伴 sparkle */}
+              <div className="flex items-center justify-center gap-2.5 mb-1">
+                <span className="sparkle sparkle-twinkle" style={{ ['--sparkle-color' as string]: 'var(--y2k-lavender)' }} aria-hidden="true" />
                 <span
                   className="font-wordmark text-y2k-navy"
-                  style={{ fontSize: '1.05rem' }}
+                  style={{ fontSize: 'clamp(2.4rem, 6vw, 3.6rem)', lineHeight: 1 }}
                 >
                   pindou.studio
                 </span>
-                <span
-                  className="font-pixel-arcade text-ink-soft"
-                  style={{ fontSize: '8px', letterSpacing: '0.05em' }}
-                >
-                  v1.0
-                </span>
+                <span className="sparkle sparkle-twinkle" style={{ ['--sparkle-color' as string]: 'var(--y2k-coral)', animationDelay: '800ms' }} aria-hidden="true" />
               </div>
+              {/* 中文 hero — 像素字 + 居中 */}
               <h2
-                className="text-ink-warm leading-[1.1]"
-                style={{
-                  fontFamily: 'var(--font-display)',
-                  fontSize: 'clamp(2rem, 5.5vw, 3.25rem)',
-                }}
+                className="text-center text-ink-warm leading-tight font-pixel-cn"
+                style={{ fontSize: 'clamp(1.2rem, 2.4vw, 1.6rem)', letterSpacing: '0.05em' }}
               >
-                今天想拼点什么？
+                ✦ 在浏览器里拼一颗豆 ✦
               </h2>
-              <p className="text-base sm:text-lg text-ink-soft mt-3 max-w-[34em] leading-[1.65]">
-                <span className="text-ink-warm font-semibold">在线赛博拼豆工坊</span>——
-                不用买真豆子，在浏览器里就能试拼、配色、出图纸。
-              </p>
-              {/* 装饰 sparkle 散落（右上） */}
-              <span
-                className="sparkle sparkle-sm sparkle-twinkle absolute"
-                style={{ top: 18, right: 60, ['--sparkle-color' as string]: 'var(--y2k-sky)', animationDelay: '600ms' }}
-                aria-hidden="true"
-              />
-              <span
-                className="sparkle sparkle-twinkle absolute"
-                style={{ top: 50, right: 20, ['--sparkle-color' as string]: 'var(--y2k-coral)', animationDelay: '1200ms' }}
-                aria-hidden="true"
-              />
             </section>
             <TrendingPatternsPanel onUsePattern={handleUseBlindBox} />
             {SHOW_BLIND_BOX_PANEL ? (

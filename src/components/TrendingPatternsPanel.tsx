@@ -81,21 +81,19 @@ export function TrendingPatternsPanel({ onUsePattern }: TrendingPatternsPanelPro
 
   return (
     <section>
-      <div className="flex items-end justify-between mb-4 px-1">
-        <div>
-          <h3
-            className="text-ink-warm leading-tight"
-            style={{ fontFamily: 'var(--font-headline)', fontSize: 'clamp(1.35rem, 2.2vw, 1.75rem)', fontWeight: 600 }}
-          >
-            今日图鉴
-          </h3>
-          <p className="text-sm text-ink-soft mt-1">挑一份现成的，点一下就开始拼。</p>
-        </div>
-        <span
-          className="text-xs text-ink-soft bg-paper-soft border border-edge-sand px-2.5 py-1 rounded-chip"
-          style={{ fontFamily: 'var(--font-num)' }}
+      <div className="flex items-center justify-between mb-4 px-1">
+        <h3
+          className="font-pixel-cn text-ink-warm flex items-center gap-2"
+          style={{ fontSize: 'clamp(1.05rem, 1.8vw, 1.3rem)', letterSpacing: '0.05em' }}
         >
-          {patterns.length} 份
+          <span className="sparkle sparkle-sm sparkle-twinkle" style={{ ['--sparkle-color' as string]: 'var(--y2k-sky)' }} aria-hidden="true" />
+          图鉴
+        </h3>
+        <span
+          className="font-pixel-arcade text-y2k-navy"
+          style={{ fontSize: 9, letterSpacing: 0.5 }}
+        >
+          {String(patterns.length).padStart(2, '0')} ITEMS
         </span>
       </div>
 
@@ -134,46 +132,72 @@ export function TrendingPatternsPanel({ onUsePattern }: TrendingPatternsPanelPro
           <button
             key={p.id}
             onClick={() => onUsePattern(p.grid)}
-            className="group relative text-left rounded-surface bg-paper-soft border border-edge-sand p-3 cursor-pointer focus-visible:outline-2 focus-visible:outline-moss focus-visible:outline-offset-2 transition-transform hover:-translate-y-0.5"
+            className="group relative text-left bg-paper-soft cursor-pointer focus-visible:outline-2 focus-visible:outline-moss focus-visible:outline-offset-2 transition-transform hover:-translate-y-0.5 overflow-hidden"
             style={{
-              // Y2K pixel 硬阴影：下方 + 右方 2px 暖墨 + 4px lavender 错位
-              boxShadow: '2px 2px 0 var(--bead-ink), 4px 4px 0 var(--y2k-lavender)',
+              // Y2K 1px 步阶外边 + lavender 双层硬阴影
+              boxShadow: [
+                '0 -2px 0 var(--bead-ink)',
+                '0 2px 0 var(--bead-ink)',
+                '-2px 0 0 var(--bead-ink)',
+                '2px 0 0 var(--bead-ink)',
+                '4px 4px 0 var(--y2k-lavender)',
+              ].join(', '),
             }}
             onMouseEnter={(e) => {
-              e.currentTarget.style.boxShadow =
-                '2px 2px 0 var(--bead-ink), 4px 4px 0 var(--y2k-sky)';
+              const s = e.currentTarget.style;
+              s.boxShadow = [
+                '0 -2px 0 var(--bead-ink)', '0 2px 0 var(--bead-ink)',
+                '-2px 0 0 var(--bead-ink)', '2px 0 0 var(--bead-ink)',
+                '4px 4px 0 var(--y2k-sky)',
+              ].join(', ');
             }}
             onMouseLeave={(e) => {
-              e.currentTarget.style.boxShadow =
-                '2px 2px 0 var(--bead-ink), 4px 4px 0 var(--y2k-lavender)';
+              const s = e.currentTarget.style;
+              s.boxShadow = [
+                '0 -2px 0 var(--bead-ink)', '0 2px 0 var(--bead-ink)',
+                '-2px 0 0 var(--bead-ink)', '2px 0 0 var(--bead-ink)',
+                '4px 4px 0 var(--y2k-lavender)',
+              ].join(', ');
             }}
           >
-            {/* 4 角像素角珍 — Y2K NewJeans 风装饰 */}
-            <span className="absolute -top-0.5 -left-0.5 w-1 h-1 bg-y2k-lavender pointer-events-none" aria-hidden="true" />
-            <span className="absolute -top-0.5 -right-0.5 w-1 h-1 bg-y2k-sky pointer-events-none" aria-hidden="true" />
-            <span className="absolute -bottom-0.5 -left-0.5 w-1 h-1 bg-y2k-sky pointer-events-none" aria-hidden="true" />
-            <span className="absolute -bottom-0.5 -right-0.5 w-1 h-1 bg-y2k-lavender pointer-events-none" aria-hidden="true" />
-            <div className="relative flex items-center justify-center bg-paper-bg rounded-control p-2 mb-2.5 min-h-[96px] sm:min-h-[120px] border border-edge-sand/60">
+            {/* mini Win95 title bar — 每张卡是一个小窗口 */}
+            <div
+              className="flex items-center justify-between px-1.5"
+              style={{ height: 14, backgroundColor: 'var(--y2k-navy)', color: 'var(--bead-paper-bg)' }}
+            >
+              <span
+                className="font-pixel-arcade truncate"
+                style={{ fontSize: 6, letterSpacing: 0.3 }}
+              >
+                {p.gridWidth}×{p.gridHeight}.PIN
+              </span>
+              <div className="flex gap-px shrink-0" aria-hidden="true">
+                <div className="w-2 h-2 bg-paper-bg/50" />
+                <div className="w-2 h-2 bg-y2k-coral" />
+              </div>
+            </div>
+
+            <div className="relative flex items-center justify-center bg-paper-bg p-2 min-h-[96px] sm:min-h-[120px]">
               {p.previewImage ? (
-                <img src={p.previewImage} alt={p.name} className="max-h-[88px] sm:max-h-[110px] max-w-full object-contain" />
+                <img src={p.previewImage} alt={p.name} className="max-h-[88px] sm:max-h-[110px] max-w-full object-contain" style={{ imageRendering: 'pixelated' }} />
               ) : (
                 <PatternThumbnail grid={p.grid} size={100} />
               )}
               <span
-                className="absolute -top-2 -right-2 w-7 h-7 rounded-full bg-honey text-ink-warm text-base font-bold flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                className="absolute -top-1 -right-1 w-6 h-6 bg-honey text-ink-warm font-pixel-arcade flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
                 aria-hidden="true"
-                style={{ boxShadow: 'var(--shadow-bead)' }}
+                style={{ fontSize: 10, boxShadow: '2px 2px 0 var(--bead-ink)' }}
               >
                 +
               </span>
             </div>
-            <div className="flex items-center gap-2">
-              <span className="inline-flex items-center gap-1 text-[10px] text-ink-soft">
-                <span className={`w-2 h-2 rounded-full ${DIFFICULTY_DOT[p.difficulty]}`} aria-hidden="true" />
+            <div className="flex items-center justify-between px-2 py-1.5 bg-paper-soft border-t border-edge-sand">
+              <span className="inline-flex items-center gap-1 text-[9px] text-ink-soft">
+                <span className={`w-1.5 h-1.5 ${DIFFICULTY_DOT[p.difficulty]}`} aria-hidden="true" />
                 {DIFFICULTY_LABELS[p.difficulty]}
               </span>
-              <span className="text-[10px] text-ink-soft" style={{ fontFamily: 'var(--font-num)' }}>
-                {p.gridWidth}×{p.gridHeight} · {p.beadCount}颗
+              <span className="font-pixel-arcade text-ink-soft" style={{ fontSize: 7 }}>
+                {p.beadCount}b
               </span>
             </div>
           </button>

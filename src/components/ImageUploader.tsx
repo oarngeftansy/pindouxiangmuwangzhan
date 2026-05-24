@@ -279,15 +279,20 @@ export function ImageUploader({ onImageProcessed, onCreateBlank }: ImageUploader
 
   return (
     <div className="w-full">
-      {/* 主上传区域 — Y2K pixel 硬阴影 + 4 角珍装饰 */}
+      {/* Y2K Win95 窗口主上传区 — 标题栏 + 双层硬阴影 + 角珍 + sparkle */}
       <div
-        className={`relative rounded-card border-2 border-dashed p-6 sm:p-12 transition-all cursor-pointer mb-4 bg-paper-soft ${
-          isDragging
-            ? 'border-terracotta bg-paper-deep'
-            : 'border-edge-sand hover:border-terracotta/60 hover:bg-paper-bg'
+        className={`relative cursor-pointer mb-4 overflow-hidden transition-colors ${
+          isDragging ? 'bg-paper-deep' : 'bg-paper-soft hover:bg-paper-bg'
         }`}
         style={{
-          boxShadow: '3px 3px 0 var(--bead-ink), 6px 6px 0 var(--y2k-lavender)',
+          // Y2K 双层硬阴影 + 1px 步阶外边
+          boxShadow: [
+            '0 -2px 0 var(--bead-ink)',
+            '0 2px 0 var(--bead-ink)',
+            '-2px 0 0 var(--bead-ink)',
+            '2px 0 0 var(--bead-ink)',
+            '6px 6px 0 var(--y2k-lavender)',
+          ].join(', '),
         }}
         onDragOver={(e) => {
           e.preventDefault();
@@ -297,22 +302,53 @@ export function ImageUploader({ onImageProcessed, onCreateBlank }: ImageUploader
         onDrop={handleDrop}
         onClick={() => fileInputRef.current?.click()}
       >
-        {/* 4 角像素角珍 */}
-        <span className="absolute -top-1 -left-1 w-2 h-2 bg-y2k-sky pointer-events-none" aria-hidden="true" />
-        <span className="absolute -top-1 -right-1 w-2 h-2 bg-y2k-coral pointer-events-none" aria-hidden="true" />
-        <span className="absolute -bottom-1 -left-1 w-2 h-2 bg-y2k-coral pointer-events-none" aria-hidden="true" />
-        <span className="absolute -bottom-1 -right-1 w-2 h-2 bg-y2k-lavender pointer-events-none" aria-hidden="true" />
-        {/* 飘 sparkle 装饰 */}
-        <span
-          className="sparkle sparkle-sm sparkle-twinkle absolute"
-          style={{ top: 18, right: 30, ['--sparkle-color' as string]: 'var(--y2k-lavender)' }}
-          aria-hidden="true"
-        />
-        <span
-          className="sparkle sparkle-twinkle absolute"
-          style={{ bottom: 28, left: 36, ['--sparkle-color' as string]: 'var(--y2k-sky)', animationDelay: '800ms' }}
-          aria-hidden="true"
-        />
+        {/* Win95 标题栏 */}
+        <div
+          className="flex items-center justify-between px-3"
+          style={{
+            height: 22,
+            backgroundColor: 'var(--y2k-navy)',
+            color: 'var(--bead-paper-bg)',
+          }}
+        >
+          <div className="flex items-center gap-1.5">
+            <div className="w-2.5 h-2.5 bg-paper-bg/30" aria-hidden="true" />
+            <span
+              className="font-pixel-arcade"
+              style={{ fontSize: 9, letterSpacing: 0.5 }}
+            >
+              UPLOAD.EXE
+            </span>
+          </div>
+          <div className="flex gap-1" aria-hidden="true">
+            <div className="w-3 h-3 bg-paper-bg/60 flex items-center justify-center" style={{ fontSize: 8, lineHeight: '12px', color: 'var(--bead-ink)' }}>_</div>
+            <div className="w-3 h-3 bg-paper-bg/60 flex items-center justify-center" style={{ fontSize: 8, lineHeight: '12px', color: 'var(--bead-ink)' }}>□</div>
+            <div className="w-3 h-3 bg-y2k-coral flex items-center justify-center" style={{ fontSize: 8, lineHeight: '12px', color: 'var(--bead-ink)' }}>×</div>
+          </div>
+        </div>
+
+        {/* 内容区 — dashed border 仅在内部 */}
+        <div
+          className={`relative border-2 border-dashed m-3 p-8 sm:p-12 ${
+            isDragging ? 'border-terracotta' : 'border-edge-sand'
+          }`}
+        >
+          {/* 飘 sparkle 装饰 */}
+          <span
+            className="sparkle sparkle-sm sparkle-twinkle absolute"
+            style={{ top: 16, right: 24, ['--sparkle-color' as string]: 'var(--y2k-lavender)' }}
+            aria-hidden="true"
+          />
+          <span
+            className="sparkle sparkle-twinkle absolute"
+            style={{ bottom: 20, left: 28, ['--sparkle-color' as string]: 'var(--y2k-sky)', animationDelay: '800ms' }}
+            aria-hidden="true"
+          />
+          <span
+            className="sparkle sparkle-sm sparkle-twinkle absolute"
+            style={{ top: 40, left: 48, ['--sparkle-color' as string]: 'var(--y2k-coral)', animationDelay: '400ms' }}
+            aria-hidden="true"
+          />
         <input
           ref={fileInputRef}
           type="file"
@@ -332,26 +368,22 @@ export function ImageUploader({ onImageProcessed, onCreateBlank }: ImageUploader
 
           {isProcessing ? (
             <>
-              <h3 className="text-2xl text-ink-warm mb-2" style={{ fontFamily: 'var(--font-headline)', fontWeight: 600 }}>
-                正在处理图片...
-              </h3>
-              <div className="w-64 h-2 bg-paper-deep rounded-full overflow-hidden mt-4">
+              <p className="font-pixel-arcade text-y2k-navy" style={{ fontSize: 11, letterSpacing: 0.5 }}>
+                PROCESSING...
+              </p>
+              <div className="w-48 h-1 bg-paper-deep overflow-hidden mt-3" style={{ boxShadow: '0 0 0 2px var(--bead-ink)' }}>
                 <div className="h-full bg-terracotta animate-pulse" />
               </div>
             </>
           ) : (
             <>
-              <h3 className="text-2xl text-ink-warm mb-2" style={{ fontFamily: 'var(--font-headline)', fontWeight: 600 }}>
-                把你的图变成可拼的豆图
-              </h3>
-              <p className="text-ink-soft text-base sm:text-lg leading-relaxed">
-                拖一张图过来，或点一下选——先在屏幕里拼，看效果再决定要不要买豆。
-              </p>
-              <p className="text-xs text-ink-soft mt-2 opacity-70" style={{ fontFamily: 'var(--font-num)' }}>
+              <p className="text-ink-warm text-base mt-1">拖图到这里 · 或点击上传</p>
+              <p className="font-pixel-arcade text-ink-soft mt-2.5" style={{ fontSize: 9, letterSpacing: 1 }}>
                 JPG · PNG · GIF
               </p>
             </>
           )}
+        </div>
         </div>
       </div>
 
@@ -675,23 +707,8 @@ export function ImageUploader({ onImageProcessed, onCreateBlank }: ImageUploader
         </div>
       )}
 
-      {/* 功能介绍 — 4 个特性卡，统一 brand */}
-      <div className="mt-12 sm:mt-14 grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
-        {([
-          { Icon: Camera, title: '智能转换', desc: '高精度颜色匹配，适配多种拼豆色号。' },
-          { Icon: Palette, title: '模拟创作', desc: '在线预览拼豆排布，支持后续细节调整。' },
-          { Icon: FileDown, title: '图纸导出', desc: '导出标准图纸，便于线下按格拼装。' },
-          { Icon: Sparkles, title: '成品预览', desc: '提供细腻的成品效果和熨烫预览。' },
-        ] as const).map(({ Icon, title, desc }) => (
-          <div key={title} className="bg-paper-soft border border-edge-sand rounded-surface p-4 sm:p-5">
-            <div className="w-10 h-10 bg-paper-deep rounded-control flex items-center justify-center mb-3" aria-hidden="true">
-              <Icon className="w-5 h-5 text-moss" />
-            </div>
-            <h3 className="font-semibold mb-1 text-ink-warm">{title}</h3>
-            <p className="text-sm text-ink-soft leading-relaxed">{desc}</p>
-          </div>
-        ))}
-      </div>
+      {/* 底部 4 卡已删除 — 用户反馈：AI 味重 + 信息冗余。
+          产品定位由 hero copy 承担，不需要功能罗列。 */}
     </div>
   );
 }
