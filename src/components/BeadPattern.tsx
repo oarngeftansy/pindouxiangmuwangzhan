@@ -3,17 +3,67 @@ import {
   ChevronUp,
   Download,
   Info,
-  Play,
   RefreshCw,
-  Settings2,
 } from "lucide-react";
 import { BeadGrid, BeadColor, ColorSystem } from "../App";
 import { useState, useMemo } from "react";
-import { 
-  rgbToHex, 
+import {
+  rgbToHex,
   findClosestColor,
   getAveragedColor
 } from "../utils/colorMatching";
+import { PixelArrow, PixelStar } from "./PixelDecorations";
+
+// NJ kiosk 风窗口 chrome — 跟 UPLOAD.EXE / GALLERY.EXE 同款
+const WIN95_SHADOW = [
+  '0 -2px 0 var(--y2k-navy)',
+  '0 2px 0 var(--y2k-navy)',
+  '-2px 0 0 var(--y2k-navy)',
+  '2px 0 0 var(--y2k-navy)',
+  '6px 6px 0 var(--y2k-navy-deep)',
+].join(', ');
+
+const CARD_SHADOW = [
+  '0 -2px 0 var(--y2k-navy)',
+  '0 2px 0 var(--y2k-navy)',
+  '-2px 0 0 var(--y2k-navy)',
+  '2px 0 0 var(--y2k-navy)',
+  '4px 4px 0 var(--y2k-navy-deep)',
+].join(', ');
+
+function TitleBar({ name }: { name: string }) {
+  return (
+    <div
+      className="absolute left-0 right-0 flex items-center justify-between px-2"
+      style={{
+        top: 2,
+        height: 16,
+        backgroundColor: 'var(--y2k-navy)',
+        color: 'var(--bead-paper-bg)',
+      }}
+    >
+      <span className="font-pixel-arcade" style={{ fontSize: 8, letterSpacing: 0 }}>
+        {name}
+      </span>
+      <div className="flex gap-0.5">
+        <div className="w-2 h-2 bg-paper-bg/80" aria-hidden="true" />
+        <div className="w-2 h-2 bg-paper-bg/80" aria-hidden="true" />
+        <div className="w-2 h-2 bg-y2k-coral" aria-hidden="true" />
+      </div>
+    </div>
+  );
+}
+
+function CornerPearls() {
+  return (
+    <>
+      <div className="absolute pointer-events-none" style={{ top: -4, left: -4, width: 4, height: 4, backgroundColor: 'var(--y2k-navy)' }} aria-hidden="true" />
+      <div className="absolute pointer-events-none" style={{ top: -4, right: -4, width: 4, height: 4, backgroundColor: 'var(--y2k-navy)' }} aria-hidden="true" />
+      <div className="absolute pointer-events-none" style={{ bottom: -4, left: -4, width: 4, height: 4, backgroundColor: 'var(--y2k-navy)' }} aria-hidden="true" />
+      <div className="absolute pointer-events-none" style={{ bottom: -4, right: -4, width: 4, height: 4, backgroundColor: 'var(--y2k-navy)' }} aria-hidden="true" />
+    </>
+  );
+}
 
 interface BeadPatternProps {
   beadGrid: BeadGrid;
@@ -348,70 +398,99 @@ export function BeadPattern({
   };
 
   return (
-    <div className="max-w-7xl mx-auto">
-      {/* 图纸设置面板 */}
-      <div className="bg-paper-soft border border-edge-sand rounded-card p-4 sm:p-6 mb-4 sm:mb-6">
-        <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-semibold flex items-center gap-2 text-ink-warm">
-            <Settings2 className="w-5 h-5 text-moss" />
-            图纸设置
-          </h3>
-          <button
-            onClick={() => setShowSettings(!showSettings)}
-            className="inline-flex items-center justify-center gap-1 min-h-[44px] min-w-[44px] px-3 rounded-control text-sm font-semibold text-moss hover:bg-paper-deep transition-colors"
-            aria-label={showSettings ? "收起图纸设置" : "展开图纸设置"}
-          >
-            <span>{showSettings ? "收起" : "展开"}</span>
-            {showSettings ? (
-              <ChevronUp className="w-4 h-4" aria-hidden="true" />
-            ) : (
-              <ChevronDown className="w-4 h-4" aria-hidden="true" />
-            )}
-          </button>
-        </div>
+    <div className="max-w-7xl mx-auto space-y-6 sm:space-y-8">
+      {/* SETTINGS.EXE 窗口 — 图纸设置（可折叠） */}
+      <div className="relative">
+        <div
+          className="relative bg-paper-bg p-4 pt-7 sm:p-6 sm:pt-8"
+          style={{
+            boxShadow: WIN95_SHADOW,
+            backgroundImage:
+              'radial-gradient(circle, rgba(44, 58, 94, 0.05) 1px, transparent 1px)',
+            backgroundSize: '14px 14px',
+          }}
+        >
+          <TitleBar name="SETTINGS.EXE" />
+
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-baseline gap-3">
+              <h3
+                className="font-pixel-cn text-ink-warm"
+                style={{ fontSize: 22, letterSpacing: '0.1em', lineHeight: 1.1 }}
+              >
+                图纸设置
+              </h3>
+              <span
+                className="font-pixel-arcade text-y2k-navy"
+                style={{ fontSize: 9, letterSpacing: '0.15em' }}
+              >
+                CONFIG
+              </span>
+            </div>
+            <button
+              onClick={() => setShowSettings(!showSettings)}
+              className="inline-flex items-center gap-1.5 min-h-[36px] px-3 py-2 bg-paper-soft text-ink-warm font-pixel-cn transition-transform hover:-translate-y-0.5"
+              style={{
+                fontSize: 11,
+                letterSpacing: '0.05em',
+                boxShadow: [
+                  '0 -2px 0 var(--y2k-navy)',
+                  '0 2px 0 var(--y2k-navy)',
+                  '-2px 0 0 var(--y2k-navy)',
+                  '2px 0 0 var(--y2k-navy)',
+                  '3px 3px 0 var(--y2k-coral)',
+                ].join(', '),
+              }}
+              aria-label={showSettings ? "收起图纸设置" : "展开图纸设置"}
+            >
+              <span>{showSettings ? "收起" : "展开"}</span>
+              {showSettings ? (
+                <ChevronUp className="w-4 h-4" aria-hidden="true" />
+              ) : (
+                <ChevronDown className="w-4 h-4" aria-hidden="true" />
+              )}
+            </button>
+          </div>
 
         {showSettings && (
-          <div className="space-y-6 pt-4 border-t border-edge-sand">
-            {/* 色号系统 */}
+          <div className="space-y-6 pt-4" style={{ borderTop: '2px dashed var(--y2k-navy)' }}>
+            {/* 色号系统 — pixel pill style */}
             <div>
-              <label className="block text-sm font-semibold mb-2 text-ink-warm">
+              <label className="block font-pixel-cn text-ink-warm mb-3" style={{ fontSize: 13, letterSpacing: '0.08em' }}>
                 色号系统
               </label>
-              <div className="grid grid-cols-3 sm:grid-cols-5 gap-2">
+              <div className="grid grid-cols-3 sm:grid-cols-5 gap-3">
                 {[
-                  {
-                    value: "mard" as ColorSystem,
-                    label: "MARD",
-                  },
-                  {
-                    value: "coco" as ColorSystem,
-                    label: "COCO",
-                  },
-                  {
-                    value: "manman" as ColorSystem,
-                    label: "漫漫",
-                  },
-                  {
-                    value: "panpan" as ColorSystem,
-                    label: "盼盼",
-                  },
-                  {
-                    value: "mxw" as ColorSystem,
-                    label: "咪小窝",
-                  },
-                ].map((system) => (
-                  <button
-                    key={system.value}
-                    onClick={() => setColorSystem(system.value)}
-                    className={`px-3 py-2.5 rounded-control text-sm font-semibold transition-colors ${
-                      colorSystem === system.value
-                        ? "bg-moss text-paper-bg border border-moss"
-                        : "bg-paper-bg text-ink-warm border border-edge-sand hover:bg-paper-deep"
-                    }`}
-                  >
-                    {system.label}
-                  </button>
-                ))}
+                  { value: "mard" as ColorSystem, label: "MARD" },
+                  { value: "coco" as ColorSystem, label: "COCO" },
+                  { value: "manman" as ColorSystem, label: "漫漫" },
+                  { value: "panpan" as ColorSystem, label: "盼盼" },
+                  { value: "mxw" as ColorSystem, label: "咪小窝" },
+                ].map((system) => {
+                  const active = colorSystem === system.value;
+                  return (
+                    <button
+                      key={system.value}
+                      onClick={() => setColorSystem(system.value)}
+                      className="font-pixel-cn px-3 py-2 transition-transform hover:-translate-y-0.5 active:translate-x-[1px] active:translate-y-[1px]"
+                      style={{
+                        fontSize: 12,
+                        letterSpacing: '0.05em',
+                        backgroundColor: active ? 'var(--y2k-navy)' : 'var(--bead-paper-soft)',
+                        color: active ? 'var(--bead-paper-bg)' : 'var(--bead-ink)',
+                        boxShadow: [
+                          '0 -2px 0 var(--y2k-navy)',
+                          '0 2px 0 var(--y2k-navy)',
+                          '-2px 0 0 var(--y2k-navy)',
+                          '2px 0 0 var(--y2k-navy)',
+                          active ? '3px 3px 0 var(--y2k-coral)' : '3px 3px 0 var(--y2k-navy-deep)',
+                        ].join(', '),
+                      }}
+                    >
+                      {system.label}
+                    </button>
+                  );
+                })}
               </div>
             </div>
 
@@ -552,21 +631,47 @@ export function BeadPattern({
             </div>
           </div>
         )}
+        </div>
+        <CornerPearls />
       </div>
 
-      <div className="bg-paper-soft border border-edge-sand rounded-card p-4 sm:p-8">
-        <div className="flex flex-col md:flex-row gap-4 sm:gap-8">
-          {/* 图纸预览 */}
-          <div className="flex-1">
+      {/* PATTERN.EXE + MATERIALS.EXE 两窗并排 */}
+      <div className="grid grid-cols-1 md:grid-cols-[1fr_auto] gap-6 sm:gap-8 items-start">
+        {/* PATTERN.EXE — 拼豆图纸主窗口 */}
+        <div className="relative">
+          <div
+            className="relative bg-paper-bg p-4 pt-8 sm:p-6 sm:pt-9"
+            style={{
+              boxShadow: WIN95_SHADOW,
+              backgroundImage:
+                'radial-gradient(circle, rgba(44, 58, 94, 0.05) 1px, transparent 1px)',
+              backgroundSize: '14px 14px',
+            }}
+          >
+            <TitleBar name="PATTERN.EXE" />
             <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
-              <h2 className="text-2xl font-semibold text-ink-warm" style={{ fontFamily: 'var(--font-headline)' }}>拼豆图纸</h2>
-              <div className="text-sm text-ink-soft" style={{ fontFamily: 'var(--font-num)' }}>
-                {beadGrid[0].length} × {beadGrid.length} · 共需{" "}
-                {Array.from(colorCount.values()).reduce((a, b) => a + b, 0)} 颗
+              <div className="flex items-baseline gap-3">
+                <PixelStar size={14} color="var(--y2k-coral)" className="self-center pixel-float-fast" style={{ marginBottom: 3 }} />
+                <h2 className="font-pixel-cn text-ink-warm" style={{ fontSize: 22, letterSpacing: '0.1em', lineHeight: 1.1 }}>
+                  拼豆图纸
+                </h2>
+              </div>
+              <div className="flex items-center gap-2 font-pixel-arcade text-y2k-navy" style={{ fontSize: 9, letterSpacing: '0.1em' }}>
+                <span>{beadGrid[0].length}×{beadGrid.length}</span>
+                <span className="text-ink-soft">·</span>
+                <span>{Array.from(colorCount.values()).reduce((a, b) => a + b, 0)}b TOTAL</span>
               </div>
             </div>
 
-            <div className="bg-paper-deep rounded-surface p-3 sm:p-6 overflow-auto">
+            <div
+              className="bg-paper-soft p-3 sm:p-5 overflow-auto"
+              style={{
+                boxShadow: 'inset 0 0 0 2px var(--y2k-navy)',
+                backgroundImage:
+                  'radial-gradient(circle, rgba(44, 58, 94, 0.08) 1px, transparent 1px)',
+                backgroundSize: '10px 10px',
+              }}
+            >
               <div className="inline-block">
                 <div
                   className="grid gap-0 bg-paper-bg rounded-control overflow-hidden border border-edge-sand"
@@ -590,7 +695,7 @@ export function BeadPattern({
                             width: beadSize,
                             height: beadSize,
                             backgroundColor: color || "var(--bead-paper-bg)",
-                            border: `0.15px solid rgba(58, 52, 42, ${gridOpacity * 0.5})`,
+                            border: `0.15px solid rgba(44, 58, 94, ${gridOpacity * 0.55})`,
                           }}
                           onClick={() => {
                             if (!color) return;
@@ -654,96 +759,157 @@ export function BeadPattern({
               </div>
             </div>
           </div>
+          <CornerPearls />
+        </div>
 
-          {/* 颜色统计和操作 */}
-          <div className="md:w-64 lg:w-80">
-            <h3 className="text-xl font-semibold mb-4 text-ink-warm" style={{ fontFamily: 'var(--font-headline)' }}>
-              所需材料清单
-            </h3>
-            <div className="bg-paper-bg border border-edge-sand rounded-surface p-4 mb-6">
-              <div className="text-sm text-ink-soft mb-3 flex justify-between" style={{ fontFamily: 'var(--font-num)' }}>
-                <span>
-                  总计{" "}
-                  {Array.from(colorCount.values()).reduce(
-                    (a, b) => a + b,
-                    0,
-                  )}{" "}
-                  颗
-                </span>
-                <span>{Array.from(colorCount.entries()).filter(([_, count]) => count >= minColorCount).length} 种色</span>
-              </div>
-              <div className="space-y-2 max-h-96 overflow-y-auto">
-                {Array.from(colorCount.entries())
-                  .filter(([_, count]) => count >= minColorCount)
-                  .sort((a, b) => b[1] - a[1])
-                  .map(([colorHex, count]) => {
-                    const code = getColorCode(colorHex);
-                    return (
-                      <div
-                        key={colorHex}
-                        className="flex items-center justify-between bg-paper-soft rounded-control p-3 border border-edge-sand"
-                      >
-                        <div className="flex items-center gap-3 min-w-0">
-                          <div
-                            className="w-10 h-10 rounded-full border border-edge-sand flex items-center justify-center shrink-0"
-                            style={{
-                              backgroundColor: colorHex,
-                            }}
-                          >
-                            <span
-                              className="text-xs font-bold"
-                              style={{
-                                color: "var(--bead-ink)",
-                                fontFamily: "var(--font-num)",
-                                textShadow:
-                                  "0 0 2px var(--bead-paper-bg)",
-                              }}
-                            >
-                              {code}
-                            </span>
-                          </div>
-                          <div className="text-sm font-semibold text-ink-warm truncate" style={{ fontFamily: 'var(--font-num)' }}>
-                            {code}
-                          </div>
-                        </div>
-                        <span className="text-sm font-bold text-ink-warm shrink-0" style={{ fontFamily: 'var(--font-num)' }}>
-                          {count}
-                        </span>
-                      </div>
-                    );
-                  })}
-              </div>
+        {/* MATERIALS.EXE — 材料清单 + 操作按钮 */}
+        <div className="relative md:w-72 lg:w-80 md:shrink-0">
+          <div
+            className="relative bg-paper-bg p-4 pt-8 sm:p-5 sm:pt-9"
+            style={{
+              boxShadow: WIN95_SHADOW,
+              backgroundImage:
+                'radial-gradient(circle, rgba(44, 58, 94, 0.05) 1px, transparent 1px)',
+              backgroundSize: '14px 14px',
+            }}
+          >
+            <TitleBar name="MATERIALS.EXE" />
+
+            <div className="flex items-baseline gap-3 mb-4">
+              <h3 className="font-pixel-cn text-ink-warm" style={{ fontSize: 22, letterSpacing: '0.1em', lineHeight: 1.1 }}>
+                材料清单
+              </h3>
+              <span className="font-pixel-arcade text-y2k-navy" style={{ fontSize: 9, letterSpacing: '0.15em' }}>
+                ITEMS
+              </span>
             </div>
 
-            {/* 操作按钮 */}
-            <div className="space-y-3">
+            {/* 总览 — pixel chip 行 */}
+            <div className="flex items-center justify-between mb-4 px-3 py-2 bg-paper-soft"
+              style={{ boxShadow: 'inset 0 0 0 2px var(--y2k-navy)' }}
+            >
+              <span className="font-pixel-arcade text-y2k-navy" style={{ fontSize: 9, letterSpacing: '0.1em' }}>
+                {Array.from(colorCount.values()).reduce((a, b) => a + b, 0)}b
+              </span>
+              <span className="font-pixel-arcade text-y2k-coral" style={{ fontSize: 9, letterSpacing: '0.1em' }}>
+                {Array.from(colorCount.entries()).filter(([_, count]) => count >= minColorCount).length} COLORS
+              </span>
+            </div>
+
+            <div className="space-y-2 max-h-96 overflow-y-auto pr-1">
+              {Array.from(colorCount.entries())
+                .filter(([_, count]) => count >= minColorCount)
+                .sort((a, b) => b[1] - a[1])
+                .map(([colorHex, count]) => {
+                  const code = getColorCode(colorHex);
+                  return (
+                    <div
+                      key={colorHex}
+                      className="flex items-center justify-between bg-paper-soft p-2"
+                      style={{
+                        boxShadow: [
+                          '0 -1px 0 var(--y2k-navy)',
+                          '0 1px 0 var(--y2k-navy)',
+                          '-1px 0 0 var(--y2k-navy)',
+                          '1px 0 0 var(--y2k-navy)',
+                          '2px 2px 0 var(--y2k-navy-deep)',
+                        ].join(', '),
+                      }}
+                    >
+                      <div className="flex items-center gap-2.5 min-w-0">
+                        {/* 色块 — 方形像素 chip 替代圆 */}
+                        <div
+                          className="w-8 h-8 flex items-center justify-center shrink-0"
+                          style={{
+                            backgroundColor: colorHex,
+                            boxShadow: [
+                              '0 -1px 0 var(--y2k-navy)',
+                              '0 1px 0 var(--y2k-navy)',
+                              '-1px 0 0 var(--y2k-navy)',
+                              '1px 0 0 var(--y2k-navy)',
+                            ].join(', '),
+                          }}
+                        >
+                          <span
+                            className="font-pixel-arcade"
+                            style={{
+                              fontSize: 7,
+                              color: 'var(--bead-ink)',
+                              textShadow: '0 0 2px var(--bead-paper-bg)',
+                              letterSpacing: 0,
+                            }}
+                          >
+                            {code}
+                          </span>
+                        </div>
+                        <span className="font-pixel-cn text-ink-warm truncate" style={{ fontSize: 11 }}>
+                          {code}
+                        </span>
+                      </div>
+                      <span className="font-pixel-arcade text-y2k-navy shrink-0" style={{ fontSize: 9, letterSpacing: '0.05em' }}>
+                        ×{count}
+                      </span>
+                    </div>
+                  );
+                })}
+            </div>
+
+            {/* 操作按钮 — 主 CTA arcade-pill + 副下载 chrome */}
+            <div className="space-y-3 mt-5 pt-4" style={{ borderTop: '2px dashed var(--y2k-navy)' }}>
               <button
                 onClick={onStartDIY}
-                className="w-full inline-flex items-center justify-center gap-2 min-h-[52px] px-6 py-4 bg-terracotta text-paper-bg rounded-control text-base font-semibold hover:bg-terracotta-deep transition-colors focus-visible:outline-2 focus-visible:outline-moss focus-visible:outline-offset-2"
-                style={{ boxShadow: 'var(--shadow-lift-bead)' }}
+                className="w-full arcade-pill font-pixel-cn text-paper-bg cursor-pointer"
+                style={{
+                  backgroundColor: 'var(--y2k-navy)',
+                  fontSize: 14,
+                  letterSpacing: '0.1em',
+                }}
               >
-                <Play className="w-5 h-5" aria-hidden="true" />
-                开始拼豆DIY
+                <span>开始拼豆 DIY</span>
+                <PixelArrow size={14} color="var(--bead-paper-bg)" />
               </button>
 
               <button
                 onClick={downloadPattern}
-                className="w-full inline-flex items-center justify-center gap-2 min-h-[52px] px-6 py-4 bg-paper-bg border border-edge-sand text-ink-warm rounded-control text-base font-semibold hover:bg-paper-deep transition-colors focus-visible:outline-2 focus-visible:outline-moss focus-visible:outline-offset-2"
+                className="w-full inline-flex items-center justify-center gap-2 min-h-[48px] px-4 py-3 bg-paper-soft text-ink-warm font-pixel-cn transition-transform hover:-translate-y-0.5 active:translate-x-[1px] active:translate-y-[1px]"
+                style={{
+                  fontSize: 13,
+                  letterSpacing: '0.1em',
+                  boxShadow: [
+                    '0 -2px 0 var(--y2k-navy)',
+                    '0 2px 0 var(--y2k-navy)',
+                    '-2px 0 0 var(--y2k-navy)',
+                    '2px 0 0 var(--y2k-navy)',
+                    '4px 4px 0 var(--y2k-coral)',
+                  ].join(', '),
+                }}
               >
-                <Download className="w-5 h-5" aria-hidden="true" />
+                <Download className="w-4 h-4" aria-hidden="true" />
                 下载图纸
               </button>
             </div>
 
-            <div className="mt-6 p-4 bg-honey-glow/40 rounded-surface border border-honey/40 flex items-start gap-2.5">
-              <Info className="w-4 h-4 text-ink-warm shrink-0 mt-0.5" aria-hidden="true" />
-              <p className="text-sm text-ink-warm leading-relaxed">
+            {/* 提示 ribbon */}
+            <div
+              className="mt-4 p-3 flex items-start gap-2 bg-paper-soft"
+              style={{
+                boxShadow: [
+                  '0 -1px 0 var(--y2k-navy)',
+                  '0 1px 0 var(--y2k-navy)',
+                  '-1px 0 0 var(--y2k-navy)',
+                  '1px 0 0 var(--y2k-navy)',
+                ].join(', '),
+              }}
+            >
+              <Info className="w-4 h-4 text-y2k-coral shrink-0 mt-0.5" aria-hidden="true" />
+              <p className="font-pixel-cn text-ink-warm leading-relaxed" style={{ fontSize: 11, letterSpacing: '0.03em' }}>
                 {typeof window !== 'undefined' && 'ontouchstart' in window
-                  ? '轻触任意格子可查看色号，再点一下取消。'
-                  : '鼠标悬停或点击任意格子可查看色号。'}
+                  ? '轻触格子查看色号'
+                  : '鼠标悬停或点击格子查看色号'}
               </p>
             </div>
           </div>
+          <CornerPearls />
         </div>
       </div>
     </div>
