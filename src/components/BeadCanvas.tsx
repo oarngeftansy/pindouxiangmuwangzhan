@@ -1095,7 +1095,7 @@ export function BeadCanvas({
                     letterSpacing: '0.1em',
                     padding: '12px 26px',
                   }}
-                  title="作品已熨烫并加入作品馆，结束并回主页"
+                  title="作品已经存进作品馆啦，回主页继续做下一个~"
                 >
                   <Check className="w-5 h-5" aria-hidden="true" />
                   <span>结束作品</span>
@@ -2380,7 +2380,7 @@ export function BeadCanvas({
               >
                 <Check className="w-4 h-4 text-moss shrink-0" aria-hidden="true" />
                 <p className="font-pixel-cn text-ink-warm" style={{ fontSize: 12, letterSpacing: '0.05em' }}>
-                  已自动加入作品馆，可下载或调节效果继续覆盖
+                  已经悄悄收进作品馆啦，可以下载或者继续调一调效果哦
                 </p>
               </div>
 
@@ -2410,27 +2410,27 @@ export function BeadCanvas({
                 {[
                   {
                     key: 'gloss',
-                    label: '光泽 (反光强度)',
-                    desc: '调低 = 哑光 · 调高 = 亮面',
+                    label: '光泽 · 反光强弱',
+                    desc: '往左拉哑哑的 · 往右拉会很亮哦',
                     value: effectGloss,
                     setter: setEffectGloss,
                     color: 'var(--bead-honey)',
                   },
                   {
                     key: 'texture',
-                    label: '质感 (表面纹理)',
-                    desc: ironingMethod === 'paper' ? '调低 = 平整 · 调高 = 显孔洞' :
-                          ironingMethod === 'towel' ? '调低 = 光滑 · 调高 = 显织纹' :
-                          ironingMethod === 'glitter' ? '调低 = 干净 · 调高 = 显闪片纹' :
-                          '调低 = 镜面 · 调高 = 微纹理',
+                    label: '质感 · 表面纹路',
+                    desc: ironingMethod === 'paper' ? '往左拉平平的 · 往右拉能看到小孔孔' :
+                          ironingMethod === 'towel' ? '往左拉滑滑的 · 往右拉能看到布纹' :
+                          ironingMethod === 'glitter' ? '往左拉干净 · 往右拉能看到闪片纹' :
+                          '往左拉像镜子 · 往右拉有点小纹理',
                     value: effectTexture,
                     setter: setEffectTexture,
                     color: 'var(--y2k-navy)',
                   },
                   ...(ironingMethod === 'glitter' ? [{
                     key: 'sparkle',
-                    label: '闪片 (亮片数量)',
-                    desc: '调低 = 稀疏 · 调高 = 密集',
+                    label: '闪片 · 亮片多少',
+                    desc: '往左拉一点点 · 往右拉满满都是',
                     value: effectSparkle,
                     setter: setEffectSparkle,
                     color: 'var(--y2k-coral)',

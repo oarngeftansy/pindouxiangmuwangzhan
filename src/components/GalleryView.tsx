@@ -516,20 +516,17 @@ export function GalleryView({ onClose }: GalleryViewProps) {
                 </div>
 
                 <p
-                  className="font-pixel-arcade text-y2k-coral arcade-blink mb-3"
-                  style={{ fontSize: 11, letterSpacing: '0.2em' }}
+                  className="font-pixel-cn text-y2k-coral mb-3"
+                  style={{ fontSize: 14, letterSpacing: '0.08em' }}
                 >
-                  ⚠ DELETE CONFIRM ⚠
+                  要把这个删掉吗
                 </p>
 
-                <p className="font-pixel-cn text-ink-warm mb-2" style={{ fontSize: 16, letterSpacing: '0.05em', lineHeight: 1.4 }}>
-                  确定删除作品
-                </p>
                 <p className="font-pixel-cn text-ink-warm font-bold mb-2" style={{ fontSize: 18, letterSpacing: '0.05em' }}>
                   「{deletingItem.title}」
                 </p>
                 <p className="font-pixel-cn text-ink-soft mb-6" style={{ fontSize: 12, letterSpacing: '0.03em' }}>
-                  删除后无法恢复
+                  删了就找不回来了哦
                 </p>
 
                 <div className="flex gap-3 w-full">
@@ -548,7 +545,7 @@ export function GalleryView({ onClose }: GalleryViewProps) {
                       ].join(', '),
                     }}
                   >
-                    取消
+                    再想想
                   </button>
                   <button
                     onClick={() => {
@@ -564,7 +561,7 @@ export function GalleryView({ onClose }: GalleryViewProps) {
                     }}
                   >
                     <Trash2 className="w-4 h-4" aria-hidden="true" />
-                    <span>确认删除</span>
+                    <span>嗯，删掉吧</span>
                   </button>
                 </div>
               </div>

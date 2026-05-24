@@ -22,57 +22,57 @@ const STEPS: TourStep[] = [
   {
     id: 'upload-zone',
     mode: 'upload',
-    title: '先扔张图过来',
-    desc: '拽一张图扔进这里\n或者点一下选图就行\n会自动转成拼豆图纸',
+    title: '先挑一张图吧',
+    desc: '把喜欢的图片拖进来\n或者点这里选一张～\n它会自动变成拼豆图纸哦',
     placement: 'bottom',
   },
   {
     id: 'gallery-section',
     mode: 'upload',
-    title: '懒得找图也行',
-    desc: '下面这些都是现成的\n看哪个顺眼就点哪个\n直接开拼',
+    title: '没图也没关系',
+    desc: '下面有好多现成的图鉴呢\n看到喜欢的点一下\n就可以直接开始啦',
     placement: 'top',
   },
   {
     id: 'header-gallery',
     mode: 'upload',
-    title: '作品馆在这',
-    desc: '拼好熨完的都丢这\n啥时候想看回来就行',
+    title: '作品馆藏在这里',
+    desc: '拼好熨完的小作品\n都会乖乖收在这里\n想再看一眼随时回来就行',
     placement: 'bottom',
   },
   // ─── 创作阶段 ───
   {
     id: 'view-mode-toggle',
     mode: 'canvas',
-    title: '两种视图随你切',
-    desc: '拼豆板 = 像真板子那样有钉子\n简洁 = 干净的网格\n看你喜欢哪个',
+    title: '想看哪种视图都行',
+    desc: '拼豆板像真的板子那样\n有小钉子可以放豆豆\n简洁模式清爽一些\n看你的心情挑就好',
     placement: 'bottom',
   },
   {
     id: 'pour-mode',
     mode: 'canvas',
-    title: '滑豆模式真香',
-    desc: '挑个颜色锁定 + 开滑豆\n然后手指/鼠标一划就是一片\n一个一个点累死人',
+    title: '滑豆模式好用哦',
+    desc: '挑一个颜色锁定\n再把滑豆打开\n手指轻轻一划就能填好一片\n比一颗一颗点轻松多了',
     placement: 'bottom',
   },
   {
     id: 'iron-button',
     mode: 'canvas',
-    title: '拼完了就熨',
-    desc: '点这个一键熨烫\n默认帮你去掉背景\n还能微调亮度和质感',
+    title: '拼好了就来熨吧',
+    desc: '点这个一键熨烫\n会帮你把背景去掉\n还可以微调亮度和质感哦',
     placement: 'bottom',
   },
   // ─── 熨完后 ───
   {
     id: 'finish-button',
     mode: 'canvas-ironed',
-    title: '熨完啦',
-    desc: '点这个绿按钮结束\n作品已经帮你存好了\n直接回主页继续整下一个',
+    title: '辛苦啦~',
+    desc: '熨完点这个绿色按钮就好啦\n作品已经悄悄收进作品馆\n可以继续做下一个咯',
     placement: 'bottom',
   },
 ];
 
-const STORAGE_KEY = 'onboarding_done_v2';
+const STORAGE_KEY = 'onboarding_done_v3';
 
 interface OnboardingTourProps {
   currentMode: TourMode;
@@ -269,11 +269,11 @@ export function OnboardingTour({ currentMode }: OnboardingTourProps) {
             </span>
             <button
               onClick={finish}
-              className="font-pixel-arcade text-y2k-navy hover:text-y2k-coral transition-colors"
-              style={{ fontSize: 12, letterSpacing: '0.1em' }}
+              className="font-pixel-cn text-y2k-navy hover:text-y2k-coral transition-colors"
+              style={{ fontSize: 12, letterSpacing: '0.05em' }}
               aria-label="跳过引导"
             >
-              不看了 ×
+              先不看啦 ×
             </button>
           </div>
 
@@ -304,7 +304,7 @@ export function OnboardingTour({ currentMode }: OnboardingTourProps) {
               padding: '10px 16px',
             }}
           >
-            <span>{stepIdx >= STEPS.length - 1 ? '玩得开心' : '下一个'}</span>
+            <span>{stepIdx >= STEPS.length - 1 ? '开心玩耍吧 ♡' : '看下一个'}</span>
             <PixelArrow size={12} color="var(--bead-paper-bg)" />
           </button>
         </div>
