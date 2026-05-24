@@ -560,16 +560,7 @@ export function ImageUploader({ onImageProcessed, onCreateBlank }: ImageUploader
         </div>
       </div>
 
-      {/* 辅助：空白画布入口 — 暖色 ghost link */}
-      <div className="text-center mt-2">
-        <button
-          onClick={() => setShowBlankModal(true)}
-          className="inline-flex items-center gap-2 text-sm text-ink-soft hover:text-terracotta transition-colors px-4 py-2 focus-visible:outline-2 focus-visible:outline-terracotta focus-visible:outline-offset-2"
-        >
-          <Grid className="w-4 h-4" aria-hidden="true" />
-          <span>或者，从一张空白画布开始</span>
-        </button>
-      </div>
+      {/* 空白画布入口已移除 — 用户反馈不需要 */}
 
       {/* 图片处理配置模态框 */}
       {showImageConfig && pendingFile && (
