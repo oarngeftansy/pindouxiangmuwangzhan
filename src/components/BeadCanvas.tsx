@@ -848,50 +848,9 @@ export function BeadCanvas({
 
             <div className="h-7 w-px bg-y2k-navy" aria-hidden="true" />
 
-            {/* 网格 */}
-            <button
-              onClick={() => setShowGrid(!showGrid)}
-              className="inline-flex items-center justify-center min-h-[40px] min-w-[40px] p-2 transition-transform hover:-translate-y-0.5 active:translate-x-[1px] active:translate-y-[1px]"
-              style={toolBtnStyle(showGrid)}
-              title="网格"
-              aria-label="切换网格显示"
-              aria-pressed={showGrid}
-            >
-              <GridIcon className="w-5 h-5" aria-hidden="true" />
-            </button>
-
-            {/* 参考图纸 */}
-            <button
-              onClick={() => {
-                const next = !showReference;
-                setShowReference(next);
-                if (next && isMobile) setSidebarCollapsed(false);
-              }}
-              className="inline-flex items-center min-h-[40px] gap-2 px-3 py-2 font-pixel-cn transition-transform hover:-translate-y-0.5 active:translate-x-[1px] active:translate-y-[1px]"
-              style={{ ...toolBtnStyle(showReference), fontSize: 11, letterSpacing: '0.05em' }}
-              aria-pressed={showReference}
-            >
-              {showReference ? <Eye className="w-5 h-5" aria-hidden="true" /> : <EyeOff className="w-5 h-5" aria-hidden="true" />}
-              <span className="hidden sm:inline">参考图纸</span>
-            </button>
-
-            {viewMode === 'pegboard' && (
-              <button
-                onClick={() => {
-                  const next = !showMaterialList;
-                  setShowMaterialList(next);
-                  if (next && isMobile) setSidebarCollapsed(false);
-                }}
-                className="inline-flex items-center min-h-[40px] gap-2 px-3 py-2 font-pixel-cn transition-transform hover:-translate-y-0.5 active:translate-x-[1px] active:translate-y-[1px]"
-                style={{ ...toolBtnStyle(showMaterialList), fontSize: 11, letterSpacing: '0.05em' }}
-                aria-pressed={showMaterialList}
-              >
-                {showMaterialList ? <Square className="w-5 h-5" aria-hidden="true" /> : <EyeOff className="w-5 h-5" aria-hidden="true" />}
-                <span className="hidden sm:inline">材料清单</span>
-              </button>
-            )}
-
-            <div className="h-7 w-px bg-y2k-navy" aria-hidden="true" />
+            {/* 移除冗余 toggle（网格 / 参考图纸 / 材料清单）— 用户反馈不必要
+                参考图和材料清单默认显示，各自 title bar 自带 close X；
+                showGrid 默认 false，需要可在代码加回 */}
 
             {/* 滑豆模式开关 — 始终显示在工具栏，大字 + Zap 图标，
                 即使没锁色也能预先开（开了再选色直接 pour） */}
@@ -1727,9 +1686,9 @@ export function BeadCanvas({
           )}
         </div>
 
-        {/* STOCK.EXE 材料清单 — 简洁模式右侧 */}
+        {/* STOCK.EXE 材料清单 — 简洁模式右侧（限宽 w-72/80 防撑爆布局） */}
         {viewMode === 'simple' && (
-          <div className="relative h-fit sticky top-4">
+          <div className="relative h-fit sticky top-4 w-full md:w-72 lg:w-80 shrink-0">
             <div
               className="relative bg-paper-bg p-4 pt-7"
               style={{
