@@ -332,7 +332,7 @@ function App() {
               {/* 顶部街机机厅闪烁标语 — coral pop */}
               <p
                 className="font-pixel-arcade text-y2k-coral arcade-blink mb-4"
-                style={{ fontSize: 9, letterSpacing: '0.25em' }}
+                style={{ fontSize: 13, letterSpacing: '0.25em' }}
               >
                 ▶ INSERT COIN ◀
               </p>
@@ -374,7 +374,7 @@ function App() {
                   hero 只保留 wordmark + 一行小版本号 */}
               <p
                 className="font-pixel-arcade text-y2k-navy mt-6"
-                style={{ fontSize: 9, letterSpacing: '0.2em' }}
+                style={{ fontSize: 13, letterSpacing: '0.2em' }}
               >
                 EST · 2026 · V1.0 · ARCADE EDITION
               </p>

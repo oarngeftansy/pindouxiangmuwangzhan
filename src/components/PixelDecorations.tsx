@@ -170,7 +170,7 @@ export function PixelBadge({
       style={{
         backgroundColor: color,
         color: 'var(--bead-paper-bg)',
-        fontSize: 9,
+        fontSize: 13,
         padding: '3px 5px',
         letterSpacing: '0.05em',
         boxShadow: [

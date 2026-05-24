@@ -357,7 +357,7 @@ export function ImageUploader({ onImageProcessed, onCreateBlank }: ImageUploader
                 color: 'var(--bead-paper-bg)',
               }}
             >
-              <span className="font-pixel-arcade" style={{ fontSize: 8, letterSpacing: 0 }}>
+              <span className="font-pixel-arcade" style={{ fontSize: 12, letterSpacing: 0 }}>
                 UPLOAD.EXE
               </span>
               <div className="flex gap-0.5">
@@ -406,7 +406,7 @@ export function ImageUploader({ onImageProcessed, onCreateBlank }: ImageUploader
                   </div>
                   <p
                     className="font-pixel-arcade text-y2k-navy arcade-blink mt-3"
-                    style={{ fontSize: 9, letterSpacing: '0.2em' }}
+                    style={{ fontSize: 13, letterSpacing: '0.2em' }}
                   >
                     PIXELATING<span>...</span>
                   </p>
@@ -426,7 +426,7 @@ export function ImageUploader({ onImageProcessed, onCreateBlank }: ImageUploader
                   </p>
                   <p
                     className="font-pixel-arcade text-y2k-navy mb-5"
-                    style={{ fontSize: 9, letterSpacing: '0.25em' }}
+                    style={{ fontSize: 13, letterSpacing: '0.25em' }}
                   >
                     DROP IMAGE TO PIXELATE
                   </p>
@@ -451,7 +451,7 @@ export function ImageUploader({ onImageProcessed, onCreateBlank }: ImageUploader
                   {/* 副提示 — 文件格式 */}
                   <p
                     className="font-pixel-arcade text-ink-soft mt-4"
-                    style={{ fontSize: 8, letterSpacing: '0.18em' }}
+                    style={{ fontSize: 12, letterSpacing: '0.18em' }}
                   >
                     JPG · PNG · GIF · 1-10 MB
                   </p>
@@ -501,7 +501,7 @@ export function ImageUploader({ onImageProcessed, onCreateBlank }: ImageUploader
         <div className="mt-7 text-center">
           <p
             className="font-pixel-arcade text-y2k-coral arcade-blink"
-            style={{ fontSize: 10, letterSpacing: '0.3em' }}
+            style={{ fontSize: 13, letterSpacing: '0.3em' }}
           >
             ▶ PRESS START ◀
           </p>

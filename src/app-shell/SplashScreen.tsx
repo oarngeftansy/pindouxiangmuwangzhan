@@ -137,7 +137,7 @@ export function SplashScreen({ onDone }: SplashScreenProps) {
           >
             <span
               className="font-pixel-arcade"
-              style={{ fontSize: 8, letterSpacing: 0 }}
+              style={{ fontSize: 12, letterSpacing: 0 }}
             >
               APPLE.EXE
             </span>
@@ -221,7 +221,7 @@ export function SplashScreen({ onDone }: SplashScreenProps) {
         className="splash-fade-up font-pixel-arcade text-y2k-navy mt-3"
         style={{
           animationDelay: '1950ms',
-          fontSize: 9,
+          fontSize: 13,
           letterSpacing: '0.1em',
         }}
       >

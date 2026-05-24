@@ -42,7 +42,7 @@ function TitleBar({ name }: { name: string }) {
         color: 'var(--bead-paper-bg)',
       }}
     >
-      <span className="font-pixel-arcade" style={{ fontSize: 8, letterSpacing: 0 }}>
+      <span className="font-pixel-arcade" style={{ fontSize: 12, letterSpacing: 0 }}>
         {name}
       </span>
       <div className="flex gap-0.5">
@@ -422,7 +422,7 @@ export function BeadPattern({
               </h3>
               <span
                 className="font-pixel-arcade text-y2k-navy"
-                style={{ fontSize: 9, letterSpacing: '0.15em' }}
+                style={{ fontSize: 13, letterSpacing: '0.15em' }}
               >
                 CONFIG
               </span>
@@ -656,7 +656,7 @@ export function BeadPattern({
                   拼豆图纸
                 </h2>
               </div>
-              <div className="flex items-center gap-2 font-pixel-arcade text-y2k-navy" style={{ fontSize: 9, letterSpacing: '0.1em' }}>
+              <div className="flex items-center gap-2 font-pixel-arcade text-y2k-navy" style={{ fontSize: 13, letterSpacing: '0.1em' }}>
                 <span>{beadGrid[0].length}×{beadGrid.length}</span>
                 <span className="text-ink-soft">·</span>
                 <span>{Array.from(colorCount.values()).reduce((a, b) => a + b, 0)}b TOTAL</span>
@@ -779,7 +779,7 @@ export function BeadPattern({
               <h3 className="font-pixel-cn text-ink-warm" style={{ fontSize: 22, letterSpacing: '0.1em', lineHeight: 1.1 }}>
                 材料清单
               </h3>
-              <span className="font-pixel-arcade text-y2k-navy" style={{ fontSize: 9, letterSpacing: '0.15em' }}>
+              <span className="font-pixel-arcade text-y2k-navy" style={{ fontSize: 13, letterSpacing: '0.15em' }}>
                 ITEMS
               </span>
             </div>
@@ -788,10 +788,10 @@ export function BeadPattern({
             <div className="flex items-center justify-between mb-4 px-3 py-2 bg-paper-soft"
               style={{ boxShadow: 'inset 0 0 0 2px var(--y2k-navy)' }}
             >
-              <span className="font-pixel-arcade text-y2k-navy" style={{ fontSize: 9, letterSpacing: '0.1em' }}>
+              <span className="font-pixel-arcade text-y2k-navy" style={{ fontSize: 13, letterSpacing: '0.1em' }}>
                 {Array.from(colorCount.values()).reduce((a, b) => a + b, 0)}b
               </span>
-              <span className="font-pixel-arcade text-y2k-coral" style={{ fontSize: 9, letterSpacing: '0.1em' }}>
+              <span className="font-pixel-arcade text-y2k-coral" style={{ fontSize: 13, letterSpacing: '0.1em' }}>
                 {Array.from(colorCount.entries()).filter(([_, count]) => count >= minColorCount).length} COLORS
               </span>
             </div>
@@ -833,7 +833,7 @@ export function BeadPattern({
                           <span
                             className="font-pixel-arcade"
                             style={{
-                              fontSize: 7,
+                              fontSize: 12,
                               color: 'var(--bead-ink)',
                               textShadow: '0 0 2px var(--bead-paper-bg)',
                               letterSpacing: 0,
@@ -846,7 +846,7 @@ export function BeadPattern({
                           {code}
                         </span>
                       </div>
-                      <span className="font-pixel-arcade text-y2k-navy shrink-0" style={{ fontSize: 9, letterSpacing: '0.05em' }}>
+                      <span className="font-pixel-arcade text-y2k-navy shrink-0" style={{ fontSize: 13, letterSpacing: '0.05em' }}>
                         ×{count}
                       </span>
                     </div>

@@ -753,7 +753,7 @@ export function BeadCanvas({
             </button>
             <span
               className="font-pixel-arcade text-y2k-navy text-center"
-              style={{ fontSize: 10, width: 42, letterSpacing: '0.05em' }}
+              style={{ fontSize: 13, width: 42, letterSpacing: '0.05em' }}
             >
               {Math.round(zoom * 100)}%
             </span>
@@ -811,76 +811,57 @@ export function BeadCanvas({
               </button>
             )}
 
-            {/* 滑豆模式 + 锁色指示（桌面内联） */}
-            {lockedColor && !isMobile && (
-              <>
-                <div className="h-7 w-px bg-y2k-navy" aria-hidden="true" />
+            <div className="h-7 w-px bg-y2k-navy" aria-hidden="true" />
+
+            {/* 滑豆模式开关 — 始终显示在工具栏，大字 + Zap 图标，
+                即使没锁色也能预先开（开了再选色直接 pour） */}
+            <button
+              onClick={() => setPourMode(!pourMode)}
+              className="inline-flex items-center gap-2 min-h-[40px] px-3 py-2 font-pixel-cn transition-transform hover:-translate-y-0.5 active:translate-x-[1px] active:translate-y-[1px]"
+              style={{
+                ...toolBtnStyle(pourMode),
+                fontSize: 13,
+                letterSpacing: '0.05em',
+              }}
+              aria-label="切换滑豆模式"
+              aria-pressed={pourMode}
+              title="滑豆模式：开启后鼠标/手指划过即填豆"
+            >
+              <Zap className={`w-5 h-5 ${pourMode ? 'animate-pulse' : ''}`} aria-hidden="true" />
+              <span>滑豆 {pourMode ? '· ON' : '· OFF'}</span>
+            </button>
+
+            {/* 锁色指示 — 仅有锁色时显示 */}
+            {lockedColor && (
+              <div
+                className="flex items-center gap-2 px-3 py-2 bg-paper-soft"
+                style={{ boxShadow: INPUT_SHADOW }}
+              >
                 <div
-                  className="flex items-center gap-2 px-3 py-2 bg-paper-soft"
-                  style={{ boxShadow: INPUT_SHADOW }}
+                  className="w-5 h-5"
+                  style={{
+                    backgroundColor: lockedColor,
+                    boxShadow: [
+                      '0 -1px 0 var(--y2k-navy)',
+                      '0 1px 0 var(--y2k-navy)',
+                      '-1px 0 0 var(--y2k-navy)',
+                      '1px 0 0 var(--y2k-navy)',
+                    ].join(', '),
+                  }}
+                  aria-hidden="true"
+                />
+                <span className="font-pixel-arcade text-y2k-navy" style={{ fontSize: 13, letterSpacing: '0.05em' }}>
+                  LOCK {getColorCode(lockedColor)}
+                </span>
+                <button
+                  onClick={() => { setLockedColor(null); setPourMode(false); }}
+                  className="ml-1 font-pixel-arcade text-y2k-coral hover:text-y2k-coral/70 transition-colors"
+                  style={{ fontSize: 13, letterSpacing: '0.05em' }}
+                  aria-label="解锁颜色"
                 >
-                  <span className="font-pixel-cn text-ink-warm" style={{ fontSize: 11 }}>滑豆</span>
-                  <button
-                    onClick={() => setPourMode(!pourMode)}
-                    className="relative w-12 h-6 transition-colors duration-300"
-                    style={{
-                      backgroundColor: pourMode ? 'var(--y2k-coral)' : 'var(--y2k-navy-deep)',
-                      boxShadow: [
-                        '0 -1px 0 var(--y2k-navy)',
-                        '0 1px 0 var(--y2k-navy)',
-                        '-1px 0 0 var(--y2k-navy)',
-                        '1px 0 0 var(--y2k-navy)',
-                      ].join(', '),
-                    }}
-                    aria-label="切换滑豆模式"
-                    aria-pressed={pourMode}
-                  >
-                    <div
-                      className={`absolute top-0.5 left-0.5 w-5 h-5 bg-paper-bg transition-transform duration-300 flex items-center justify-center ${pourMode ? "translate-x-6" : "translate-x-0"}`}
-                      style={{
-                        boxShadow: [
-                          '0 -1px 0 var(--y2k-navy)',
-                          '0 1px 0 var(--y2k-navy)',
-                          '-1px 0 0 var(--y2k-navy)',
-                          '1px 0 0 var(--y2k-navy)',
-                        ].join(', '),
-                      }}
-                    >
-                      {pourMode && <Zap className="w-3 h-3 text-y2k-coral" aria-hidden="true" />}
-                    </div>
-                  </button>
-                </div>
-                <div
-                  className="flex items-center gap-2 px-3 py-2 bg-paper-soft"
-                  style={{ boxShadow: INPUT_SHADOW }}
-                >
-                  <div
-                    className="w-5 h-5"
-                    style={{
-                      backgroundColor: lockedColor,
-                      boxShadow: [
-                        '0 -1px 0 var(--y2k-navy)',
-                        '0 1px 0 var(--y2k-navy)',
-                        '-1px 0 0 var(--y2k-navy)',
-                        '1px 0 0 var(--y2k-navy)',
-                      ].join(', '),
-                    }}
-                    aria-hidden="true"
-                  />
-                  <span className="font-pixel-arcade text-y2k-navy" style={{ fontSize: 10, letterSpacing: '0.05em' }}>
-                    LOCK {getColorCode(lockedColor)}
-                  </span>
-                  {pourMode && <Zap className="w-3.5 h-3.5 text-y2k-coral" aria-hidden="true" />}
-                  <button
-                    onClick={() => { setLockedColor(null); setPourMode(false); }}
-                    className="ml-1 font-pixel-arcade text-y2k-coral hover:text-y2k-coral/70 transition-colors"
-                    style={{ fontSize: 9, letterSpacing: '0.05em' }}
-                    aria-label="解锁颜色"
-                  >
-                    × UNLOCK
-                  </button>
-                </div>
-              </>
+                  × UNLOCK
+                </button>
+              </div>
             )}
 
             {/* 右侧主操作（桌面） */}
@@ -1123,7 +1104,7 @@ export function BeadCanvas({
               className="absolute left-0 right-0 flex items-center justify-between px-2"
               style={{ top: 2, height: 16, backgroundColor: 'var(--y2k-navy)', color: 'var(--bead-paper-bg)' }}
             >
-              <span className="font-pixel-arcade" style={{ fontSize: 8, letterSpacing: 0 }}>
+              <span className="font-pixel-arcade" style={{ fontSize: 12, letterSpacing: 0 }}>
                 REF.EXE{referencePinned ? ' · PINNED' : ''}
               </span>
               <div className="flex gap-0.5 items-center">
@@ -1148,7 +1129,7 @@ export function BeadCanvas({
             >
               <div className="flex items-baseline gap-2">
                 <span className="font-pixel-cn text-ink-warm" style={{ fontSize: 13, letterSpacing: '0.08em' }}>参考图纸</span>
-                <span className="font-pixel-arcade text-y2k-navy" style={{ fontSize: 8, letterSpacing: '0.1em' }}>REFERENCE</span>
+                <span className="font-pixel-arcade text-y2k-navy" style={{ fontSize: 12, letterSpacing: '0.1em' }}>REFERENCE</span>
               </div>
             </div>
 
@@ -1238,7 +1219,7 @@ export function BeadCanvas({
               className="absolute left-0 right-0 flex items-center justify-between px-2"
               style={{ top: 2, height: 16, backgroundColor: 'var(--y2k-navy)', color: 'var(--bead-paper-bg)' }}
             >
-              <span className="font-pixel-arcade" style={{ fontSize: 8, letterSpacing: 0 }}>STOCK.EXE</span>
+              <span className="font-pixel-arcade" style={{ fontSize: 12, letterSpacing: 0 }}>STOCK.EXE</span>
               <div className="flex gap-0.5 items-center">
                 <div className="w-2.5 h-2.5 bg-paper-bg/80" aria-hidden="true" />
                 <div className="w-2.5 h-2.5 bg-paper-bg/80" aria-hidden="true" />
@@ -1254,7 +1235,7 @@ export function BeadCanvas({
             >
               <div className="flex items-baseline gap-2">
                 <span className="font-pixel-cn text-ink-warm" style={{ fontSize: 13, letterSpacing: '0.08em' }}>材料清单</span>
-                <span className="font-pixel-arcade text-y2k-navy" style={{ fontSize: 8, letterSpacing: '0.1em' }}>STOCK</span>
+                <span className="font-pixel-arcade text-y2k-navy" style={{ fontSize: 12, letterSpacing: '0.1em' }}>STOCK</span>
               </div>
             </div>
 
@@ -1341,98 +1322,7 @@ export function BeadCanvas({
           </div>
         )}
 
-            {/* COLORS.EXE 选色 — 手机端隐藏，让参考图/材料/画布能在一屏看完 */}
-            {!isMobile && (
-            <div className="relative bg-paper-bg overflow-hidden" style={{ boxShadow: CARD_SHADOW, paddingTop: 20 }}>
-              <div
-                className="absolute left-0 right-0 flex items-center justify-between px-2"
-                style={{ top: 2, height: 16, backgroundColor: 'var(--y2k-navy)', color: 'var(--bead-paper-bg)' }}
-              >
-                <span className="font-pixel-arcade" style={{ fontSize: 8, letterSpacing: 0 }}>COLORS.EXE</span>
-                <div className="flex gap-0.5 items-center">
-                  <div className="w-2.5 h-2.5 bg-paper-bg/80" aria-hidden="true" />
-                  <div className="w-2.5 h-2.5 bg-paper-bg/80" aria-hidden="true" />
-                  <div className="w-2.5 h-2.5 bg-y2k-coral" aria-hidden="true" />
-                </div>
-              </div>
-              <div className="px-3 py-2 flex items-center justify-between"
-                style={{ borderBottom: '2px solid var(--y2k-navy)' }}
-              >
-                <div className="flex items-baseline gap-2">
-                  <span className="font-pixel-cn text-ink-warm" style={{ fontSize: 13, letterSpacing: '0.08em' }}>选色</span>
-                  <span className="font-pixel-arcade text-y2k-navy" style={{ fontSize: 8, letterSpacing: '0.1em' }}>PALETTE</span>
-                </div>
-                {lockedColor && (
-                  <button
-                    onClick={() => { setLockedColor(null); setPourMode(false); }}
-                    className="font-pixel-arcade text-y2k-coral hover:text-y2k-coral/70 transition-colors"
-                    style={{ fontSize: 9, letterSpacing: '0.05em' }}
-                    aria-label="解锁颜色"
-                  >
-                    × UNLOCK
-                  </button>
-                )}
-              </div>
-              <div className="p-3 overflow-y-auto" style={{ maxHeight: isMobile ? '28vh' : '40vh' }}>
-                {/* 当前选中色 */}
-                {lockedColor && (
-                  <div className="flex items-center gap-2 mb-3 px-2.5 py-2 bg-honey-glow/40 border border-honey/40 rounded-control">
-                    <div
-                      className="w-5 h-5 rounded-bead border border-edge-sand flex-shrink-0"
-                      style={{ backgroundColor: lockedColor }}
-                      aria-hidden="true"
-                    />
-                    <span className="text-xs font-bold text-ink-warm" style={{ fontFamily: 'var(--font-num)' }}>
-                      {getColorCode(lockedColor)}
-                    </span>
-                    <span className="text-xs text-ink-soft truncate">
-                      {beadColors.find(c => c.hex === lockedColor)?.name || ''}
-                    </span>
-                  </div>
-                )}
-                {/* 颜色网格 — 22px swatch 已经接近 24px 触摸下限；rest 态保留用尺寸优先而非 44pt */}
-                <div className="flex flex-wrap gap-1.5">
-                  {beadColors.map(color => {
-                    const isSelected = lockedColor === color.hex;
-                    const completed = isColorCompleted(color.hex);
-                    return (
-                      <button
-                        key={color.hex}
-                        title={`${color[colorSystem] || color.mard} ${color.name}`}
-                        onClick={() => handleColorLock(color.hex)}
-                        className="relative rounded-bead transition-transform hover:scale-110 active:scale-95 focus-visible:outline-2 focus-visible:outline-moss focus-visible:outline-offset-2"
-                        style={{
-                          width: 22, height: 22,
-                          backgroundColor: color.hex,
-                          // 选中：白纸描边 + 色卡外圈，模拟"色卡被取出来"
-                          // 默认：暖墨色 inset 模拟塑料反光
-                          boxShadow: isSelected
-                            ? `0 0 0 2px var(--bead-paper-bg), 0 0 0 4px ${color.hex}`
-                            : 'inset -1px -1px 2px rgba(58, 52, 42, 0.2), inset 1px 1px 2px rgba(246, 239, 226, 0.4)',
-                          opacity: completed ? 0.4 : 1,
-                        }}
-                        aria-label={`${color[colorSystem] || color.mard} ${color.name}${completed ? '（已完成）' : ''}`}
-                        aria-pressed={isSelected}
-                      >
-                        {completed && (
-                          <span
-                            className="absolute inset-0 flex items-center justify-center text-[10px] font-bold pointer-events-none"
-                            style={{
-                              color: 'var(--bead-ink)',
-                              textShadow: '0 0 2px var(--bead-paper-bg)',
-                            }}
-                            aria-hidden="true"
-                          >
-                            ✓
-                          </span>
-                        )}
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-            </div>
-            )}
+            {/* COLORS.EXE 选色面板已移除 — 用户反馈冗余（材料清单的每一行已是色卡选择器） */}
 
           </div>
           </div>
@@ -1458,7 +1348,7 @@ export function BeadCanvas({
                     <h3 className="font-pixel-cn text-ink-warm" style={{ fontSize: 22, letterSpacing: '0.1em', lineHeight: 1.1 }}>
                       拼豆创作台
                     </h3>
-                    <span className="font-pixel-arcade text-y2k-navy" style={{ fontSize: 9, letterSpacing: '0.15em' }}>
+                    <span className="font-pixel-arcade text-y2k-navy" style={{ fontSize: 13, letterSpacing: '0.15em' }}>
                       STUDIO
                     </span>
                   </div>
@@ -1490,66 +1380,75 @@ export function BeadCanvas({
                   </button>
                 </div>
               )}
-              <div className="bg-paper-deep rounded-surface p-4 flex items-center justify-center flex-1 overflow-auto min-h-0">
-                <div
-                  className="rounded-control relative"
-                  style={{
-                    // 物理拼豆板：高明度、低饱和的近白板
-                    // 之前 var(--bead-paper-soft) (oklch 0.95 0.022 84) 视感偏奶黄；
-                    // 现在 oklch(0.985 0.006 80) 几乎纯白带极淡暖意，更像真实塑料板
-                    backgroundColor: 'oklch(0.985 0.006 80)',
-                    boxShadow: 'inset 0 2px 8px rgba(58, 52, 42, 0.08), 0 4px 16px rgba(168, 130, 90, 0.18)',
-                    padding: '16px',
-                    border: '6px solid var(--bead-edge)',
-                  }}
-                >
-                  <div
-                    ref={canvasRef}
-                    className="grid gap-0"
-                    style={{
-                      gridTemplateColumns: `repeat(${workingGrid[0].length}, ${baseSize * pegboardScale * zoom}px)`,
-                      width: "fit-content",
-                      backgroundColor: 'transparent',
-                      touchAction: 'manipulation',
-                      userSelect: 'none',
-                    }}
-                    onTouchStart={handleTouchStart}
-                    onTouchMove={handleTouchMove}
-                    onTouchEnd={handleTouchEnd}
-                  >
-                    {workingGrid.map((row, y) =>
-                      row.map((color, x) => {
-                        const referenceColor =
-                          referenceGrid[y][x];
-                        const shouldHighlight =
-                          lockedColor &&
-                          referenceColor === lockedColor;
-                        const canPlace =
-                          !lockedColor ||
-                          referenceColor === lockedColor;
-                        const isEmpty = !color;
-
-                        return (
-                          <PegboardCell
-                            key={`work-${x}-${y}`}
-                            x={x}
-                            y={y}
-                            color={color}
-                            beadSize={baseSize * pegboardScale * zoom}
-                            viewMode={viewMode}
-                            showGrid={false}
-                            shouldHighlight={shouldHighlight}
-                            canPlace={canPlace}
-                            isEmpty={isEmpty}
-                            onMouseDown={handleMouseDown}
-                            onMouseEnter={handleMouseEnter}
-                            canvasParams={canvasParams}
-                          />
-                        );
-                      }),
-                    )}
-                  </div>
-                </div>
+              <div className="bg-paper-deep rounded-surface p-2 flex items-center justify-center flex-1 overflow-auto min-h-0">
+                {(() => {
+                  const cols = workingGrid[0].length;
+                  const rows = workingGrid.length;
+                  // 拼豆板永远正方形 — 取宽高较大值作为边长，多余位置填空 peg
+                  const boardDim = Math.max(cols, rows);
+                  const cellSize = baseSize * pegboardScale * zoom;
+                  const boardPx = boardDim * cellSize;
+                  return (
+                    <div
+                      className="rounded-control relative"
+                      style={{
+                        backgroundColor: 'oklch(0.985 0.006 80)',
+                        boxShadow: 'inset 0 2px 8px rgba(44, 58, 94, 0.08), 0 4px 16px rgba(44, 58, 94, 0.18)',
+                        padding: '8px',
+                        border: '4px solid var(--y2k-navy)',
+                      }}
+                    >
+                      <div
+                        ref={canvasRef}
+                        className="grid gap-0"
+                        style={{
+                          gridTemplateColumns: `repeat(${boardDim}, ${cellSize}px)`,
+                          gridTemplateRows: `repeat(${boardDim}, ${cellSize}px)`,
+                          width: boardPx,
+                          height: boardPx,
+                          backgroundColor: 'transparent',
+                          // touch-action: none 让画布拥有完整 touch 控制权
+                          // 阻止浏览器默认 pan/swipe（特别是左缘 swipe-back），
+                          // 修复用户反馈"拖不到最左边填豆"的 bug
+                          touchAction: 'none',
+                          overscrollBehavior: 'contain',
+                          userSelect: 'none',
+                        }}
+                        onTouchStart={handleTouchStart}
+                        onTouchMove={handleTouchMove}
+                        onTouchEnd={handleTouchEnd}
+                      >
+                        {Array.from({ length: boardDim * boardDim }).map((_, i) => {
+                          const x = i % boardDim;
+                          const y = Math.floor(i / boardDim);
+                          const inBounds = x < cols && y < rows;
+                          const color = inBounds ? workingGrid[y][x] : null;
+                          const referenceColor = inBounds ? referenceGrid[y]?.[x] : null;
+                          const shouldHighlight = lockedColor && referenceColor === lockedColor;
+                          const canPlace = inBounds && (!lockedColor || referenceColor === lockedColor);
+                          const isEmpty = !color;
+                          return (
+                            <PegboardCell
+                              key={`work-${x}-${y}`}
+                              x={x}
+                              y={y}
+                              color={color}
+                              beadSize={cellSize}
+                              viewMode={viewMode}
+                              showGrid={false}
+                              shouldHighlight={!!shouldHighlight}
+                              canPlace={canPlace}
+                              isEmpty={isEmpty}
+                              onMouseDown={inBounds ? handleMouseDown : undefined}
+                              onMouseEnter={inBounds ? handleMouseEnter : undefined}
+                              canvasParams={canvasParams}
+                            />
+                          );
+                        })}
+                      </div>
+                    </div>
+                  );
+                })()}
               </div>
               </div>
               <CornerPearls />
@@ -1844,7 +1743,7 @@ export function BeadCanvas({
 
               <p
                 className="font-pixel-arcade text-y2k-coral arcade-blink mb-2"
-                style={{ fontSize: 10, letterSpacing: '0.25em' }}
+                style={{ fontSize: 13, letterSpacing: '0.25em' }}
               >
                 ★ STAGE CLEAR ★
               </p>
@@ -1859,7 +1758,7 @@ export function BeadCanvas({
                   {Array.from(colorCount.values()).reduce((a, b) => a + b, 0)}
                 </span> 颗
               </p>
-              <p className="font-pixel-arcade text-y2k-navy mb-7" style={{ fontSize: 9, letterSpacing: '0.15em' }}>
+              <p className="font-pixel-arcade text-y2k-navy mb-7" style={{ fontSize: 13, letterSpacing: '0.15em' }}>
                 {colorCount.size} COLORS USED
               </p>
 
@@ -1908,7 +1807,7 @@ export function BeadCanvas({
               <button
                 onClick={() => setShowCompletionModal(false)}
                 className="font-pixel-arcade text-y2k-navy hover:text-y2k-coral transition-colors"
-                style={{ fontSize: 9, letterSpacing: '0.15em' }}
+                style={{ fontSize: 13, letterSpacing: '0.15em' }}
               >
                 × CLOSE
               </button>
@@ -1963,7 +1862,7 @@ export function BeadCanvas({
                 </h2>
                 <p
                   className="font-pixel-arcade text-y2k-navy text-center mb-6"
-                  style={{ fontSize: 9, letterSpacing: '0.2em' }}
+                  style={{ fontSize: 13, letterSpacing: '0.2em' }}
                 >
                   CHOOSE IRONING STYLE
                 </p>
@@ -1982,7 +1881,7 @@ export function BeadCanvas({
                     />
                     <div>
                       <div className="font-pixel-cn text-ink-warm" style={{ fontSize: 12, letterSpacing: '0.05em' }}>去除背景</div>
-                      <div className="font-pixel-arcade text-y2k-navy mt-0.5" style={{ fontSize: 8, letterSpacing: '0.1em' }}>
+                      <div className="font-pixel-arcade text-y2k-navy mt-0.5" style={{ fontSize: 12, letterSpacing: '0.1em' }}>
                         TRANSPARENT BG
                       </div>
                     </div>
@@ -2021,7 +1920,7 @@ export function BeadCanvas({
                         <h3 className="font-pixel-cn text-ink-warm mb-1.5" style={{ fontSize: 13, letterSpacing: '0.05em' }}>
                           {label}
                         </h3>
-                        <p className="font-pixel-cn text-ink-soft leading-relaxed" style={{ fontSize: 10, letterSpacing: '0.02em' }}>
+                        <p className="font-pixel-cn text-ink-soft leading-relaxed" style={{ fontSize: 13, letterSpacing: '0.02em' }}>
                           {desc}
                         </p>
                       </button>
@@ -2185,7 +2084,7 @@ export function BeadCanvas({
                 <h2 className="font-pixel-cn text-ink-warm mb-2" style={{ fontSize: 22, letterSpacing: '0.15em', lineHeight: 1.2 }}>
                   熨烫效果预览
                 </h2>
-                <p className="font-pixel-arcade text-y2k-navy" style={{ fontSize: 9, letterSpacing: '0.15em' }}>
+                <p className="font-pixel-arcade text-y2k-navy" style={{ fontSize: 13, letterSpacing: '0.15em' }}>
                   {IRONING_METHODS[ironingMethod].name.toUpperCase()} · {removeBackground ? 'TRANSPARENT' : 'WHITE BG'}
                 </p>
               </div>

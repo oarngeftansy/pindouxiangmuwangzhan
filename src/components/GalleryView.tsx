@@ -44,7 +44,7 @@ function TitleBar({ name, onClose }: { name: string; onClose?: () => void }) {
         color: 'var(--bead-paper-bg)',
       }}
     >
-      <span className="font-pixel-arcade" style={{ fontSize: 8, letterSpacing: 0 }}>
+      <span className="font-pixel-arcade" style={{ fontSize: 12, letterSpacing: 0 }}>
         {name}
       </span>
       <div className="flex gap-0.5 items-center">
@@ -148,14 +148,14 @@ export function GalleryView({ onClose }: GalleryViewProps) {
               </h2>
               <span
                 className="font-pixel-arcade text-y2k-navy"
-                style={{ fontSize: 10, letterSpacing: '0.15em' }}
+                style={{ fontSize: 13, letterSpacing: '0.15em' }}
               >
                 COLLECTION
               </span>
             </div>
             <span
               className="font-pixel-arcade text-y2k-navy"
-              style={{ fontSize: 10, letterSpacing: '0.1em' }}
+              style={{ fontSize: 13, letterSpacing: '0.1em' }}
             >
               {String(items.length).padStart(2, '0')} ITEMS
             </span>
@@ -183,7 +183,7 @@ export function GalleryView({ onClose }: GalleryViewProps) {
                 </p>
                 <p
                   className="font-pixel-arcade text-y2k-navy arcade-blink mt-1"
-                  style={{ fontSize: 9, letterSpacing: '0.2em' }}
+                  style={{ fontSize: 13, letterSpacing: '0.2em' }}
                 >
                   ▶ PIXEL YOUR FIRST WORK ◀
                 </p>
@@ -253,7 +253,7 @@ export function GalleryView({ onClose }: GalleryViewProps) {
                         )}
                         <p
                           className="font-pixel-arcade text-y2k-navy mt-1.5"
-                          style={{ fontSize: 8, letterSpacing: '0.08em' }}
+                          style={{ fontSize: 12, letterSpacing: '0.08em' }}
                         >
                           {item.gridWidth}×{item.gridHeight} · {item.beadCount}b
                         </p>
@@ -267,7 +267,7 @@ export function GalleryView({ onClose }: GalleryViewProps) {
                         top: -10,
                         left: -8,
                         backgroundColor: idx % 3 === 0 ? 'var(--y2k-coral)' : idx % 3 === 1 ? 'var(--y2k-mint)' : 'var(--bead-honey)',
-                        fontSize: 9,
+                        fontSize: 13,
                         padding: '3px 5px',
                         letterSpacing: '0.05em',
                         boxShadow: [
@@ -463,7 +463,7 @@ function PixelMetaChip({ label, caption, color }: { label: string; caption: stri
         className="font-pixel-arcade text-paper-bg px-2.5 py-1"
         style={{
           backgroundColor: color,
-          fontSize: 10,
+          fontSize: 13,
           letterSpacing: '0.05em',
           boxShadow: [
             '0 -1px 0 var(--y2k-navy)',
@@ -477,7 +477,7 @@ function PixelMetaChip({ label, caption, color }: { label: string; caption: stri
       </span>
       <span
         className="font-pixel-arcade text-y2k-navy text-center mt-1"
-        style={{ fontSize: 7, letterSpacing: '0.1em' }}
+        style={{ fontSize: 12, letterSpacing: '0.1em' }}
       >
         {caption}
       </span>

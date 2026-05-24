@@ -66,7 +66,7 @@ export function TitleBar({
         color: 'var(--bead-paper-bg)',
       }}
     >
-      <span className="font-pixel-arcade" style={{ fontSize: 8, letterSpacing: 0 }}>
+      <span className="font-pixel-arcade" style={{ fontSize: 12, letterSpacing: 0 }}>
         {name}
       </span>
       <div className="flex gap-0.5 items-center">

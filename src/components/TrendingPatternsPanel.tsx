@@ -122,14 +122,14 @@ export function TrendingPatternsPanel({ onUsePattern }: TrendingPatternsPanelPro
           </h3>
           <span
             className="font-pixel-arcade text-y2k-navy"
-            style={{ fontSize: 10, letterSpacing: '0.15em' }}
+            style={{ fontSize: 13, letterSpacing: '0.15em' }}
           >
             STAGE SELECT
           </span>
         </div>
         <span
           className="font-pixel-arcade text-y2k-navy"
-          style={{ fontSize: 10, letterSpacing: '0.1em' }}
+          style={{ fontSize: 13, letterSpacing: '0.1em' }}
         >
           {String(patterns.length).padStart(2, '0')} STAGES
         </span>
@@ -236,7 +236,7 @@ export function TrendingPatternsPanel({ onUsePattern }: TrendingPatternsPanelPro
                   </span>
                   <span
                     className="font-pixel-arcade text-y2k-navy"
-                    style={{ fontSize: 9, letterSpacing: '0.05em' }}
+                    style={{ fontSize: 13, letterSpacing: '0.05em' }}
                   >
                     {p.beadCount}b
                   </span>
