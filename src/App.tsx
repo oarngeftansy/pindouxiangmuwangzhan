@@ -425,6 +425,7 @@ function App() {
             beadColors={beadColors}
             colorSystem={colorSystem}
             referenceGrid={referenceGrid}
+            onFinish={handleBackToUpload}
           />
         )}
       </main>

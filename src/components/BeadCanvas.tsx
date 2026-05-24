@@ -113,6 +113,8 @@ interface BeadCanvasProps {
   beadColors: BeadColor[];
   colorSystem?: ColorSystem;
   referenceGrid: BeadGrid;
+  // 熨完后用户点"结束作品"回主页
+  onFinish?: () => void;
 }
 
 type Tool = "brush" | "eraser";
@@ -189,6 +191,7 @@ export function BeadCanvas({
   beadColors,
   colorSystem = "mard",
   referenceGrid,
+  onFinish,
 }: BeadCanvasProps) {
   const [activeTool, setActiveTool] = useState<Tool>("brush");
   const [isDrawing, setIsDrawing] = useState(false);
@@ -254,6 +257,8 @@ export function BeadCanvas({
 
   // 作品馆保存提示
   const [savedToGallery, setSavedToGallery] = useState(false);
+  // 是否已熨烫过 — 控制工具栏"结束作品"按钮显隐
+  const [hasIroned, setHasIroned] = useState(false);
 
   // 手机侧边栏折叠 — 默认展开（之前 true 时所有内容隐藏，用户以为没有 sidebar）
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
@@ -861,7 +866,14 @@ export function BeadCanvas({
       params: buildIroningParams(effectGloss, effectTexture, effectSparkle),
     });
 
-    // 显示预览而不是直接下载
+    // 自动加入作品馆（用户反馈不想手动点）
+    const methodNames: Record<string, string> = {
+      paper: '铜版纸烫', towel: '毛巾烫', direct: '直烫', glitter: '格里特烫',
+    };
+    handleAddToGallery(ironedImageUrl, methodNames[ironingMethod]);
+    // 标记作品已熨烫，工具栏会显示"结束作品"按钮回主页
+    setHasIroned(true);
+
     setIronedResult(ironedImageUrl);
     setIronProgress(0);
     setIsIroning(false);
@@ -1065,6 +1077,23 @@ export function BeadCanvas({
                 <Download className="w-4 h-4" aria-hidden="true" />
                 <span>下载图纸</span>
               </button>
+              {/* 结束作品 — 熨烫后才显示，点击回主页 */}
+              {hasIroned && onFinish && (
+                <button
+                  onClick={onFinish}
+                  className="arcade-pill font-pixel-cn text-paper-bg cursor-pointer whitespace-nowrap"
+                  style={{
+                    backgroundColor: 'var(--bead-moss)',
+                    fontSize: 13,
+                    letterSpacing: '0.1em',
+                    padding: '10px 22px',
+                  }}
+                  title="作品已熨烫并加入作品馆，结束并回主页"
+                >
+                  <Check className="w-4 h-4" aria-hidden="true" />
+                  <span>结束作品</span>
+                </button>
+              )}
             </div>
           </div>
         </div>
@@ -1106,6 +1135,21 @@ export function BeadCanvas({
             <Download className="w-4 h-4" aria-hidden="true" />
             下载
           </button>
+          {hasIroned && onFinish && (
+            <button
+              onClick={onFinish}
+              className="flex-1 arcade-pill font-pixel-cn text-paper-bg cursor-pointer"
+              style={{
+                backgroundColor: 'var(--bead-moss)',
+                fontSize: 12,
+                letterSpacing: '0.1em',
+                padding: '12px 16px',
+              }}
+            >
+              <Check className="w-4 h-4" aria-hidden="true" />
+              结束
+            </button>
+          )}
         </div>
       )}
 
@@ -2313,6 +2357,24 @@ export function BeadCanvas({
                     UPDATING…
                   </span>
                 )}
+              </div>
+
+              {/* 自动入馆提示 ribbon */}
+              <div
+                className="mb-4 p-2.5 bg-paper-soft flex items-center gap-2"
+                style={{
+                  boxShadow: [
+                    '0 -1px 0 var(--bead-moss)',
+                    '0 1px 0 var(--bead-moss)',
+                    '-1px 0 0 var(--bead-moss)',
+                    '1px 0 0 var(--bead-moss)',
+                  ].join(', '),
+                }}
+              >
+                <Check className="w-4 h-4 text-moss shrink-0" aria-hidden="true" />
+                <p className="font-pixel-cn text-ink-warm" style={{ fontSize: 12, letterSpacing: '0.05em' }}>
+                  已自动加入作品馆，可下载或调节效果继续覆盖
+                </p>
               </div>
 
               {/* 效果调节面板 — 简化版（光泽 / 质感 / 闪片 3 个滑块） */}
