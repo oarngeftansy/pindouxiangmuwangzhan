@@ -377,9 +377,9 @@ export function BeadCanvas({
         // sidebar 宽 — 跟 STOCK / REF sidebar 实际宽度对齐（lg 时 STOCK 已加宽到 w-96=384）
         const sidebarW = isEffectivelyMobile ? 0 : window.innerWidth < 1024 ? 280 : 384;
 
-        // 缓冲从 80/160 减到 40/130（让板更大，跟左 sidebar 高度更对齐）
-        const availableWidth = window.innerWidth - sidebarW - 40;
-        const availableHeight = window.innerHeight - 130;
+        // 缓冲算 toolbar(~80) + 父 gap(~12) + chrome padding+title(~50) = 142
+        const availableWidth = window.innerWidth - sidebarW - 30;
+        const availableHeight = window.innerHeight - 150;
 
         const maxCellByWidth = (availableWidth - extra) / boardDim;
         const maxCellByHeight = (availableHeight - extra) / boardDim;
@@ -863,7 +863,7 @@ export function BeadCanvas({
   };
 
   return (
-    <div className="flex flex-col gap-3" style={{ minHeight: 'calc(100dvh - 80px)' }}>
+    <div className="flex flex-col gap-3" style={{ height: 'calc(100dvh - 80px)' }}>
       {/* TOOLBAR.EXE 工具栏 */}
       <div className="relative shrink-0">
         <div
@@ -1164,8 +1164,8 @@ export function BeadCanvas({
         </div>
       )}
 
-      {/* 主内容区域 */}
-      <div className={`flex-1 min-h-0 flex gap-4 relative ${
+      {/* 主内容区域 — flex-1 min-h-0 让 flex 子能拿到正确 height = 父减toolbar */}
+      <div className={`flex-1 min-h-0 flex gap-4 relative items-stretch ${
         viewMode === 'pegboard'
           ? (isMobile ? 'flex-col' : 'flex-row')
           : (isMobile ? 'flex-col' : 'flex-row-reverse')
@@ -1406,13 +1406,13 @@ export function BeadCanvas({
           </div>
         )}
 
-        {/* 主画布区域 — flex-1 横向占满，垂直 items-start 让 chrome 顶对齐 */}
-        <div className="flex-1 min-w-0 flex flex-col items-start self-stretch">
-          {/* PEGBOARD.EXE 拼豆板模式：chrome 适配 pegboard 大小，不再强制撑满 */}
+        {/* 主画布区域 — flex-1 + 内部 flex-col 让 chrome 撑满高度跟 sidebar 对齐 */}
+        <div className="flex-1 min-w-0 min-h-0 flex flex-col self-stretch">
+          {/* PEGBOARD.EXE 拼豆板模式：chrome 撑满主区，pegboard 内部居中 */}
           {viewMode === 'pegboard' ? (
-            <div className="relative">
+            <div className="relative flex-1 flex flex-col min-h-0">
               <div
-                className="relative bg-paper-bg p-3 pt-7 sm:p-4 sm:pt-8"
+                className="relative bg-paper-bg p-3 pt-7 sm:p-4 sm:pt-8 flex-1 flex flex-col min-h-0"
                 style={{
                   boxShadow: WIN95_SHADOW,
                   backgroundImage:
@@ -1459,11 +1459,9 @@ export function BeadCanvas({
                 </div>
               )}
               <div
-                className="bg-paper-deep rounded-surface p-2 overflow-auto"
+                className="bg-paper-deep rounded-surface p-2 overflow-auto flex-1 min-h-0"
                 style={{
-                  // chrome 自适应 pegboard 大小，不再 flex-1。
-                  // 限定 max-height 防超大板撑出视口，scroll 还能用
-                  maxHeight: 'calc(100dvh - 220px)',
+                  // 内部 scroll 容器 flex-1 撑满 chrome 高度，pegboard 居中
                   touchAction: 'pan-x pan-y pinch-zoom',
                 }}
               >
