@@ -208,7 +208,7 @@ function App() {
                   boxShadow: [
                     '0 -2px 0 var(--bead-ink)', '0 2px 0 var(--bead-ink)',
                     '-2px 0 0 var(--bead-ink)', '2px 0 0 var(--bead-ink)',
-                    '3px 3px 0 var(--y2k-lavender)',
+                    '3px 3px 0 var(--bead-honey)',
                   ].join(', '),
                 }}
                 aria-label="打开作品馆"
@@ -233,7 +233,7 @@ function App() {
                     boxShadow: [
                       '0 -2px 0 var(--bead-ink)', '0 2px 0 var(--bead-ink)',
                       '-2px 0 0 var(--bead-ink)', '2px 0 0 var(--bead-ink)',
-                      '3px 3px 0 var(--y2k-lavender)',
+                      '3px 3px 0 var(--bead-honey)',
                     ].join(', '),
                   }}
                   aria-label="返回首页"
@@ -252,61 +252,62 @@ function App() {
         {mode === 'upload' && (
           <div className="space-y-8">
             <section className="relative px-1 pt-10 pb-10 text-center">
-              {/* 浮动 pixel 装饰 — NJ kiosk 街机机厅小物（云、心、星） */}
+              {/* 浮动 pixel 装饰 — 暖色"晚霞云"调色：honey / terracotta / moss 三色循环，
+                  跟暖纸底完全统一在暖色相系，不再混冷紫冷蓝 */}
               <PixelCloud
                 size={48}
-                color="var(--y2k-lavender)"
+                color="var(--bead-honey)"
                 className="absolute pixel-float"
                 style={{ top: 8, left: '8%' }}
               />
               <PixelCloud
                 size={36}
-                color="var(--y2k-sky)"
+                color="var(--bead-terracotta)"
                 className="absolute pixel-float-slow"
                 style={{ top: 28, right: '10%' }}
               />
               <PixelHeart
                 size={20}
-                color="var(--y2k-coral)"
+                color="var(--bead-terracotta)"
                 className="absolute pixel-float-fast"
                 style={{ top: 60, left: '18%' }}
               />
               <PixelStar
                 size={16}
-                color="var(--y2k-lavender-deep)"
+                color="var(--bead-terracotta-deep)"
                 className="absolute pixel-float"
                 style={{ top: 90, right: '20%' }}
               />
               <PixelStar
                 size={12}
-                color="var(--bead-honey)"
+                color="var(--bead-moss)"
                 className="absolute pixel-float-slow"
                 style={{ bottom: 60, left: '12%' }}
               />
               <PixelHeart
                 size={14}
-                color="var(--y2k-lavender)"
+                color="var(--bead-honey)"
                 className="absolute pixel-float-fast"
                 style={{ bottom: 40, right: '14%' }}
               />
 
               {/* 顶部街机机厅闪烁标语 */}
               <p
-                className="font-pixel-arcade text-y2k-coral arcade-blink mb-4"
+                className="font-pixel-arcade text-terracotta arcade-blink mb-4"
                 style={{ fontSize: 9, letterSpacing: '0.25em' }}
               >
                 ▶ INSERT COIN ◀
               </p>
 
-              {/* chrome italic wordmark + halo arc — NJ 招牌金属斜体 */}
+              {/* chrome italic wordmark + halo arc — 黄铜金属斜体（暖系） */}
               <div className="relative inline-block">
-                {/* chrome halo 椭圆环 — 略 -6° 倾斜，包在 wordmark 后面 */}
+                {/* chrome halo 椭圆环 — 暖陶土深色描线 */}
                 <ChromeHalo
                   width={420}
                   height={92}
                   className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none"
                   style={{ width: 'clamp(280px, 65vw, 460px)' }}
-                  color="var(--y2k-lavender-deep)"
+                  color="var(--bead-terracotta-deep)"
                 />
                 <h1
                   className="font-chrome leading-[0.95] relative"
@@ -316,24 +317,24 @@ function App() {
                 </h1>
                 <span
                   className="sparkle sparkle-lg sparkle-twinkle absolute"
-                  style={{ top: -8, left: -22, ['--sparkle-color' as string]: 'var(--y2k-lavender)' }}
+                  style={{ top: -8, left: -22, ['--sparkle-color' as string]: 'var(--bead-honey)' }}
                   aria-hidden="true"
                 />
                 <span
                   className="sparkle sparkle-twinkle absolute"
-                  style={{ top: 4, right: -26, ['--sparkle-color' as string]: 'var(--y2k-coral)', animationDelay: '600ms' }}
+                  style={{ top: 4, right: -26, ['--sparkle-color' as string]: 'var(--bead-terracotta)', animationDelay: '600ms' }}
                   aria-hidden="true"
                 />
                 <span
                   className="sparkle sparkle-sm sparkle-twinkle absolute"
-                  style={{ bottom: -4, left: '40%', ['--sparkle-color' as string]: 'var(--bead-honey)', animationDelay: '1200ms' }}
+                  style={{ bottom: -4, left: '40%', ['--sparkle-color' as string]: 'var(--bead-moss)', animationDelay: '1200ms' }}
                   aria-hidden="true"
                 />
               </div>
 
-              {/* 主 tagline —— "赛博拼豆" 四个大字（Cubic 11 像素中文） */}
+              {/* 主 tagline —— "赛博拼豆"，两侧 1UP/GO 徽章用暖色对照 */}
               <div className="relative inline-flex items-center justify-center gap-4 mt-7">
-                <PixelBadge text="1UP" color="var(--y2k-coral)" />
+                <PixelBadge text="1UP" color="var(--bead-terracotta)" />
                 <p
                   className="font-pixel-cn text-ink-warm"
                   style={{
@@ -343,11 +344,11 @@ function App() {
                 >
                   赛博拼豆
                 </p>
-                <PixelBadge text="GO!" color="var(--y2k-navy)" />
+                <PixelBadge text="GO!" color="var(--bead-moss)" />
               </div>
 
               <p
-                className="font-pixel-arcade text-y2k-navy mt-4"
+                className="font-pixel-arcade text-ink-soft mt-4"
                 style={{ fontSize: 9, letterSpacing: '0.2em' }}
               >
                 EST · 2026 · V1.0

@@ -319,18 +319,18 @@
   animation: arcadeBlink 1.2s steps(2, end) infinite;
 }
 
-/* chrome italic wordmark — NewJeans 同款金属反光 */
+/* chrome italic wordmark — 黄铜渐变（替代之前的冷紫 chrome），跟暖纸底统一 */
 .font-chrome {
   font-family: 'Playfair Display', 'Georgia', serif;
   font-style: italic;
   font-weight: 700;
   letter-spacing: -0.02em;
-  /* 双层金属渐变 + 暖色描边 */
+  /* 暖色金属：奶油 → 蜜糖 → 陶土 → 墨 = 黄昏黄铜反光 */
   background: linear-gradient(
     180deg,
     var(--bead-paper-bg) 0%,
-    var(--y2k-lavender) 35%,
-    var(--y2k-lavender-deep) 60%,
+    var(--bead-honey) 30%,
+    var(--bead-terracotta) 62%,
     var(--bead-ink) 100%
   );
   -webkit-background-clip: text;
@@ -358,6 +358,7 @@
     rgba(0, 0, 0, 0) 50%,
     rgba(0, 0, 0, 0.18) 100%
   );
+  /* 硬阴影改成 honey 蜜糖色 — 跟暖纸底 / 陶土主色统一在暖色系 */
   box-shadow:
     inset 0 1.5px 0 rgba(255, 255, 255, 0.45),
     inset 0 -2px 0 rgba(0, 0, 0, 0.22),
@@ -365,7 +366,7 @@
     0 2px 0 var(--bead-ink),
     -2px 0 0 var(--bead-ink),
     2px 0 0 var(--bead-ink),
-    4px 4px 0 var(--y2k-lavender);
+    4px 4px 0 var(--bead-honey);
   transition: transform 0.12s ease;
 }
 .arcade-pill:hover {
@@ -377,7 +378,7 @@
     0 2px 0 var(--bead-ink),
     -2px 0 0 var(--bead-ink),
     2px 0 0 var(--bead-ink),
-    5px 5px 0 var(--y2k-lavender);
+    5px 5px 0 var(--bead-honey);
 }
 .arcade-pill:active {
   transform: translate(2px, 2px);
@@ -388,5 +389,5 @@
     0 2px 0 var(--bead-ink),
     -2px 0 0 var(--bead-ink),
     2px 0 0 var(--bead-ink),
-    2px 2px 0 var(--y2k-lavender);
+    2px 2px 0 var(--bead-honey);
 }

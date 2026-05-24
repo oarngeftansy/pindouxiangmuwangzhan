@@ -15,7 +15,7 @@ type Props = {
 };
 
 // 16-bit 云朵（chunky 4 段堆）
-export function PixelCloud({ size = 36, color = 'var(--y2k-lavender)', className = '', style }: Props) {
+export function PixelCloud({ size = 36, color = 'var(--bead-honey)', className = '', style }: Props) {
   return (
     <svg
       viewBox="0 0 16 8"
@@ -36,7 +36,7 @@ export function PixelCloud({ size = 36, color = 'var(--y2k-lavender)', className
 }
 
 // 经典 7×6 像素心
-export function PixelHeart({ size = 18, color = 'var(--y2k-coral)', className = '', style }: Props) {
+export function PixelHeart({ size = 18, color = 'var(--bead-terracotta)', className = '', style }: Props) {
   return (
     <svg
       viewBox="0 0 7 6"
@@ -57,7 +57,7 @@ export function PixelHeart({ size = 18, color = 'var(--y2k-coral)', className = 
 }
 
 // 4-点像素星（+ 形）
-export function PixelStar({ size = 14, color = 'var(--y2k-lavender)', className = '', style }: Props) {
+export function PixelStar({ size = 14, color = 'var(--bead-terracotta)', className = '', style }: Props) {
   return (
     <svg
       viewBox="0 0 7 7"
@@ -98,7 +98,7 @@ export function PixelArrow({ size = 14, color = 'currentColor', className = '', 
 }
 
 // 街机摇杆（小图标版 — 顶部圆球 + 底座）
-export function PixelJoystick({ size = 20, ballColor = 'var(--y2k-coral)', className = '', style }: Props) {
+export function PixelJoystick({ size = 20, ballColor = 'var(--bead-terracotta)', className = '', style }: Props) {
   return (
     <svg
       viewBox="0 0 10 12"
@@ -122,7 +122,7 @@ export function PixelJoystick({ size = 20, ballColor = 'var(--y2k-coral)', class
 }
 
 // 小街机按钮（圆球状有反光）
-export function ArcadeButton({ size = 16, color = 'var(--y2k-coral)', className = '', style }: Props) {
+export function ArcadeButton({ size = 16, color = 'var(--bead-terracotta)', className = '', style }: Props) {
   return (
     <div
       className={`relative ${className}`}
@@ -159,7 +159,7 @@ export function ArcadeButton({ size = 16, color = 'var(--y2k-coral)', className 
 // 1UP / PLAY / READY 像素徽章（街机文字标签）
 export function PixelBadge({
   text = '1UP',
-  color = 'var(--y2k-coral)',
+  color = 'var(--bead-terracotta)',
   className = '',
   style,
 }: { text?: string; color?: string; className?: string; style?: React.CSSProperties }) {
@@ -193,7 +193,7 @@ export function ChromeHalo({
   height = 80,
   className = '',
   style,
-  color = 'var(--y2k-lavender-deep)',
+  color = 'var(--bead-terracotta-deep)',
 }: {
   width?: number;
   height?: number;

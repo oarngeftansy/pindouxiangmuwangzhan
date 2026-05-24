@@ -290,16 +290,16 @@ export function ImageUploader({ onImageProcessed, onCreateBlank }: ImageUploader
     <div className="w-full">
       {/* 街机 kiosk 容器 — UPLOAD.EXE 窗口外漂浮 pixel 装饰小物 */}
       <div className="relative mb-6 mx-auto" style={{ maxWidth: 600 }}>
-        {/* 窗口外的浮动 pixel 装饰 — 街机机厅 vibe */}
+        {/* 窗口外的浮动 pixel 装饰 — 暖色"晚霞云"调色 */}
         <PixelCloud
           size={38}
-          color="var(--y2k-sky)"
+          color="var(--bead-honey)"
           className="absolute pixel-float-slow z-10"
           style={{ top: -16, left: -18 }}
         />
         <PixelCloud
           size={28}
-          color="var(--y2k-lavender)"
+          color="var(--bead-terracotta)"
           className="absolute pixel-float z-10"
           style={{ top: -22, right: 32 }}
         />
@@ -311,7 +311,7 @@ export function ImageUploader({ onImageProcessed, onCreateBlank }: ImageUploader
         />
         <PixelHeart
           size={16}
-          color="var(--y2k-coral)"
+          color="var(--bead-terracotta)"
           className="absolute pixel-float z-10"
           style={{ bottom: 28, left: -22 }}
         />
@@ -339,14 +339,15 @@ export function ImageUploader({ onImageProcessed, onCreateBlank }: ImageUploader
                 '0 2px 0 var(--bead-ink)',
                 '-2px 0 0 var(--bead-ink)',
                 '2px 0 0 var(--bead-ink)',
-                '6px 6px 0 var(--y2k-lavender)',
+                /* 硬阴影改成 terracotta — 暖底上的暖阴影 = 黄昏感，比冷紫和谐 */
+                '6px 6px 0 var(--bead-terracotta)',
               ].join(', '),
               backgroundImage:
                 'radial-gradient(circle, rgba(58, 52, 42, 0.07) 1px, transparent 1px)',
               backgroundSize: '14px 14px',
             }}
           >
-            {/* Win95 风 title bar */}
+            {/* Win95 风 title bar — 保留 navy 作为唯一冷锚点，让暖系画面有一处对比 */}
             <div
               className="absolute left-0 right-0 flex items-center justify-between px-2"
               style={{
@@ -362,19 +363,19 @@ export function ImageUploader({ onImageProcessed, onCreateBlank }: ImageUploader
               <div className="flex gap-0.5">
                 <div className="w-2 h-2 bg-paper-bg/80" aria-hidden="true" />
                 <div className="w-2 h-2 bg-paper-bg/80" aria-hidden="true" />
-                <div className="w-2 h-2 bg-y2k-coral" aria-hidden="true" />
+                <div className="w-2 h-2 bg-terracotta" aria-hidden="true" />
               </div>
             </div>
 
-            {/* 窗口内角落 sparkle */}
+            {/* 窗口内角落 sparkle — 暖色调 */}
             <span
               className="sparkle sparkle-sm sparkle-twinkle absolute"
-              style={{ top: 28, right: 22, ['--sparkle-color' as string]: 'var(--y2k-lavender)' }}
+              style={{ top: 28, right: 22, ['--sparkle-color' as string]: 'var(--bead-honey)' }}
               aria-hidden="true"
             />
             <span
               className="sparkle sparkle-sm sparkle-twinkle absolute"
-              style={{ top: 64, left: 28, ['--sparkle-color' as string]: 'var(--bead-honey)', animationDelay: '400ms' }}
+              style={{ top: 64, left: 28, ['--sparkle-color' as string]: 'var(--bead-terracotta)', animationDelay: '400ms' }}
               aria-hidden="true"
             />
 
@@ -448,18 +449,18 @@ export function ImageUploader({ onImageProcessed, onCreateBlank }: ImageUploader
                     JPG · PNG · GIF · 1-10 MB
                   </p>
 
-                  {/* 底部街机控制台栏 — 一排 mini 摇杆 + 4 个彩色按钮（纯装饰） */}
+                  {/* 底部街机控制台栏 — 摇杆 + 彩色按钮（暖色调 + 1 navy 锚） */}
                   <div className="mt-6 flex items-center justify-center gap-6 pt-3"
                     style={{ borderTop: '1px dashed var(--bead-edge)' }}
                   >
-                    <PixelJoystick size={22} ballColor="var(--y2k-coral)" />
+                    <PixelJoystick size={22} ballColor="var(--bead-terracotta)" />
                     <div className="flex items-center gap-2">
                       <ArcadeButton size={14} color="var(--bead-honey)" />
-                      <ArcadeButton size={14} color="var(--y2k-coral)" />
+                      <ArcadeButton size={14} color="var(--bead-terracotta)" />
                       <ArcadeButton size={14} color="var(--bead-moss)" />
                       <ArcadeButton size={14} color="var(--y2k-navy)" />
                     </div>
-                    <PixelJoystick size={22} ballColor="var(--y2k-lavender-deep)" />
+                    <PixelJoystick size={22} ballColor="var(--bead-honey)" />
                   </div>
                 </>
               )}
@@ -469,22 +470,22 @@ export function ImageUploader({ onImageProcessed, onCreateBlank }: ImageUploader
           {/* 4 角像素角珍 (lavender) */}
           <div
             className="absolute"
-            style={{ top: -4, left: -4, width: 4, height: 4, backgroundColor: 'var(--y2k-lavender)' }}
+            style={{ top: -4, left: -4, width: 4, height: 4, backgroundColor: 'var(--bead-terracotta)' }}
             aria-hidden="true"
           />
           <div
             className="absolute"
-            style={{ top: -4, right: -4, width: 4, height: 4, backgroundColor: 'var(--y2k-lavender)' }}
+            style={{ top: -4, right: -4, width: 4, height: 4, backgroundColor: 'var(--bead-terracotta)' }}
             aria-hidden="true"
           />
           <div
             className="absolute"
-            style={{ bottom: -4, left: -4, width: 4, height: 4, backgroundColor: 'var(--y2k-lavender)' }}
+            style={{ bottom: -4, left: -4, width: 4, height: 4, backgroundColor: 'var(--bead-terracotta)' }}
             aria-hidden="true"
           />
           <div
             className="absolute"
-            style={{ bottom: -4, right: -4, width: 4, height: 4, backgroundColor: 'var(--y2k-lavender)' }}
+            style={{ bottom: -4, right: -4, width: 4, height: 4, backgroundColor: 'var(--bead-terracotta)' }}
             aria-hidden="true"
           />
         </div>
@@ -492,7 +493,7 @@ export function ImageUploader({ onImageProcessed, onCreateBlank }: ImageUploader
         {/* 窗口下方 PRESS START 闪烁标语 — 街机经典 */}
         <div className="mt-7 text-center">
           <p
-            className="font-pixel-arcade text-y2k-coral arcade-blink"
+            className="font-pixel-arcade text-terracotta arcade-blink"
             style={{ fontSize: 10, letterSpacing: '0.3em' }}
           >
             ▶ PRESS START ◀
