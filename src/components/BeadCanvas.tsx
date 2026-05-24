@@ -362,11 +362,10 @@ export function BeadCanvas({
     return { boardDim, offsetX, offsetY, cols, rows };
   }, [workingGrid.length, workingGrid[0]?.length]);
 
-  // 自适应计算拼豆板缩放 — 让正方形拼豆板充满工作区
+  // 自适应计算拼豆板缩放 — 让正方形拼豆板充满工作区（缓冲减小让板更大）
   useEffect(() => {
     if (viewMode === 'pegboard') {
       const updateScale = () => {
-        // 用智能 boardLayout.boardDim 作两轴尺寸（已含 padding + min 29）
         const boardDim = boardLayout.boardDim;
 
         const padding = 8;
@@ -375,10 +374,12 @@ export function BeadCanvas({
 
         const landscape = window.innerWidth > window.innerHeight;
         const isEffectivelyMobile = !landscape && window.innerWidth < 768;
-        const sidebarW = isEffectivelyMobile ? 0 : window.innerWidth < 1024 ? 260 : 320;
+        // sidebar 宽 — 跟 STOCK / REF sidebar 实际宽度对齐（lg 时 STOCK 已加宽到 w-96=384）
+        const sidebarW = isEffectivelyMobile ? 0 : window.innerWidth < 1024 ? 280 : 384;
 
-        const availableWidth = window.innerWidth - sidebarW - 80;
-        const availableHeight = window.innerHeight - 160;
+        // 缓冲从 80/160 减到 40/130（让板更大，跟左 sidebar 高度更对齐）
+        const availableWidth = window.innerWidth - sidebarW - 40;
+        const availableHeight = window.innerHeight - 130;
 
         const maxCellByWidth = (availableWidth - extra) / boardDim;
         const maxCellByHeight = (availableHeight - extra) / boardDim;
@@ -1169,11 +1170,11 @@ export function BeadCanvas({
           ? (isMobile ? 'flex-col' : 'flex-row')
           : (isMobile ? 'flex-col' : 'flex-row-reverse')
       }`}>
-        {/* 拼豆板模式：侧边栏 */}
+        {/* 拼豆板模式：侧边栏（加宽匹配 STOCK，跟主画布对齐） */}
         {viewMode === 'pegboard' && (
           <div className={isMobile
             ? 'shrink-0'
-            : 'w-[260px] lg:w-[320px] shrink-0 overflow-y-auto'
+            : 'w-[280px] lg:w-[384px] shrink-0 overflow-y-auto self-stretch'
           }>
           {/* 手机：折叠切换条 — 展开时同步打开参考图和材料清单（否则只见色盘） */}
           {isMobile && (
@@ -1405,8 +1406,8 @@ export function BeadCanvas({
           </div>
         )}
 
-        {/* 主画布区域 — fit-content 不再 flex-1，chrome 包到 pegboard 大小 */}
-        <div className="flex-1 min-w-0 flex flex-col items-start">
+        {/* 主画布区域 — flex-1 横向占满，垂直 items-start 让 chrome 顶对齐 */}
+        <div className="flex-1 min-w-0 flex flex-col items-start self-stretch">
           {/* PEGBOARD.EXE 拼豆板模式：chrome 适配 pegboard 大小，不再强制撑满 */}
           {viewMode === 'pegboard' ? (
             <div className="relative">
@@ -1639,9 +1640,9 @@ export function BeadCanvas({
           )}
         </div>
 
-        {/* STOCK.EXE 材料清单 — 简洁模式右侧（限宽 w-72/80 防撑爆布局） */}
+        {/* STOCK.EXE 材料清单 — 简洁模式左侧（w-80 / lg:w-96 加宽 + 不再 sticky 防错位） */}
         {viewMode === 'simple' && (
-          <div className="relative h-fit sticky top-4 w-full md:w-72 lg:w-80 shrink-0">
+          <div className="relative w-full md:w-80 lg:w-96 shrink-0 self-stretch">
             <div
               className="relative bg-paper-bg p-4 pt-7"
               style={{
