@@ -76,6 +76,8 @@ export function GalleryView({ onClose }: GalleryViewProps) {
   const [selected, setSelected] = useState<GalleryItem | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editTitle, setEditTitle] = useState('');
+  // 删除确认弹层 — 卡片右上角小垃圾桶按钮点开
+  const [deletingItem, setDeletingItem] = useState<GalleryItem | null>(null);
 
   useEffect(() => {
     setItems(getGallery());
@@ -194,9 +196,34 @@ export function GalleryView({ onClose }: GalleryViewProps) {
             ) : (
               <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-6 sm:gap-7 p-1">
                 {items.map((item, idx) => (
-                  <div key={item.id} className="relative">
+                  <div key={item.id} className="relative group">
+                    {/* 删除按钮 — 右上角 hover 显示 */}
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setDeletingItem(item);
+                      }}
+                      className="absolute z-20 opacity-0 group-hover:opacity-100 transition-opacity bg-y2k-coral text-paper-bg flex items-center justify-center"
+                      style={{
+                        top: -10,
+                        right: -10,
+                        width: 28,
+                        height: 28,
+                        boxShadow: [
+                          '0 -2px 0 var(--y2k-navy)',
+                          '0 2px 0 var(--y2k-navy)',
+                          '-2px 0 0 var(--y2k-navy)',
+                          '2px 0 0 var(--y2k-navy)',
+                          '2px 2px 0 var(--y2k-navy-deep)',
+                        ].join(', '),
+                      }}
+                      title="删除作品"
+                      aria-label={`删除 ${item.title}`}
+                    >
+                      <Trash2 className="w-4 h-4" aria-hidden="true" />
+                    </button>
                     <div
-                      className="group relative cursor-pointer transition-transform hover:-translate-y-1"
+                      className="relative cursor-pointer transition-transform hover:-translate-y-1"
                       style={{
                         backgroundColor: 'var(--bead-paper-bg)',
                         boxShadow: CARD_SHADOW,
@@ -406,13 +433,9 @@ export function GalleryView({ onClose }: GalleryViewProps) {
                 </div>
 
                 <div className="flex flex-col-reverse sm:flex-row gap-3">
-                  {/* 删除 — paper-soft + navy 步阶 + coral hard shadow */}
+                  {/* 删除 — 改用自定义确认对话框（NJ kiosk 风） */}
                   <button
-                    onClick={() => {
-                      if (window.confirm(`确定删除「${selected.title}」吗？`)) {
-                        handleDelete(selected.id);
-                      }
-                    }}
+                    onClick={() => setDeletingItem(selected)}
                     className="flex-1 inline-flex items-center justify-center gap-2 min-h-[48px] px-6 py-3 bg-paper-soft text-ink-warm font-pixel-cn transition-transform hover:-translate-y-0.5 active:translate-x-[1px] active:translate-y-[1px]"
                     style={{
                       fontSize: 13,
@@ -447,6 +470,105 @@ export function GalleryView({ onClose }: GalleryViewProps) {
               </div>
             </div>
 
+            <CornerPearls />
+          </div>
+        </div>
+      )}
+
+      {/* CONFIRM.EXE 删除确认弹层（自定义替代 window.confirm） */}
+      {deletingItem && (
+        <div
+          className="fixed inset-0 z-[520] flex items-center justify-center p-6"
+          style={{ backgroundColor: 'rgba(44, 58, 94, 0.7)' }}
+          onClick={() => setDeletingItem(null)}
+        >
+          <div
+            className="relative max-w-sm w-full animate-in zoom-in-95 duration-150"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div
+              className="relative bg-paper-bg pt-7 px-6 pb-6"
+              style={{
+                boxShadow: WIN95_SHADOW,
+                backgroundImage:
+                  'radial-gradient(circle, rgba(44, 58, 94, 0.05) 1px, transparent 1px)',
+                backgroundSize: '14px 14px',
+              }}
+            >
+              <TitleBar name="CONFIRM.EXE" onClose={() => setDeletingItem(null)} />
+
+              <div className="flex flex-col items-center text-center">
+                {/* coral 警告图标 */}
+                <div
+                  className="w-16 h-16 bg-y2k-coral flex items-center justify-center mb-4"
+                  style={{
+                    boxShadow: [
+                      '0 -2px 0 var(--y2k-navy)',
+                      '0 2px 0 var(--y2k-navy)',
+                      '-2px 0 0 var(--y2k-navy)',
+                      '2px 0 0 var(--y2k-navy)',
+                      '3px 3px 0 var(--y2k-navy-deep)',
+                    ].join(', '),
+                  }}
+                  aria-hidden="true"
+                >
+                  <Trash2 className="w-8 h-8 text-paper-bg" />
+                </div>
+
+                <p
+                  className="font-pixel-arcade text-y2k-coral arcade-blink mb-3"
+                  style={{ fontSize: 11, letterSpacing: '0.2em' }}
+                >
+                  ⚠ DELETE CONFIRM ⚠
+                </p>
+
+                <p className="font-pixel-cn text-ink-warm mb-2" style={{ fontSize: 16, letterSpacing: '0.05em', lineHeight: 1.4 }}>
+                  确定删除作品
+                </p>
+                <p className="font-pixel-cn text-ink-warm font-bold mb-2" style={{ fontSize: 18, letterSpacing: '0.05em' }}>
+                  「{deletingItem.title}」
+                </p>
+                <p className="font-pixel-cn text-ink-soft mb-6" style={{ fontSize: 12, letterSpacing: '0.03em' }}>
+                  删除后无法恢复
+                </p>
+
+                <div className="flex gap-3 w-full">
+                  <button
+                    onClick={() => setDeletingItem(null)}
+                    className="flex-1 inline-flex items-center justify-center min-h-[44px] px-4 py-2.5 bg-paper-soft text-ink-warm font-pixel-cn transition-transform hover:-translate-y-0.5 active:translate-x-[1px] active:translate-y-[1px]"
+                    style={{
+                      fontSize: 14,
+                      letterSpacing: '0.08em',
+                      boxShadow: [
+                        '0 -2px 0 var(--y2k-navy)',
+                        '0 2px 0 var(--y2k-navy)',
+                        '-2px 0 0 var(--y2k-navy)',
+                        '2px 0 0 var(--y2k-navy)',
+                        '3px 3px 0 var(--y2k-navy-deep)',
+                      ].join(', '),
+                    }}
+                  >
+                    取消
+                  </button>
+                  <button
+                    onClick={() => {
+                      handleDelete(deletingItem.id);
+                      setDeletingItem(null);
+                    }}
+                    className="flex-1 arcade-pill font-pixel-cn text-paper-bg cursor-pointer"
+                    style={{
+                      backgroundColor: 'var(--y2k-coral)',
+                      fontSize: 14,
+                      letterSpacing: '0.08em',
+                      padding: '10px 14px',
+                    }}
+                  >
+                    <Trash2 className="w-4 h-4" aria-hidden="true" />
+                    <span>确认删除</span>
+                  </button>
+                </div>
+              </div>
+            </div>
             <CornerPearls />
           </div>
         </div>
