@@ -116,6 +116,83 @@ interface BeadCanvasProps {
 
 type Tool = "brush" | "eraser";
 
+// 参考图纸共享渲染组件 —— 简洁模式 + 拼豆板模式两处共用，保证视觉一致
+// 方格像素图 + SVG 自适应 + cell stroke 细网格线 = PATTERN.EXE 同款图纸样式
+interface ReferenceGridDisplayProps {
+  referenceGrid: BeadGrid;
+  workingGrid: BeadGrid;
+  lockedColor: string | null;
+  onColorLock: (color: string) => void;
+  maxHeight?: string;
+  showPlacedIndicator?: boolean; // 是否显示已放置标记（pegboard sidebar 不需要，simple 需要）
+}
+
+function ReferenceGridDisplay({
+  referenceGrid,
+  workingGrid,
+  lockedColor,
+  onColorLock,
+  maxHeight = '36vh',
+  showPlacedIndicator = true,
+}: ReferenceGridDisplayProps) {
+  if (!referenceGrid?.length || !referenceGrid[0]?.length) return null;
+  const refCols = referenceGrid[0].length;
+  const refRows = referenceGrid.length;
+  return (
+    <div
+      className="bg-paper-bg p-2 flex items-center justify-center"
+      style={{ boxShadow: 'inset 0 0 0 2px var(--y2k-navy)' }}
+    >
+      <svg
+        viewBox={`0 0 ${refCols} ${refRows}`}
+        preserveAspectRatio="xMidYMid meet"
+        shapeRendering="crispEdges"
+        style={{
+          width: '100%',
+          maxHeight,
+          display: 'block',
+          backgroundColor: 'var(--bead-paper-bg)',
+        }}
+        role="img"
+        aria-label="参考图纸"
+      >
+        {referenceGrid.map((row, y) =>
+          row.map((color, x) => {
+            if (!color) return null;
+            const isHighlight = lockedColor === color;
+            const isPlaced = !!workingGrid[y]?.[x];
+            const dimmed = lockedColor && !isHighlight;
+            return (
+              <g
+                key={`ref-${x}-${y}`}
+                onClick={() => onColorLock(color)}
+                style={{ cursor: 'pointer' }}
+              >
+                {isHighlight && (
+                  <rect x={x - 0.05} y={y - 0.05} width={1.1} height={1.1} fill="var(--bead-honey-glow)" />
+                )}
+                <rect
+                  x={x}
+                  y={y}
+                  width={1}
+                  height={1}
+                  fill={color}
+                  stroke="rgba(44,58,94,0.22)"
+                  strokeWidth={0.04}
+                  opacity={dimmed ? 0.3 : 1}
+                />
+                {showPlacedIndicator && isPlaced && (
+                  <rect x={x + 0.2} y={y + 0.2} width={0.6} height={0.6} fill="none" stroke="var(--y2k-navy)" strokeWidth={0.12} />
+                )}
+              </g>
+            );
+          }),
+        )}
+      </svg>
+    </div>
+  );
+}
+
 export function BeadCanvas({
   beadGrid,
   setBeadGrid,
@@ -1195,60 +1272,15 @@ export function BeadCanvas({
               </div>
             )}
 
-            {/* 参考图内容 — 方格像素图 + SVG 自适应，每 cell 加细 navy stroke 当网格线（图纸样式） */}
-            {(() => {
-              const refCols = referenceGrid[0].length;
-              const refRows = referenceGrid.length;
-              return (
-                <div
-                  className="bg-paper-bg p-2 flex items-center justify-center"
-                  style={{ boxShadow: 'inset 0 0 0 2px var(--y2k-navy)' }}
-                >
-                  <svg
-                    viewBox={`0 0 ${refCols} ${refRows}`}
-                    preserveAspectRatio="xMidYMid meet"
-                    shapeRendering="crispEdges"
-                    style={{
-                      width: '100%',
-                      maxHeight: '36vh',
-                      display: 'block',
-                      backgroundColor: 'var(--bead-paper-bg)',
-                    }}
-                    role="img"
-                    aria-label="参考图纸"
-                  >
-                    {referenceGrid.map((row, y) =>
-                      row.map((color, x) => {
-                        if (!color) return null;
-                        const isHighlight = lockedColor === color;
-                        const dimmed = lockedColor && !isHighlight;
-                        return (
-                          <g
-                            key={`ref-${x}-${y}`}
-                            onClick={() => handleColorLock(color)}
-                            style={{ cursor: 'pointer' }}
-                          >
-                            {isHighlight && (
-                              <rect x={x - 0.05} y={y - 0.05} width={1.1} height={1.1} fill="var(--bead-honey-glow)" />
-                            )}
-                            <rect
-                              x={x}
-                              y={y}
-                              width={1}
-                              height={1}
-                              fill={color}
-                              stroke="rgba(44,58,94,0.22)"
-                              strokeWidth={0.04}
-                              opacity={dimmed ? 0.3 : 1}
-                            />
-                          </g>
-                        );
-                      }),
-                    )}
-                  </svg>
-                </div>
-              );
-            })()}
+            {/* 参考图内容 — 共享 ReferenceGridDisplay 跟简洁模式同款 */}
+            <ReferenceGridDisplay
+              referenceGrid={referenceGrid}
+              workingGrid={workingGrid}
+              lockedColor={lockedColor}
+              onColorLock={handleColorLock}
+              maxHeight="36vh"
+              showPlacedIndicator
+            />
 
             {/* 提示文字 */}
             <div className="px-4 py-2.5 bg-paper-deep border-t border-edge-sand flex items-center justify-center gap-1.5">
@@ -1618,73 +1650,27 @@ export function BeadCanvas({
             >
               <TitleBar name="STOCK.EXE" />
 
-              {/* 参考图纸 — 放在 STOCK 顶部，方格像素图 SVG 自适应 */}
-              {showReference && (() => {
-                const refCols = referenceGrid[0].length;
-                const refRows = referenceGrid.length;
-                return (
-                  <div className="mb-4">
-                    <div className="flex items-baseline gap-2 mb-2">
-                      <h3 className="font-pixel-cn text-ink-warm" style={{ fontSize: 16, letterSpacing: '0.08em' }}>
-                        参考图纸
-                      </h3>
-                      <span className="font-pixel-arcade text-y2k-navy" style={{ fontSize: 11, letterSpacing: '0.12em' }}>
-                        REF
-                      </span>
-                    </div>
-                    <div
-                      className="bg-paper-bg p-1.5 flex items-center justify-center"
-                      style={{ boxShadow: 'inset 0 0 0 2px var(--y2k-navy)' }}
-                    >
-                      <svg
-                        viewBox={`0 0 ${refCols} ${refRows}`}
-                        preserveAspectRatio="xMidYMid meet"
-                        shapeRendering="crispEdges"
-                        style={{
-                          width: '100%',
-                          maxHeight: '30vh',
-                          display: 'block',
-                        }}
-                        role="img"
-                        aria-label="参考图纸"
-                      >
-                        {referenceGrid.map((row, y) =>
-                          row.map((color, x) => {
-                            if (!color) return null;
-                            const isHighlight = lockedColor === color;
-                            const isPlaced = !!workingGrid[y][x];
-                            const dimmed = lockedColor && !isHighlight;
-                            return (
-                              <g
-                                key={`ref-mini-${x}-${y}`}
-                                onClick={() => handleColorLock(color)}
-                                style={{ cursor: 'pointer' }}
-                              >
-                                {isHighlight && (
-                                  <rect x={x - 0.05} y={y - 0.05} width={1.1} height={1.1} fill="var(--bead-honey-glow)" />
-                                )}
-                                <rect
-                                  x={x}
-                                  y={y}
-                                  width={1}
-                                  height={1}
-                                  fill={color}
-                                  stroke="rgba(44,58,94,0.22)"
-                                  strokeWidth={0.04}
-                                  opacity={dimmed ? 0.3 : 1}
-                                />
-                                {isPlaced && (
-                                  <rect x={x + 0.2} y={y + 0.2} width={0.6} height={0.6} fill="none" stroke="var(--y2k-navy)" strokeWidth={0.12} />
-                                )}
-                              </g>
-                            );
-                          }),
-                        )}
-                      </svg>
-                    </div>
+              {/* 参考图纸 — 共享 ReferenceGridDisplay，跟拼豆板模式 REF.EXE 同款 */}
+              {showReference && (
+                <div className="mb-4">
+                  <div className="flex items-baseline gap-2 mb-2">
+                    <h3 className="font-pixel-cn text-ink-warm" style={{ fontSize: 16, letterSpacing: '0.08em' }}>
+                      参考图纸
+                    </h3>
+                    <span className="font-pixel-arcade text-y2k-navy" style={{ fontSize: 11, letterSpacing: '0.12em' }}>
+                      REF
+                    </span>
                   </div>
-                );
-              })()}
+                  <ReferenceGridDisplay
+                    referenceGrid={referenceGrid}
+                    workingGrid={workingGrid}
+                    lockedColor={lockedColor}
+                    onColorLock={handleColorLock}
+                    maxHeight="30vh"
+                    showPlacedIndicator
+                  />
+                </div>
+              )}
 
               {/* 分隔 */}
               <div className="flex items-baseline gap-3 mb-3 mt-2 pt-2" style={{ borderTop: showReference ? '2px dashed var(--y2k-navy)' : undefined }}>
