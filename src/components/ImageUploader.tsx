@@ -279,21 +279,11 @@ export function ImageUploader({ onImageProcessed, onCreateBlank }: ImageUploader
 
   return (
     <div className="w-full">
-      {/* Y2K Win95 窗口主上传区 — 标题栏 + 双层硬阴影 + 角珍 + sparkle */}
+      {/* NJ photo card 风主上传区 — 白卡 + 冷软阴影 + 圆角 + 小 file-meta 行 */}
       <div
-        className={`relative cursor-pointer mb-4 overflow-hidden transition-colors ${
-          isDragging ? 'bg-paper-deep' : 'bg-paper-soft hover:bg-paper-bg'
+        className={`relative cursor-pointer mb-4 overflow-hidden transition-all nj-card ${
+          isDragging ? 'bg-nj-cloud-deep' : 'hover:-translate-y-0.5'
         }`}
-        style={{
-          // Y2K 双层硬阴影 + 1px 步阶外边
-          boxShadow: [
-            '0 -2px 0 var(--bead-ink)',
-            '0 2px 0 var(--bead-ink)',
-            '-2px 0 0 var(--bead-ink)',
-            '2px 0 0 var(--bead-ink)',
-            '6px 6px 0 var(--y2k-lavender)',
-          ].join(', '),
-        }}
         onDragOver={(e) => {
           e.preventDefault();
           setIsDragging(true);
@@ -302,38 +292,13 @@ export function ImageUploader({ onImageProcessed, onCreateBlank }: ImageUploader
         onDrop={handleDrop}
         onClick={() => fileInputRef.current?.click()}
       >
-        {/* Win95 标题栏 */}
+        {/* 内容区 — 包内 dashed border 暗示"drop zone" */}
         <div
-          className="flex items-center justify-between px-3"
-          style={{
-            height: 22,
-            backgroundColor: 'var(--y2k-navy)',
-            color: 'var(--bead-paper-bg)',
-          }}
-        >
-          <div className="flex items-center gap-1.5">
-            <div className="w-2.5 h-2.5 bg-paper-bg/30" aria-hidden="true" />
-            <span
-              className="font-pixel-arcade"
-              style={{ fontSize: 9, letterSpacing: 0.5 }}
-            >
-              UPLOAD.EXE
-            </span>
-          </div>
-          <div className="flex gap-1" aria-hidden="true">
-            <div className="w-3 h-3 bg-paper-bg/60 flex items-center justify-center" style={{ fontSize: 8, lineHeight: '12px', color: 'var(--bead-ink)' }}>_</div>
-            <div className="w-3 h-3 bg-paper-bg/60 flex items-center justify-center" style={{ fontSize: 8, lineHeight: '12px', color: 'var(--bead-ink)' }}>□</div>
-            <div className="w-3 h-3 bg-y2k-coral flex items-center justify-center" style={{ fontSize: 8, lineHeight: '12px', color: 'var(--bead-ink)' }}>×</div>
-          </div>
-        </div>
-
-        {/* 内容区 — dashed border 仅在内部 */}
-        <div
-          className={`relative border-2 border-dashed m-3 p-8 sm:p-12 ${
-            isDragging ? 'border-terracotta' : 'border-edge-sand'
+          className={`relative border-2 border-dashed m-3 sm:m-4 p-10 sm:p-14 rounded-2xl ${
+            isDragging ? 'border-nj-navy' : 'border-nj-edge'
           }`}
         >
-          {/* 飘 sparkle 装饰 */}
+          {/* 装饰 sparkle */}
           <span
             className="sparkle sparkle-sm sparkle-twinkle absolute"
             style={{ top: 16, right: 24, ['--sparkle-color' as string]: 'var(--y2k-lavender)' }}
@@ -341,12 +306,12 @@ export function ImageUploader({ onImageProcessed, onCreateBlank }: ImageUploader
           />
           <span
             className="sparkle sparkle-twinkle absolute"
-            style={{ bottom: 20, left: 28, ['--sparkle-color' as string]: 'var(--y2k-sky)', animationDelay: '800ms' }}
+            style={{ bottom: 20, left: 28, ['--sparkle-color' as string]: 'var(--nj-coral)', animationDelay: '800ms' }}
             aria-hidden="true"
           />
           <span
             className="sparkle sparkle-sm sparkle-twinkle absolute"
-            style={{ top: 40, left: 48, ['--sparkle-color' as string]: 'var(--y2k-coral)', animationDelay: '400ms' }}
+            style={{ top: 40, left: 48, ['--sparkle-color' as string]: 'var(--nj-bunny-pink)', animationDelay: '400ms' }}
             aria-hidden="true"
           />
         <input
@@ -357,28 +322,38 @@ export function ImageUploader({ onImageProcessed, onCreateBlank }: ImageUploader
           className="hidden"
         />
 
-        <div className="flex flex-col items-center justify-center text-center">
+        <div className="relative flex flex-col items-center justify-center text-center">
+          {/* glossy 3D 上传圆按钮 — NJ navy 主品牌色 */}
           <div
-            className="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-terracotta flex items-center justify-center mb-4 sm:mb-5"
-            style={{ boxShadow: 'var(--shadow-bead)' }}
+            className="btn-glossy bg-nj-navy w-16 h-16 sm:w-20 sm:h-20 flex items-center justify-center mb-5"
             aria-hidden="true"
           >
-            <Upload className="w-6 h-6 sm:w-7 sm:h-7 text-paper-bg" />
+            <Upload className="w-7 h-7 sm:w-9 sm:h-9 text-nj-cloud" strokeWidth={2.2} />
           </div>
 
           {isProcessing ? (
             <>
-              <p className="font-pixel-arcade text-y2k-navy" style={{ fontSize: 11, letterSpacing: 0.5 }}>
-                PROCESSING...
+              <p
+                className="font-pixel-arcade text-nj-navy"
+                style={{ fontSize: 11, letterSpacing: 1 }}
+              >
+                PROCESSING<span className="animate-pulse">...</span>
               </p>
-              <div className="w-48 h-1 bg-paper-deep overflow-hidden mt-3" style={{ boxShadow: '0 0 0 2px var(--bead-ink)' }}>
-                <div className="h-full bg-terracotta animate-pulse" />
+              <div
+                className="w-48 h-1.5 bg-nj-cloud-deep overflow-hidden mt-3 rounded-full"
+                style={{ boxShadow: 'inset 0 0 0 1px var(--nj-edge)' }}
+              >
+                <div className="h-full bg-nj-navy animate-pulse" />
               </div>
             </>
           ) : (
             <>
-              <p className="text-ink-warm text-base mt-1">拖图到这里 · 或点击上传</p>
-              <p className="font-pixel-arcade text-ink-soft mt-2.5" style={{ fontSize: 9, letterSpacing: 1 }}>
+              <p className="text-nj-ink text-lg font-semibold">拖图到这里</p>
+              <p className="text-nj-ink-soft text-sm mt-1">或点击上传</p>
+              <p
+                className="font-pixel-arcade text-nj-ink-soft mt-3"
+                style={{ fontSize: 9, letterSpacing: 1.5 }}
+              >
                 JPG · PNG · GIF
               </p>
             </>
@@ -387,14 +362,14 @@ export function ImageUploader({ onImageProcessed, onCreateBlank }: ImageUploader
         </div>
       </div>
 
-      {/* 辅助功能：创建空白画布 */}
+      {/* 辅助：空白画布入口 */}
       <div className="text-center">
         <button
           onClick={() => setShowBlankModal(true)}
-          className="inline-flex items-center gap-2 text-sm text-ink-soft hover:text-terracotta transition-colors px-3 py-2 rounded-control focus-visible:outline-2 focus-visible:outline-moss focus-visible:outline-offset-2"
+          className="inline-flex items-center gap-2 text-sm text-nj-ink-soft hover:text-nj-navy transition-colors px-4 py-2 rounded-2xl focus-visible:outline-2 focus-visible:outline-nj-navy focus-visible:outline-offset-2"
         >
           <Grid className="w-4 h-4" aria-hidden="true" />
-          <span>或者，从一张空白画布开始自己拼</span>
+          <span>或者，从一张空白画布开始</span>
         </button>
       </div>
 

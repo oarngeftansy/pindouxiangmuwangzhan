@@ -81,31 +81,34 @@ export function TrendingPatternsPanel({ onUsePattern }: TrendingPatternsPanelPro
 
   return (
     <section>
-      <div className="flex items-center justify-between mb-4 px-1">
-        <h3
-          className="font-pixel-cn text-ink-warm flex items-center gap-2"
-          style={{ fontSize: 'clamp(1.05rem, 1.8vw, 1.3rem)', letterSpacing: '0.05em' }}
-        >
-          <span className="sparkle sparkle-sm sparkle-twinkle" style={{ ['--sparkle-color' as string]: 'var(--y2k-sky)' }} aria-hidden="true" />
-          图鉴
-        </h3>
+      <div className="flex items-baseline justify-between mb-4 px-1">
+        <div className="flex items-baseline gap-3">
+          <h3
+            className="font-wordmark text-nj-navy"
+            style={{ fontSize: 'clamp(1.6rem, 2.6vw, 2rem)' }}
+          >
+            gallery
+          </h3>
+          <span className="text-sm text-nj-ink-soft">·</span>
+          <span className="text-sm text-nj-ink-soft">图鉴</span>
+        </div>
         <span
-          className="font-pixel-arcade text-y2k-navy"
-          style={{ fontSize: 9, letterSpacing: 0.5 }}
+          className="font-pixel-arcade text-nj-navy"
+          style={{ fontSize: 10, letterSpacing: 0.5 }}
         >
           {String(patterns.length).padStart(2, '0')} ITEMS
         </span>
       </div>
 
-      {/* 标签筛选 */}
+      {/* 标签筛选 — NJ glossy pill */}
       {allTags.length > 0 && (
-        <div className="flex flex-wrap gap-2 mb-4 px-1">
+        <div className="flex flex-wrap gap-2 mb-5 px-1">
           <button
             onClick={() => setSelectedTag(null)}
-            className={`px-3 py-1.5 rounded-chip text-xs font-semibold border transition-colors ${
+            className={`px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all ${
               selectedTag === null
-                ? 'bg-terracotta text-paper-bg border-terracotta'
-                : 'bg-paper-soft text-ink-warm border-edge-sand hover:bg-paper-deep'
+                ? 'bg-nj-navy text-nj-cloud nj-shadow-card'
+                : 'bg-nj-cloud text-nj-ink border border-nj-edge hover:bg-nj-cloud-deep'
             }`}
           >
             全部
@@ -114,10 +117,10 @@ export function TrendingPatternsPanel({ onUsePattern }: TrendingPatternsPanelPro
             <button
               key={tag}
               onClick={() => setSelectedTag(tag)}
-              className={`px-3 py-1.5 rounded-chip text-xs font-semibold border transition-colors ${
+              className={`px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all ${
                 selectedTag === tag
-                  ? 'bg-terracotta text-paper-bg border-terracotta'
-                  : 'bg-paper-soft text-ink-warm border-edge-sand hover:bg-paper-deep'
+                  ? 'bg-nj-navy text-nj-cloud nj-shadow-card'
+                  : 'bg-nj-cloud text-nj-ink border border-nj-edge hover:bg-nj-cloud-deep'
               }`}
             >
               {tag}
@@ -132,71 +135,39 @@ export function TrendingPatternsPanel({ onUsePattern }: TrendingPatternsPanelPro
           <button
             key={p.id}
             onClick={() => onUsePattern(p.grid)}
-            className="group relative text-left bg-paper-soft cursor-pointer focus-visible:outline-2 focus-visible:outline-moss focus-visible:outline-offset-2 transition-transform hover:-translate-y-0.5 overflow-hidden"
-            style={{
-              // Y2K 1px 步阶外边 + lavender 双层硬阴影
-              boxShadow: [
-                '0 -2px 0 var(--bead-ink)',
-                '0 2px 0 var(--bead-ink)',
-                '-2px 0 0 var(--bead-ink)',
-                '2px 0 0 var(--bead-ink)',
-                '4px 4px 0 var(--y2k-lavender)',
-              ].join(', '),
-            }}
-            onMouseEnter={(e) => {
-              const s = e.currentTarget.style;
-              s.boxShadow = [
-                '0 -2px 0 var(--bead-ink)', '0 2px 0 var(--bead-ink)',
-                '-2px 0 0 var(--bead-ink)', '2px 0 0 var(--bead-ink)',
-                '4px 4px 0 var(--y2k-sky)',
-              ].join(', ');
-            }}
-            onMouseLeave={(e) => {
-              const s = e.currentTarget.style;
-              s.boxShadow = [
-                '0 -2px 0 var(--bead-ink)', '0 2px 0 var(--bead-ink)',
-                '-2px 0 0 var(--bead-ink)', '2px 0 0 var(--bead-ink)',
-                '4px 4px 0 var(--y2k-lavender)',
-              ].join(', ');
-            }}
+            className="group relative text-left nj-card overflow-hidden cursor-pointer focus-visible:outline-2 focus-visible:outline-nj-navy focus-visible:outline-offset-2 transition-transform hover:-translate-y-1"
           >
-            {/* mini Win95 title bar — 每张卡是一个小窗口 */}
-            <div
-              className="flex items-center justify-between px-1.5"
-              style={{ height: 14, backgroundColor: 'var(--y2k-navy)', color: 'var(--bead-paper-bg)' }}
-            >
-              <span
-                className="font-pixel-arcade truncate"
-                style={{ fontSize: 6, letterSpacing: 0.3 }}
-              >
-                {p.gridWidth}×{p.gridHeight}.PIN
-              </span>
-              <div className="flex gap-px shrink-0" aria-hidden="true">
-                <div className="w-2 h-2 bg-paper-bg/50" />
-                <div className="w-2 h-2 bg-y2k-coral" />
-              </div>
-            </div>
-
-            <div className="relative flex items-center justify-center bg-paper-bg p-2 min-h-[96px] sm:min-h-[120px]">
+            {/* 主图区 — 占 80% */}
+            <div className="relative flex items-center justify-center bg-nj-sky-mist p-3 aspect-[4/3]">
               {p.previewImage ? (
-                <img src={p.previewImage} alt={p.name} className="max-h-[88px] sm:max-h-[110px] max-w-full object-contain" style={{ imageRendering: 'pixelated' }} />
+                <img
+                  src={p.previewImage}
+                  alt={p.name}
+                  className="max-h-full max-w-full object-contain"
+                  style={{ imageRendering: 'pixelated' }}
+                />
               ) : (
                 <PatternThumbnail grid={p.grid} size={100} />
               )}
+              {/* hover 时 glossy + 角标 */}
               <span
-                className="absolute -top-1 -right-1 w-6 h-6 bg-honey text-ink-warm font-pixel-arcade flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                className="absolute top-2 right-2 w-7 h-7 bg-nj-coral text-nj-cloud rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity text-lg font-bold"
                 aria-hidden="true"
-                style={{ fontSize: 10, boxShadow: '2px 2px 0 var(--bead-ink)' }}
+                style={{ boxShadow: '0 2px 6px rgba(44, 58, 94, 0.25)' }}
               >
                 +
               </span>
             </div>
-            <div className="flex items-center justify-between px-2 py-1.5 bg-paper-soft border-t border-edge-sand">
-              <span className="inline-flex items-center gap-1 text-[9px] text-ink-soft">
-                <span className={`w-1.5 h-1.5 ${DIFFICULTY_DOT[p.difficulty]}`} aria-hidden="true" />
+            {/* 信息条 — ID card 风：左 difficulty dot + label，右 bead count（小像素字） */}
+            <div className="flex items-center justify-between px-3 py-2 border-t border-nj-edge bg-nj-cloud">
+              <span className="inline-flex items-center gap-1.5 text-xs text-nj-ink-soft">
+                <span className={`w-1.5 h-1.5 rounded-full ${DIFFICULTY_DOT[p.difficulty]}`} aria-hidden="true" />
                 {DIFFICULTY_LABELS[p.difficulty]}
               </span>
-              <span className="font-pixel-arcade text-ink-soft" style={{ fontSize: 7 }}>
+              <span
+                className="font-pixel-arcade text-nj-navy"
+                style={{ fontSize: 9, letterSpacing: 0.5 }}
+              >
                 {p.beadCount}b
               </span>
             </div>

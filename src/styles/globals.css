@@ -33,6 +33,20 @@
   --y2k-sky:         oklch(0.85 0.06 235);    /* ≈#a8c9e3 婴儿蓝 (NewJeans 大量用) */
   --y2k-mint:        oklch(0.88 0.055 165);   /* ≈#aedccd 薄荷 */
 
+  /* ─────── NewJeans (NJ) 主色 token —— landing/browse 表面用这套
+     替代 paper-cream + terracotta。
+     创作页 (BeadCanvas / 豆子本身) 仍可用 paper-cream 暖色（intimate craft moment） */
+  --nj-sky-mist:     oklch(0.965 0.018 235);  /* ≈#e8eff6 极淡婴儿蓝 — 页面底 */
+  --nj-cloud:        oklch(0.99 0.005 240);   /* ≈#fafcfe 几乎纯白 — 卡片底 */
+  --nj-cloud-deep:   oklch(0.945 0.015 235);  /* ≈#dfe6ee hover 沉淀 */
+  --nj-navy:         oklch(0.32 0.085 265);   /* ≈#2c3a5e NewJeans 招牌深海军蓝 — 主品牌 */
+  --nj-navy-deep:    oklch(0.22 0.075 265);   /* ≈#1d2949 navy active */
+  --nj-ink:          oklch(0.28 0.04 260);    /* ≈#23304a 主文字（深 navy ink） */
+  --nj-ink-soft:     oklch(0.55 0.025 260);   /* ≈#6c7790 副文字 */
+  --nj-edge:         oklch(0.88 0.015 235);   /* ≈#d4dce6 1px 冷边线 */
+  --nj-coral:        oklch(0.78 0.10 22);     /* ≈#e8a48c 柔珊瑚（reuse y2k-coral） */
+  --nj-bunny-pink:   oklch(0.86 0.06 10);     /* ≈#f1c7c1 兔子粉 */
+
   /* Warm shadow base — used by all elevation tokens */
   --bead-shadow-rgba: 168, 130, 90;
 
@@ -120,6 +134,18 @@
   --color-y2k-coral: var(--y2k-coral);
   --color-y2k-sky: var(--y2k-sky);
   --color-y2k-mint: var(--y2k-mint);
+
+  /* NewJeans 主色暴露给 Tailwind — bg-nj-sky-mist / text-nj-navy / border-nj-edge 等 */
+  --color-nj-sky-mist: var(--nj-sky-mist);
+  --color-nj-cloud: var(--nj-cloud);
+  --color-nj-cloud-deep: var(--nj-cloud-deep);
+  --color-nj-navy: var(--nj-navy);
+  --color-nj-navy-deep: var(--nj-navy-deep);
+  --color-nj-ink: var(--nj-ink);
+  --color-nj-ink-soft: var(--nj-ink-soft);
+  --color-nj-edge: var(--nj-edge);
+  --color-nj-coral: var(--nj-coral);
+  --color-nj-bunny-pink: var(--nj-bunny-pink);
 
   /* shadcn-aliased tokens — preserve standard shadcn class API */
   --color-background: var(--background);

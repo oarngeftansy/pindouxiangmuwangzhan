@@ -210,29 +210,65 @@
   letter-spacing: -0.01em;
 }
 
-/* Glossy 圆润按钮 —— Y2K 立体光泽，类似 NewJeans 那种"塑料发亮"按钮 */
+/* Glossy 3D 按钮 V2 — NewJeans "ID Card / Pick My Outfits" 风
+   底色由父元素 bg-* 决定；这里只加 gradient 高光 + 双层阴影 + 鼓起感 */
 .btn-glossy {
   position: relative;
+  border-radius: 18px;
+  /* 上方高光 + 下方暗化，模拟塑料按钮鼓起 */
   background-image: linear-gradient(
     180deg,
-    rgba(255, 255, 255, 0.45) 0%,
-    rgba(255, 255, 255, 0.18) 40%,
-    rgba(0, 0, 0, 0) 41%,
-    rgba(0, 0, 0, 0.08) 100%
+    rgba(255, 255, 255, 0.32) 0%,
+    rgba(255, 255, 255, 0.12) 38%,
+    rgba(0, 0, 0, 0) 50%,
+    rgba(0, 0, 0, 0.10) 100%
   );
-  border-radius: 14px;
-  /* 像素 + 暖色双阴影 */
   box-shadow:
-    0 2px 0 rgba(58, 52, 42, 0.4),
-    0 4px 0 rgba(168, 130, 90, 0.25),
-    inset 0 1px 0 rgba(255, 255, 255, 0.6);
-  transition: transform 0.1s ease, box-shadow 0.1s ease;
+    /* 内高光 (顶部白边) */
+    inset 0 1.5px 0 rgba(255, 255, 255, 0.55),
+    /* 内暗影 (底部黑边) */
+    inset 0 -2px 0 rgba(0, 0, 0, 0.18),
+    /* 外软阴影 */
+    0 4px 12px rgba(44, 58, 94, 0.20),
+    0 2px 4px rgba(44, 58, 94, 0.15);
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
+}
+.btn-glossy:hover {
+  transform: translateY(-1px);
+  box-shadow:
+    inset 0 1.5px 0 rgba(255, 255, 255, 0.6),
+    inset 0 -2px 0 rgba(0, 0, 0, 0.18),
+    0 6px 16px rgba(44, 58, 94, 0.25),
+    0 2px 6px rgba(44, 58, 94, 0.18);
 }
 .btn-glossy:active {
-  transform: translateY(2px);
+  transform: translateY(1px);
   box-shadow:
-    0 1px 0 rgba(58, 52, 42, 0.3),
-    inset 0 1px 0 rgba(255, 255, 255, 0.4);
+    inset 0 1px 0 rgba(255, 255, 255, 0.4),
+    inset 0 2px 4px rgba(0, 0, 0, 0.15),
+    0 2px 6px rgba(44, 58, 94, 0.15);
+}
+
+/* NewJeans 风软阴影（冷调，配 navy ink） */
+.nj-shadow {
+  box-shadow:
+    0 2px 6px rgba(44, 58, 94, 0.08),
+    0 8px 24px -6px rgba(44, 58, 94, 0.14);
+}
+.nj-shadow-card {
+  box-shadow:
+    0 1px 3px rgba(44, 58, 94, 0.06),
+    0 4px 16px -4px rgba(44, 58, 94, 0.10);
+}
+
+/* ID card / photo card 风：白底 + 圆角 + 冷软阴影 + 1px 冷边 */
+.nj-card {
+  background: var(--nj-cloud);
+  border: 1px solid var(--nj-edge);
+  border-radius: 18px;
+  box-shadow:
+    0 1px 3px rgba(44, 58, 94, 0.05),
+    0 6px 18px -6px rgba(44, 58, 94, 0.12);
 }
 
 /* 闪光装饰星 — sparkle / star，CSS 直接画一颗 4 角星，可改色 */
