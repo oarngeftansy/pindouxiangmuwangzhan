@@ -224,18 +224,19 @@ export function BeadCanvas({
   const baseSize = 20; // 基础尺寸20px，更合理的拼豆板大小
   const beadSize = baseSize * zoom;
 
-  // 自适应计算拼豆板缩放 - 让拼豆板充满工作区
+  // 自适应计算拼豆板缩放 — 让正方形拼豆板充满工作区
   useEffect(() => {
     if (viewMode === 'pegboard') {
       const updateScale = () => {
         const gridWidth = workingGrid[0]?.length || referenceGrid[0]?.length || 30;
         const gridHeight = workingGrid.length || referenceGrid.length || 30;
+        // 板永远是正方形，边长 = max(cols, rows)
+        const boardDim = Math.max(gridWidth, gridHeight);
 
-        const padding = 16;
-        const border = 6;
+        const padding = 8;
+        const border = 4;
         const extra = (padding + border) * 2;
 
-        // 可用空间
         const landscape = window.innerWidth > window.innerHeight;
         const isEffectivelyMobile = !landscape && window.innerWidth < 768;
         const sidebarW = isEffectivelyMobile ? 0 : window.innerWidth < 1024 ? 260 : 320;
@@ -243,15 +244,12 @@ export function BeadCanvas({
         const availableWidth = window.innerWidth - sidebarW - 80;
         const availableHeight = window.innerHeight - 160;
 
-        // 直接算每个格子最大能多大
-        const maxCellByWidth = (availableWidth - extra) / gridWidth;
-        const maxCellByHeight = (availableHeight - extra) / gridHeight;
+        // 正方形板用 boardDim 作两轴尺寸
+        const maxCellByWidth = (availableWidth - extra) / boardDim;
+        const maxCellByHeight = (availableHeight - extra) / boardDim;
         const optimalCell = Math.min(maxCellByWidth, maxCellByHeight);
 
-        // 不再用 CSS scale，直接用 scale=1，通过调整 beadSize 的倍率达到效果
-        // pegboardScale 现在表示 beadSize 的乘数
         const cellScale = Math.max(0.3, optimalCell / baseSize);
-
         setPegboardScale(cellScale);
       };
 
@@ -1380,7 +1378,14 @@ export function BeadCanvas({
                   </button>
                 </div>
               )}
-              <div className="bg-paper-deep rounded-surface p-2 flex items-center justify-center flex-1 overflow-auto min-h-0">
+              <div
+                className="bg-paper-deep rounded-surface p-2 flex-1 overflow-auto min-h-0"
+                style={{
+                  // 关键：scroll 容器允许 pan 滚动，让用户能滑到正方形板的任何位置
+                  // 不再 flex justify-center（中心化会让超大板对称溢出 = 触不到左缘）
+                  touchAction: 'pan-x pan-y pinch-zoom',
+                }}
+              >
                 {(() => {
                   const cols = workingGrid[0].length;
                   const rows = workingGrid.length;
@@ -1390,7 +1395,7 @@ export function BeadCanvas({
                   const boardPx = boardDim * cellSize;
                   return (
                     <div
-                      className="rounded-control relative"
+                      className="rounded-control relative inline-block"
                       style={{
                         backgroundColor: 'oklch(0.985 0.006 80)',
                         boxShadow: 'inset 0 2px 8px rgba(44, 58, 94, 0.08), 0 4px 16px rgba(44, 58, 94, 0.18)',
@@ -1407,9 +1412,8 @@ export function BeadCanvas({
                           width: boardPx,
                           height: boardPx,
                           backgroundColor: 'transparent',
-                          // touch-action: none 让画布拥有完整 touch 控制权
-                          // 阻止浏览器默认 pan/swipe（特别是左缘 swipe-back），
-                          // 修复用户反馈"拖不到最左边填豆"的 bug
+                          // 画布本体不响应浏览器 pan/swipe，把 touch 完全交给 React
+                          // 滚动靠外层 scroll 容器 + 用户触摸外围 padding 区域实现
                           touchAction: 'none',
                           overscrollBehavior: 'contain',
                           userSelect: 'none',
