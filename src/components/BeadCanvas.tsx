@@ -33,6 +33,30 @@ import { PegboardCell } from "./PegboardCell";
 import { ViewModeToggle } from "./ViewModeToggle";
 import { loadCanvasParams, type CanvasParams } from "../data/canvasParams";
 import { saveOrShareImage, tapHaptic } from "../utils/native";
+import {
+  ChromeWindow,
+  TitleBar,
+  CornerPearls,
+  WIN95_SHADOW,
+  CARD_SHADOW,
+  BUTTON_SHADOW,
+  BUTTON_SHADOW_NAVY,
+  INPUT_SHADOW,
+} from "./ChromeWindow";
+import { PixelArrow } from "./PixelDecorations";
+
+// 工具栏小按钮 chrome 风样式 — 未按下 vs 按下两态共用
+const toolBtnStyle = (pressed: boolean): React.CSSProperties => ({
+  backgroundColor: pressed ? 'var(--y2k-navy)' : 'var(--bead-paper-soft)',
+  color: pressed ? 'var(--bead-paper-bg)' : 'var(--bead-ink)',
+  boxShadow: [
+    '0 -2px 0 var(--y2k-navy)',
+    '0 2px 0 var(--y2k-navy)',
+    '-2px 0 0 var(--y2k-navy)',
+    '2px 0 0 var(--y2k-navy)',
+    pressed ? '2px 2px 0 var(--y2k-coral)' : '3px 3px 0 var(--y2k-navy-deep)',
+  ].join(', '),
+});
 
 // 暂时隐藏高清渲染入口；将来重启用时翻成 true，工具栏 / 手机底栏 / 完成 modal 三处会一起恢复。
 const SHOW_HD_RENDER = false;
@@ -683,18 +707,24 @@ export function BeadCanvas({
 
   return (
     <div className="flex flex-col gap-3" style={{ minHeight: 'calc(100dvh - 80px)' }}>
-      {/* 工具栏 */}
-      <div className="bg-paper-soft border border-edge-sand rounded-card p-3 sm:p-4 shrink-0">
-        <div className={`flex items-center gap-2 ${isMobile ? 'flex-wrap gap-y-2' : 'flex-wrap gap-3'}`}>
-          {/* 工具选择 */}
-          <div className="flex gap-2">
+      {/* TOOLBAR.EXE 工具栏 */}
+      <div className="relative shrink-0">
+        <div
+          className="relative bg-paper-bg p-3 pt-7 sm:p-4 sm:pt-8"
+          style={{
+            boxShadow: WIN95_SHADOW,
+            backgroundImage:
+              'radial-gradient(circle, rgba(44, 58, 94, 0.05) 1px, transparent 1px)',
+            backgroundSize: '14px 14px',
+          }}
+        >
+          <TitleBar name="TOOLBAR.EXE" />
+          <div className={`flex items-center gap-2.5 ${isMobile ? 'flex-wrap gap-y-2.5' : 'flex-wrap gap-3'}`}>
+            {/* 画笔 / 橡皮 */}
             <button
               onClick={() => setActiveTool("brush")}
-              className={`inline-flex items-center justify-center min-h-[44px] min-w-[44px] p-3 rounded-control border transition-colors focus-visible:outline-2 focus-visible:outline-moss focus-visible:outline-offset-2 ${
-                activeTool === "brush"
-                  ? "bg-moss text-paper-bg border-moss"
-                  : "bg-paper-bg text-ink-warm border-edge-sand hover:bg-paper-deep"
-              }`}
+              className="inline-flex items-center justify-center min-h-[40px] min-w-[40px] p-2.5 transition-transform hover:-translate-y-0.5 active:translate-x-[1px] active:translate-y-[1px]"
+              style={toolBtnStyle(activeTool === "brush")}
               aria-label="画笔"
               aria-pressed={activeTool === "brush"}
             >
@@ -702,166 +732,199 @@ export function BeadCanvas({
             </button>
             <button
               onClick={() => setActiveTool("eraser")}
-              className={`inline-flex items-center justify-center min-h-[44px] min-w-[44px] p-3 rounded-control border transition-colors focus-visible:outline-2 focus-visible:outline-moss focus-visible:outline-offset-2 ${
-                activeTool === "eraser"
-                  ? "bg-moss text-paper-bg border-moss"
-                  : "bg-paper-bg text-ink-warm border-edge-sand hover:bg-paper-deep"
-              }`}
+              className="inline-flex items-center justify-center min-h-[40px] min-w-[40px] p-2.5 transition-transform hover:-translate-y-0.5 active:translate-x-[1px] active:translate-y-[1px]"
+              style={toolBtnStyle(activeTool === "eraser")}
               aria-label="橡皮"
               aria-pressed={activeTool === "eraser"}
             >
               <Eraser className="w-5 h-5" aria-hidden="true" />
             </button>
-          </div>
 
-          <div className="h-8 w-px bg-edge-sand" aria-hidden="true" />
+            <div className="h-7 w-px bg-y2k-navy" aria-hidden="true" />
 
-          {/* 缩放控制 */}
-          <div className="flex items-center gap-2">
+            {/* 缩放控制 */}
             <button
               onClick={handleZoomOut}
-              className="inline-flex items-center justify-center min-h-[44px] min-w-[44px] p-2 rounded-control bg-paper-bg border border-edge-sand text-ink-warm hover:bg-paper-deep transition-colors focus-visible:outline-2 focus-visible:outline-moss focus-visible:outline-offset-2"
+              className="inline-flex items-center justify-center min-h-[40px] min-w-[40px] p-2 transition-transform hover:-translate-y-0.5 active:translate-x-[1px] active:translate-y-[1px]"
+              style={toolBtnStyle(false)}
               aria-label="缩小"
             >
               <ZoomOut className="w-5 h-5" aria-hidden="true" />
             </button>
-            <span className="text-sm font-semibold w-12 text-center text-ink-warm" style={{ fontFamily: 'var(--font-num)' }}>
+            <span
+              className="font-pixel-arcade text-y2k-navy text-center"
+              style={{ fontSize: 10, width: 42, letterSpacing: '0.05em' }}
+            >
               {Math.round(zoom * 100)}%
             </span>
             <button
               onClick={handleZoomIn}
-              className="inline-flex items-center justify-center min-h-[44px] min-w-[44px] p-2 rounded-control bg-paper-bg border border-edge-sand text-ink-warm hover:bg-paper-deep transition-colors focus-visible:outline-2 focus-visible:outline-moss focus-visible:outline-offset-2"
+              className="inline-flex items-center justify-center min-h-[40px] min-w-[40px] p-2 transition-transform hover:-translate-y-0.5 active:translate-x-[1px] active:translate-y-[1px]"
+              style={toolBtnStyle(false)}
               aria-label="放大"
             >
               <ZoomIn className="w-5 h-5" aria-hidden="true" />
             </button>
-          </div>
 
-          <div className="h-8 w-px bg-edge-sand" aria-hidden="true" />
+            <div className="h-7 w-px bg-y2k-navy" aria-hidden="true" />
 
-          {/* 网格显示 */}
-          <button
-            onClick={() => setShowGrid(!showGrid)}
-            className={`inline-flex items-center justify-center min-h-[44px] min-w-[44px] p-2 rounded-control border transition-colors focus-visible:outline-2 focus-visible:outline-moss focus-visible:outline-offset-2 ${
-              showGrid
-                ? "bg-paper-deep text-moss border-moss"
-                : "bg-paper-bg text-ink-warm border-edge-sand hover:bg-paper-deep"
-            }`}
-            title="网格"
-            aria-label="切换网格显示"
-            aria-pressed={showGrid}
-          >
-            <GridIcon className="w-5 h-5" aria-hidden="true" />
-          </button>
+            {/* 网格 */}
+            <button
+              onClick={() => setShowGrid(!showGrid)}
+              className="inline-flex items-center justify-center min-h-[40px] min-w-[40px] p-2 transition-transform hover:-translate-y-0.5 active:translate-x-[1px] active:translate-y-[1px]"
+              style={toolBtnStyle(showGrid)}
+              title="网格"
+              aria-label="切换网格显示"
+              aria-pressed={showGrid}
+            >
+              <GridIcon className="w-5 h-5" aria-hidden="true" />
+            </button>
 
-          {/* 参考图纸显示 — 手机端打开时同步展开 sidebar，否则用户看不见 */}
-          <button
-            onClick={() => {
-              const next = !showReference;
-              setShowReference(next);
-              if (next && isMobile) setSidebarCollapsed(false);
-            }}
-            className={`inline-flex items-center min-h-[44px] gap-2 px-3 py-2 rounded-control border transition-colors focus-visible:outline-2 focus-visible:outline-moss focus-visible:outline-offset-2 ${
-              showReference
-                ? "bg-paper-deep text-moss border-moss"
-                : "bg-paper-bg text-ink-warm border-edge-sand hover:bg-paper-deep"
-            }`}
-            aria-pressed={showReference}
-          >
-            {showReference ? <Eye className="w-5 h-5" aria-hidden="true" /> : <EyeOff className="w-5 h-5" aria-hidden="true" />}
-            <span className="text-sm font-semibold hidden sm:inline">参考图纸</span>
-          </button>
-
-          {/* 材料清单显示 - 只在拼豆板模式下显示 */}
-          {viewMode === 'pegboard' && (
+            {/* 参考图纸 */}
             <button
               onClick={() => {
-                const next = !showMaterialList;
-                setShowMaterialList(next);
+                const next = !showReference;
+                setShowReference(next);
                 if (next && isMobile) setSidebarCollapsed(false);
               }}
-              className={`inline-flex items-center min-h-[44px] gap-2 px-3 py-2 rounded-control border transition-colors focus-visible:outline-2 focus-visible:outline-moss focus-visible:outline-offset-2 ${
-                showMaterialList
-                  ? "bg-paper-deep text-moss border-moss"
-                  : "bg-paper-bg text-ink-warm border-edge-sand hover:bg-paper-deep"
-              }`}
-              aria-pressed={showMaterialList}
+              className="inline-flex items-center min-h-[40px] gap-2 px-3 py-2 font-pixel-cn transition-transform hover:-translate-y-0.5 active:translate-x-[1px] active:translate-y-[1px]"
+              style={{ ...toolBtnStyle(showReference), fontSize: 11, letterSpacing: '0.05em' }}
+              aria-pressed={showReference}
             >
-              {showMaterialList ? <Square className="w-5 h-5" aria-hidden="true" /> : <EyeOff className="w-5 h-5" aria-hidden="true" />}
-              <span className="text-sm font-semibold hidden sm:inline">材料清单</span>
+              {showReference ? <Eye className="w-5 h-5" aria-hidden="true" /> : <EyeOff className="w-5 h-5" aria-hidden="true" />}
+              <span className="hidden sm:inline">参考图纸</span>
             </button>
-          )}
 
-          {/* 滑豆模式 + 锁色指示 — 桌面内联，手机隐藏（改为画布浮动徽章） */}
-          {lockedColor && !isMobile && (
-            <>
-              <div className="h-8 w-px bg-edge-sand" aria-hidden="true" />
-              <div className="flex items-center gap-2 px-3 py-2 bg-paper-bg border border-edge-sand rounded-control">
-                <span className="text-sm font-semibold text-ink-warm hidden sm:inline">滑豆</span>
-                <button
-                  onClick={() => setPourMode(!pourMode)}
-                  className={`relative w-12 h-6 rounded-bead transition-colors duration-300 ${pourMode ? "bg-terracotta" : "bg-bead-shadow"}`}
-                  aria-label="切换滑豆模式"
-                  aria-pressed={pourMode}
-                >
-                  <div
-                    className={`absolute top-0.5 left-0.5 w-5 h-5 bg-paper-bg rounded-bead transition-transform duration-300 flex items-center justify-center ${pourMode ? "translate-x-6" : "translate-x-0"}`}
-                    style={{ boxShadow: '0 1px 2px rgba(58, 52, 42, 0.2)' }}
-                  >
-                    {pourMode && <Zap className="w-3 h-3 text-terracotta" aria-hidden="true" />}
-                  </div>
-                </button>
-              </div>
-              <div className="h-8 w-px bg-edge-sand" aria-hidden="true" />
-              <div className="flex items-center gap-2 px-3 py-2 bg-honey-glow/40 border border-honey/50 rounded-control">
-                <div className="w-6 h-6 rounded-bead border border-edge-sand" style={{ backgroundColor: lockedColor }} aria-hidden="true" />
-                <span className="text-sm font-semibold text-ink-warm" style={{ fontFamily: 'var(--font-num)' }}>
-                  锁定 {getColorCode(lockedColor)}
-                </span>
-                {pourMode && <Zap className="w-3.5 h-3.5 text-terracotta" aria-hidden="true" />}
-                <button
-                  onClick={() => { setLockedColor(null); setPourMode(false); }}
-                  className="ml-1 text-ink-soft hover:text-ink-warm text-xs underline transition-colors"
-                  aria-label="解锁颜色"
-                >
-                  解锁
-                </button>
-              </div>
-            </>
-          )}
-
-          {/* 右侧按钮组 - 桌面/iPad内联，手机隐藏（底部栏显示） */}
-          <div className="ml-auto hidden sm:flex flex-wrap gap-2">
-            <button
-              onClick={() => setShowIroningModal(true)}
-              disabled={isIroning}
-              className="inline-flex items-center gap-2 min-h-[44px] px-3 sm:px-5 py-2.5 bg-terracotta text-paper-bg rounded-control hover:bg-terracotta-deep transition-colors disabled:opacity-50 disabled:cursor-not-allowed font-semibold whitespace-nowrap focus-visible:outline-2 focus-visible:outline-moss focus-visible:outline-offset-2"
-              style={{ boxShadow: 'var(--shadow-lift-bead)' }}
-              title="一键熨烫"
-            >
-              <Flame className={`w-5 h-5 ${isIroning ? 'animate-pulse' : ''}`} aria-hidden="true" />
-              <span className="hidden sm:inline">{isIroning ? '熨烫中…' : '一键熨烫'}</span>
-            </button>
-            {SHOW_HD_RENDER && (
+            {viewMode === 'pegboard' && (
               <button
-                onClick={() => setShowHDModal(true)}
-                className="inline-flex items-center gap-2 min-h-[44px] px-3 sm:px-5 py-2.5 bg-paper-bg border border-edge-sand text-ink-warm rounded-control hover:bg-paper-deep transition-colors font-semibold whitespace-nowrap focus-visible:outline-2 focus-visible:outline-moss focus-visible:outline-offset-2"
-                title="高清渲染"
+                onClick={() => {
+                  const next = !showMaterialList;
+                  setShowMaterialList(next);
+                  if (next && isMobile) setSidebarCollapsed(false);
+                }}
+                className="inline-flex items-center min-h-[40px] gap-2 px-3 py-2 font-pixel-cn transition-transform hover:-translate-y-0.5 active:translate-x-[1px] active:translate-y-[1px]"
+                style={{ ...toolBtnStyle(showMaterialList), fontSize: 11, letterSpacing: '0.05em' }}
+                aria-pressed={showMaterialList}
               >
-                <Sparkles className="w-5 h-5" aria-hidden="true" />
-                <span className="hidden sm:inline">高清渲染</span>
+                {showMaterialList ? <Square className="w-5 h-5" aria-hidden="true" /> : <EyeOff className="w-5 h-5" aria-hidden="true" />}
+                <span className="hidden sm:inline">材料清单</span>
               </button>
             )}
-            <button
-              onClick={downloadCanvas}
-              className="inline-flex items-center gap-2 min-h-[44px] px-3 sm:px-5 py-2.5 bg-paper-bg border border-edge-sand text-ink-warm rounded-control hover:bg-paper-deep transition-colors font-semibold whitespace-nowrap focus-visible:outline-2 focus-visible:outline-moss focus-visible:outline-offset-2"
-              title="下载图纸"
-            >
-              <Download className="w-5 h-5" aria-hidden="true" />
-              <span className="hidden sm:inline">下载图纸</span>
-            </button>
+
+            {/* 滑豆模式 + 锁色指示（桌面内联） */}
+            {lockedColor && !isMobile && (
+              <>
+                <div className="h-7 w-px bg-y2k-navy" aria-hidden="true" />
+                <div
+                  className="flex items-center gap-2 px-3 py-2 bg-paper-soft"
+                  style={{ boxShadow: INPUT_SHADOW }}
+                >
+                  <span className="font-pixel-cn text-ink-warm" style={{ fontSize: 11 }}>滑豆</span>
+                  <button
+                    onClick={() => setPourMode(!pourMode)}
+                    className="relative w-12 h-6 transition-colors duration-300"
+                    style={{
+                      backgroundColor: pourMode ? 'var(--y2k-coral)' : 'var(--y2k-navy-deep)',
+                      boxShadow: [
+                        '0 -1px 0 var(--y2k-navy)',
+                        '0 1px 0 var(--y2k-navy)',
+                        '-1px 0 0 var(--y2k-navy)',
+                        '1px 0 0 var(--y2k-navy)',
+                      ].join(', '),
+                    }}
+                    aria-label="切换滑豆模式"
+                    aria-pressed={pourMode}
+                  >
+                    <div
+                      className={`absolute top-0.5 left-0.5 w-5 h-5 bg-paper-bg transition-transform duration-300 flex items-center justify-center ${pourMode ? "translate-x-6" : "translate-x-0"}`}
+                      style={{
+                        boxShadow: [
+                          '0 -1px 0 var(--y2k-navy)',
+                          '0 1px 0 var(--y2k-navy)',
+                          '-1px 0 0 var(--y2k-navy)',
+                          '1px 0 0 var(--y2k-navy)',
+                        ].join(', '),
+                      }}
+                    >
+                      {pourMode && <Zap className="w-3 h-3 text-y2k-coral" aria-hidden="true" />}
+                    </div>
+                  </button>
+                </div>
+                <div
+                  className="flex items-center gap-2 px-3 py-2 bg-paper-soft"
+                  style={{ boxShadow: INPUT_SHADOW }}
+                >
+                  <div
+                    className="w-5 h-5"
+                    style={{
+                      backgroundColor: lockedColor,
+                      boxShadow: [
+                        '0 -1px 0 var(--y2k-navy)',
+                        '0 1px 0 var(--y2k-navy)',
+                        '-1px 0 0 var(--y2k-navy)',
+                        '1px 0 0 var(--y2k-navy)',
+                      ].join(', '),
+                    }}
+                    aria-hidden="true"
+                  />
+                  <span className="font-pixel-arcade text-y2k-navy" style={{ fontSize: 10, letterSpacing: '0.05em' }}>
+                    LOCK {getColorCode(lockedColor)}
+                  </span>
+                  {pourMode && <Zap className="w-3.5 h-3.5 text-y2k-coral" aria-hidden="true" />}
+                  <button
+                    onClick={() => { setLockedColor(null); setPourMode(false); }}
+                    className="ml-1 font-pixel-arcade text-y2k-coral hover:text-y2k-coral/70 transition-colors"
+                    style={{ fontSize: 9, letterSpacing: '0.05em' }}
+                    aria-label="解锁颜色"
+                  >
+                    × UNLOCK
+                  </button>
+                </div>
+              </>
+            )}
+
+            {/* 右侧主操作（桌面） */}
+            <div className="ml-auto hidden sm:flex flex-wrap gap-3">
+              <button
+                onClick={() => setShowIroningModal(true)}
+                disabled={isIroning}
+                className="arcade-pill font-pixel-cn text-paper-bg cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
+                style={{
+                  backgroundColor: 'var(--y2k-navy)',
+                  fontSize: 13,
+                  letterSpacing: '0.1em',
+                  padding: '10px 22px',
+                }}
+                title="一键熨烫"
+              >
+                <Flame className={`w-4 h-4 ${isIroning ? 'animate-pulse' : ''}`} aria-hidden="true" />
+                <span>{isIroning ? '熨烫中…' : '一键熨烫'}</span>
+                {!isIroning && <PixelArrow size={12} color="var(--bead-paper-bg)" />}
+              </button>
+              {SHOW_HD_RENDER && (
+                <button
+                  onClick={() => setShowHDModal(true)}
+                  className="inline-flex items-center gap-2 min-h-[40px] px-4 py-2 font-pixel-cn whitespace-nowrap transition-transform hover:-translate-y-0.5 active:translate-x-[1px] active:translate-y-[1px]"
+                  style={{ ...toolBtnStyle(false), fontSize: 12, letterSpacing: '0.05em' }}
+                  title="高清渲染"
+                >
+                  <Sparkles className="w-4 h-4" aria-hidden="true" />
+                  <span>高清渲染</span>
+                </button>
+              )}
+              <button
+                onClick={downloadCanvas}
+                className="inline-flex items-center gap-2 min-h-[40px] px-4 py-2 font-pixel-cn whitespace-nowrap transition-transform hover:-translate-y-0.5 active:translate-x-[1px] active:translate-y-[1px]"
+                style={{ ...toolBtnStyle(false), fontSize: 12, letterSpacing: '0.05em' }}
+                title="下载图纸"
+              >
+                <Download className="w-4 h-4" aria-hidden="true" />
+                <span>下载图纸</span>
+              </button>
+            </div>
           </div>
         </div>
+        <CornerPearls />
       </div>
 
       {/* 手机专用底部操作栏 */}
@@ -870,26 +933,33 @@ export function BeadCanvas({
           <button
             onClick={() => setShowIroningModal(true)}
             disabled={isIroning}
-            className="flex-1 inline-flex items-center justify-center gap-2 min-h-[48px] py-3 bg-terracotta text-paper-bg rounded-control font-semibold disabled:opacity-50 disabled:cursor-not-allowed focus-visible:outline-2 focus-visible:outline-moss focus-visible:outline-offset-2"
-            style={{ boxShadow: 'var(--shadow-lift-bead)' }}
+            className="flex-1 arcade-pill font-pixel-cn text-paper-bg cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+            style={{
+              backgroundColor: 'var(--y2k-navy)',
+              fontSize: 12,
+              letterSpacing: '0.1em',
+              padding: '12px 16px',
+            }}
           >
-            <Flame className={`w-5 h-5 ${isIroning ? 'animate-pulse' : ''}`} aria-hidden="true" />
+            <Flame className={`w-4 h-4 ${isIroning ? 'animate-pulse' : ''}`} aria-hidden="true" />
             {isIroning ? '熨烫中…' : '一键熨烫'}
           </button>
           {SHOW_HD_RENDER && (
             <button
               onClick={() => setShowHDModal(true)}
-              className="flex-1 inline-flex items-center justify-center gap-2 min-h-[48px] py-3 bg-paper-soft border border-edge-sand text-ink-warm rounded-control font-semibold focus-visible:outline-2 focus-visible:outline-moss focus-visible:outline-offset-2"
+              className="flex-1 inline-flex items-center justify-center gap-2 min-h-[48px] py-3 font-pixel-cn"
+              style={{ ...toolBtnStyle(false), fontSize: 12, letterSpacing: '0.05em' }}
             >
-              <Sparkles className="w-5 h-5" aria-hidden="true" />
+              <Sparkles className="w-4 h-4" aria-hidden="true" />
               高清
             </button>
           )}
           <button
             onClick={downloadCanvas}
-            className="flex-1 inline-flex items-center justify-center gap-2 min-h-[48px] py-3 bg-paper-soft border border-edge-sand text-ink-warm rounded-control font-semibold focus-visible:outline-2 focus-visible:outline-moss focus-visible:outline-offset-2"
+            className="flex-1 inline-flex items-center justify-center gap-2 min-h-[48px] py-3 font-pixel-cn"
+            style={{ ...toolBtnStyle(false), fontSize: 12, letterSpacing: '0.05em' }}
           >
-            <Download className="w-5 h-5" aria-hidden="true" />
+            <Download className="w-4 h-4" aria-hidden="true" />
             下载
           </button>
         </div>
@@ -900,39 +970,67 @@ export function BeadCanvas({
       {isMobile && showRotateModal && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center p-6 animate-in fade-in duration-200"
-          style={{ backgroundColor: 'rgba(58, 52, 42, 0.55)' }}
+          style={{ backgroundColor: 'rgba(44, 58, 94, 0.55)' }}
           onClick={dismissRotateModal}
           role="dialog"
           aria-modal="true"
           aria-labelledby="rotate-modal-title"
         >
-          <div
-            className="relative bg-paper-bg border border-edge-sand rounded-card max-w-sm w-full p-7 sm:p-8 animate-in zoom-in-95 duration-200"
-            style={{ boxShadow: 'var(--shadow-lift-card)' }}
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="flex flex-col items-center text-center">
-              <div className="w-20 h-20 rounded-card bg-honey-glow flex items-center justify-center mb-5">
-                <RotateCw className="w-10 h-10 text-terracotta animate-rotate-hint" aria-hidden="true" />
+          <div className="relative max-w-sm w-full animate-in zoom-in-95 duration-200" onClick={(e) => e.stopPropagation()}>
+            <div
+              className="relative bg-paper-bg pt-7 px-6 pb-6 sm:px-7 sm:pb-7"
+              style={{
+                boxShadow: WIN95_SHADOW,
+                backgroundImage:
+                  'radial-gradient(circle, rgba(44, 58, 94, 0.05) 1px, transparent 1px)',
+                backgroundSize: '14px 14px',
+              }}
+            >
+              <TitleBar name="HINT.EXE" onClose={dismissRotateModal} />
+              <div className="flex flex-col items-center text-center">
+                <div
+                  className="w-20 h-20 bg-y2k-coral flex items-center justify-center mb-5"
+                  style={{
+                    boxShadow: [
+                      '0 -2px 0 var(--y2k-navy)',
+                      '0 2px 0 var(--y2k-navy)',
+                      '-2px 0 0 var(--y2k-navy)',
+                      '2px 0 0 var(--y2k-navy)',
+                      '4px 4px 0 var(--y2k-navy-deep)',
+                    ].join(', '),
+                  }}
+                >
+                  <RotateCw className="w-10 h-10 text-paper-bg animate-rotate-hint" aria-hidden="true" />
+                </div>
+                <h3
+                  id="rotate-modal-title"
+                  className="font-pixel-cn text-ink-warm mb-3"
+                  style={{ fontSize: 22, letterSpacing: '0.1em', lineHeight: 1.2 }}
+                >
+                  请试试横屏
+                </h3>
+                <p
+                  className="font-pixel-cn text-ink-soft mb-6 leading-relaxed"
+                  style={{ fontSize: 11, letterSpacing: '0.03em' }}
+                >
+                  画布会大很多，参考图 / 材料清单能一屏看到
+                </p>
+                <button
+                  onClick={dismissRotateModal}
+                  className="w-full arcade-pill font-pixel-cn text-paper-bg cursor-pointer"
+                  style={{
+                    backgroundColor: 'var(--y2k-navy)',
+                    fontSize: 13,
+                    letterSpacing: '0.1em',
+                    padding: '12px 18px',
+                  }}
+                >
+                  <span>知道了</span>
+                  <PixelArrow size={12} color="var(--bead-paper-bg)" />
+                </button>
               </div>
-              <h3
-                id="rotate-modal-title"
-                className="text-xl font-semibold text-ink-warm mb-2"
-                style={{ fontFamily: 'var(--font-headline)' }}
-              >
-                请试试横屏
-              </h3>
-              <p className="text-sm text-ink-soft mb-6 leading-relaxed">
-                画布会大很多，参考图、材料清单都能在一屏看到，操作也更精准。
-              </p>
-              <button
-                onClick={dismissRotateModal}
-                className="w-full inline-flex items-center justify-center min-h-[48px] px-6 py-3 bg-terracotta text-paper-bg rounded-control font-semibold hover:bg-terracotta-deep transition-colors focus-visible:outline-2 focus-visible:outline-moss focus-visible:outline-offset-2"
-                style={{ boxShadow: 'var(--shadow-lift-bead)' }}
-              >
-                知道了
-              </button>
             </div>
+            <CornerPearls />
           </div>
         </div>
       )}
@@ -1007,7 +1105,7 @@ export function BeadCanvas({
                 限制只在 sidebar 内"贴"，滚到 canvas 就消失；fixed 不受影响）*/}
             {showReference && (
           <div
-            className="bg-paper-soft border border-edge-sand rounded-card overflow-hidden"
+            className="relative bg-paper-bg overflow-hidden"
             style={referencePinned ? {
               position: 'fixed',
               top: '8px',
@@ -1016,44 +1114,41 @@ export function BeadCanvas({
               zIndex: 40,
               maxHeight: '50vh',
               overflowY: 'auto',
-              boxShadow: 'var(--shadow-lift-card)',
-            } : undefined}
+              boxShadow: CARD_SHADOW,
+              paddingTop: 20,
+            } : { boxShadow: CARD_SHADOW, paddingTop: 20 }}
           >
-            {/* 顶部标题栏 */}
-            <div className="bg-paper-deep border-b border-edge-sand text-ink-warm px-4 py-2.5 flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <Eye className="w-4 h-4 text-moss" aria-hidden="true" />
-                <span className="font-semibold text-sm">参考图纸</span>
-                {referencePinned && (
-                  <span className="text-xs text-moss font-semibold">· 已置顶</span>
-                )}
-              </div>
-              <div className="flex items-center gap-1">
+            {/* REF.EXE title bar */}
+            <div
+              className="absolute left-0 right-0 flex items-center justify-between px-2"
+              style={{ top: 2, height: 16, backgroundColor: 'var(--y2k-navy)', color: 'var(--bead-paper-bg)' }}
+            >
+              <span className="font-pixel-arcade" style={{ fontSize: 8, letterSpacing: 0 }}>
+                REF.EXE{referencePinned ? ' · PINNED' : ''}
+              </span>
+              <div className="flex gap-0.5 items-center">
                 <button
                   onClick={togglePinReference}
-                  className={`inline-flex items-center justify-center min-h-[36px] min-w-[36px] rounded-control transition-colors ${
-                    referencePinned
-                      ? 'text-moss hover:bg-paper-bg'
-                      : 'text-ink-soft hover:bg-paper-bg hover:text-ink-warm'
-                  }`}
+                  className="w-2.5 h-2.5 flex items-center justify-center"
+                  style={{ backgroundColor: referencePinned ? 'var(--y2k-coral)' : 'var(--bead-paper-bg)', opacity: referencePinned ? 1 : 0.8 }}
                   title={referencePinned ? '取消置顶' : '置顶到视口顶部'}
                   aria-label={referencePinned ? '取消置顶参考图' : '置顶参考图'}
                   aria-pressed={referencePinned}
-                >
-                  {referencePinned ? (
-                    <PinOff className="w-4 h-4" aria-hidden="true" />
-                  ) : (
-                    <Pin className="w-4 h-4" aria-hidden="true" />
-                  )}
-                </button>
+                />
+                <div className="w-2.5 h-2.5 bg-paper-bg/80" aria-hidden="true" />
                 <button
                   onClick={() => setShowReference(false)}
-                  className="inline-flex items-center justify-center min-h-[36px] min-w-[36px] rounded-control hover:bg-paper-bg transition-colors"
-                  title="关闭"
+                  className="w-2.5 h-2.5 bg-y2k-coral cursor-pointer hover:bg-y2k-coral/80 transition-colors"
                   aria-label="关闭参考图纸"
-                >
-                  <X className="w-4 h-4 text-ink-soft" aria-hidden="true" />
-                </button>
+                />
+              </div>
+            </div>
+            <div className="flex items-center justify-between px-3 py-2"
+              style={{ borderBottom: '2px solid var(--y2k-navy)' }}
+            >
+              <div className="flex items-baseline gap-2">
+                <span className="font-pixel-cn text-ink-warm" style={{ fontSize: 13, letterSpacing: '0.08em' }}>参考图纸</span>
+                <span className="font-pixel-arcade text-y2k-navy" style={{ fontSize: 8, letterSpacing: '0.1em' }}>REFERENCE</span>
               </div>
             </div>
 
@@ -1136,23 +1231,31 @@ export function BeadCanvas({
           </div>
         )}
 
-        {/* 材料清单 */}
+        {/* 材料清单 STOCK.EXE */}
         {showMaterialList && (
-          <div className="bg-paper-soft border border-edge-sand rounded-card overflow-hidden">
-            {/* 顶部标题栏 */}
-            <div className="bg-paper-deep border-b border-edge-sand text-ink-warm px-4 py-2.5 flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <Square className="w-4 h-4 text-moss" aria-hidden="true" />
-                <span className="font-semibold text-sm">材料清单</span>
+          <div className="relative bg-paper-bg overflow-hidden" style={{ boxShadow: CARD_SHADOW, paddingTop: 20 }}>
+            <div
+              className="absolute left-0 right-0 flex items-center justify-between px-2"
+              style={{ top: 2, height: 16, backgroundColor: 'var(--y2k-navy)', color: 'var(--bead-paper-bg)' }}
+            >
+              <span className="font-pixel-arcade" style={{ fontSize: 8, letterSpacing: 0 }}>STOCK.EXE</span>
+              <div className="flex gap-0.5 items-center">
+                <div className="w-2.5 h-2.5 bg-paper-bg/80" aria-hidden="true" />
+                <div className="w-2.5 h-2.5 bg-paper-bg/80" aria-hidden="true" />
+                <button
+                  onClick={() => setShowMaterialList(false)}
+                  className="w-2.5 h-2.5 bg-y2k-coral cursor-pointer hover:bg-y2k-coral/80 transition-colors"
+                  aria-label="关闭材料清单"
+                />
               </div>
-              <button
-                onClick={() => setShowMaterialList(false)}
-                className="inline-flex items-center justify-center min-h-[36px] min-w-[36px] rounded-control hover:bg-paper-bg transition-colors"
-                title="关闭"
-                aria-label="关闭材料清单"
-              >
-                <X className="w-4 h-4 text-ink-soft" aria-hidden="true" />
-              </button>
+            </div>
+            <div className="flex items-center justify-between px-3 py-2"
+              style={{ borderBottom: '2px solid var(--y2k-navy)' }}
+            >
+              <div className="flex items-baseline gap-2">
+                <span className="font-pixel-cn text-ink-warm" style={{ fontSize: 13, letterSpacing: '0.08em' }}>材料清单</span>
+                <span className="font-pixel-arcade text-y2k-navy" style={{ fontSize: 8, letterSpacing: '0.1em' }}>STOCK</span>
+              </div>
             </div>
 
             {/* 材料清单内容 */}
@@ -1238,19 +1341,35 @@ export function BeadCanvas({
           </div>
         )}
 
-            {/* 颜色选择面板 — 手机端隐藏：材料清单的每一行已经是色卡选择器，
-                两个挤在一起浪费屏幕，让参考图 / 材料 / 画布能在一屏看完 */}
+            {/* COLORS.EXE 选色 — 手机端隐藏，让参考图/材料/画布能在一屏看完 */}
             {!isMobile && (
-            <div className="bg-paper-soft border border-edge-sand rounded-card overflow-hidden">
-              <div className="px-4 py-2.5 bg-paper-deep border-b border-edge-sand flex items-center justify-between">
-                <span className="font-semibold text-sm text-ink-warm">选色</span>
+            <div className="relative bg-paper-bg overflow-hidden" style={{ boxShadow: CARD_SHADOW, paddingTop: 20 }}>
+              <div
+                className="absolute left-0 right-0 flex items-center justify-between px-2"
+                style={{ top: 2, height: 16, backgroundColor: 'var(--y2k-navy)', color: 'var(--bead-paper-bg)' }}
+              >
+                <span className="font-pixel-arcade" style={{ fontSize: 8, letterSpacing: 0 }}>COLORS.EXE</span>
+                <div className="flex gap-0.5 items-center">
+                  <div className="w-2.5 h-2.5 bg-paper-bg/80" aria-hidden="true" />
+                  <div className="w-2.5 h-2.5 bg-paper-bg/80" aria-hidden="true" />
+                  <div className="w-2.5 h-2.5 bg-y2k-coral" aria-hidden="true" />
+                </div>
+              </div>
+              <div className="px-3 py-2 flex items-center justify-between"
+                style={{ borderBottom: '2px solid var(--y2k-navy)' }}
+              >
+                <div className="flex items-baseline gap-2">
+                  <span className="font-pixel-cn text-ink-warm" style={{ fontSize: 13, letterSpacing: '0.08em' }}>选色</span>
+                  <span className="font-pixel-arcade text-y2k-navy" style={{ fontSize: 8, letterSpacing: '0.1em' }}>PALETTE</span>
+                </div>
                 {lockedColor && (
                   <button
                     onClick={() => { setLockedColor(null); setPourMode(false); }}
-                    className="text-xs text-ink-soft hover:text-ink-warm underline transition-colors"
+                    className="font-pixel-arcade text-y2k-coral hover:text-y2k-coral/70 transition-colors"
+                    style={{ fontSize: 9, letterSpacing: '0.05em' }}
                     aria-label="解锁颜色"
                   >
-                    解锁
+                    × UNLOCK
                   </button>
                 )}
               </div>
@@ -1321,16 +1440,30 @@ export function BeadCanvas({
 
         {/* 主画布区域 */}
         <div className="flex-1 min-w-0 min-h-0 flex flex-col">
-          {/* 拼豆板模式：全屏主画布 */}
+          {/* PEGBOARD.EXE 拼豆板模式：全屏主画布 */}
           {viewMode === 'pegboard' ? (
-            <div className="bg-paper-soft border border-edge-sand rounded-card p-3 sm:p-4 flex-1 flex flex-col min-h-0">
-              <div className="flex items-center justify-between mb-3">
-                <h3 className="text-lg font-semibold flex items-center gap-2 text-ink-warm" style={{ fontFamily: 'var(--font-headline)' }}>
-                  <Paintbrush className="w-5 h-5 text-moss" aria-hidden="true" />
-                  拼豆创作台
-                </h3>
-                <ViewModeToggle viewMode={viewMode} onChange={setViewMode} />
-              </div>
+            <div className="relative flex-1 flex flex-col min-h-0">
+              <div
+                className="relative bg-paper-bg p-3 pt-7 sm:p-4 sm:pt-8 flex-1 flex flex-col min-h-0"
+                style={{
+                  boxShadow: WIN95_SHADOW,
+                  backgroundImage:
+                    'radial-gradient(circle, rgba(44, 58, 94, 0.05) 1px, transparent 1px)',
+                  backgroundSize: '14px 14px',
+                }}
+              >
+                <TitleBar name="PEGBOARD.EXE" />
+                <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-baseline gap-3">
+                    <h3 className="font-pixel-cn text-ink-warm" style={{ fontSize: 22, letterSpacing: '0.1em', lineHeight: 1.1 }}>
+                      拼豆创作台
+                    </h3>
+                    <span className="font-pixel-arcade text-y2k-navy" style={{ fontSize: 9, letterSpacing: '0.15em' }}>
+                      STUDIO
+                    </span>
+                  </div>
+                  <ViewModeToggle viewMode={viewMode} onChange={setViewMode} />
+                </div>
               {/* 手机锁色浮动徽章 */}
               {isMobile && lockedColor && (
                 <div className="flex items-center gap-2 mb-2 flex-wrap">
@@ -1418,6 +1551,8 @@ export function BeadCanvas({
                   </div>
                 </div>
               </div>
+              </div>
+              <CornerPearls />
             </div>
           ) : (
             /* 简洁模式：左右分屏 */
@@ -1670,179 +1805,257 @@ export function BeadCanvas({
 
       </div>
 
-      {/* 完成提示模态框 */}
+      {/* 完成 CONGRATS.EXE 模态框 */}
       {showCompletionModal && (
         <div
           className="fixed inset-0 z-50 flex items-end sm:items-center justify-center sm:p-4"
-          style={{ backgroundColor: 'rgba(58, 52, 42, 0.6)' }}
+          style={{ backgroundColor: 'rgba(44, 58, 94, 0.6)' }}
         >
-          <div className="relative bg-paper-soft border border-edge-sand rounded-t-card sm:rounded-card p-6 sm:p-10 max-w-md w-full text-center max-h-[92vh] sm:max-h-none overflow-y-auto animate-in slide-in-from-bottom duration-200 sm:slide-in-from-bottom-0 sm:zoom-in-95">
-            {/* 手机端 drag handle */}
-            <div className="sm:hidden absolute top-2 left-1/2 -translate-x-1/2 w-10 h-1 rounded-bead bg-edge-sand" aria-hidden="true" />
+          <div className="relative max-w-md w-full text-center max-h-[92vh] sm:max-h-none animate-in slide-in-from-bottom duration-200 sm:slide-in-from-bottom-0 sm:zoom-in-95">
+            <div
+              className="relative bg-paper-bg pt-7 px-6 pb-7 sm:p-10 sm:pt-9 overflow-y-auto max-h-[92vh]"
+              style={{
+                boxShadow: WIN95_SHADOW,
+                backgroundImage:
+                  'radial-gradient(circle, rgba(44, 58, 94, 0.05) 1px, transparent 1px)',
+                backgroundSize: '14px 14px',
+              }}
+            >
+              <TitleBar name="CONGRATS.EXE" onClose={() => setShowCompletionModal(false)} />
 
-            {/* 庆祝图标 */}
-            <div className="mb-6 flex justify-center">
-              <div
-                className="w-20 h-20 sm:w-24 sm:h-24 bg-honey rounded-bead flex items-center justify-center animate-bounce"
-                style={{ boxShadow: 'var(--shadow-lift-bead)' }}
-                aria-hidden="true"
-              >
-                <PartyPopper className="w-10 h-10 sm:w-12 sm:h-12 text-ink-warm" />
-              </div>
-            </div>
-
-            <h2 className="text-2xl sm:text-3xl font-semibold mb-3 text-ink-warm" style={{ fontFamily: 'var(--font-display)' }}>
-              恭喜完成！
-            </h2>
-            <p className="text-ink-warm mb-1">
-              您已成功完成所有{" "}
-              <span style={{ fontFamily: 'var(--font-num)' }}>
-                {Array.from(colorCount.values()).reduce((a, b) => a + b, 0)}
-              </span>{" "}
-              颗拼豆
-            </p>
-            <p className="text-sm text-ink-soft mb-8">
-              使用了 <span style={{ fontFamily: 'var(--font-num)' }}>{colorCount.size}</span> 种颜色
-            </p>
-
-            <div className="flex flex-col sm:flex-row gap-3 mb-4">
-              {SHOW_HD_RENDER && (
-                <button
-                  onClick={renderHighResolution}
-                  disabled={isRendering}
-                  className="flex-1 inline-flex items-center justify-center gap-2 min-h-[48px] px-4 py-3 bg-paper-bg border border-edge-sand text-ink-warm rounded-control font-semibold hover:bg-paper-deep transition-colors disabled:opacity-50 disabled:cursor-not-allowed focus-visible:outline-2 focus-visible:outline-moss focus-visible:outline-offset-2"
+              {/* 庆祝徽章 — pixel chrome 边 + bounce */}
+              <div className="mb-5 flex justify-center">
+                <div
+                  className="w-20 h-20 sm:w-24 sm:h-24 bg-y2k-coral flex items-center justify-center animate-bounce"
+                  style={{
+                    boxShadow: [
+                      '0 -2px 0 var(--y2k-navy)',
+                      '0 2px 0 var(--y2k-navy)',
+                      '-2px 0 0 var(--y2k-navy)',
+                      '2px 0 0 var(--y2k-navy)',
+                      '4px 4px 0 var(--y2k-navy-deep)',
+                    ].join(', '),
+                  }}
+                  aria-hidden="true"
                 >
-                  {isRendering ? (
-                    <><Sparkles className="w-5 h-5 animate-spin" aria-hidden="true" />渲染中…</>
+                  <PartyPopper className="w-10 h-10 sm:w-12 sm:h-12 text-paper-bg" />
+                </div>
+              </div>
+
+              <p
+                className="font-pixel-arcade text-y2k-coral arcade-blink mb-2"
+                style={{ fontSize: 10, letterSpacing: '0.25em' }}
+              >
+                ★ STAGE CLEAR ★
+              </p>
+              <h2
+                className="font-pixel-cn text-ink-warm mb-3"
+                style={{ fontSize: 33, letterSpacing: '0.15em', lineHeight: 1.15 }}
+              >
+                恭喜完成
+              </h2>
+              <p className="font-pixel-cn text-ink-warm mb-1" style={{ fontSize: 13, letterSpacing: '0.05em' }}>
+                完成全部 <span className="font-pixel-arcade text-y2k-navy" style={{ fontSize: 13 }}>
+                  {Array.from(colorCount.values()).reduce((a, b) => a + b, 0)}
+                </span> 颗
+              </p>
+              <p className="font-pixel-arcade text-y2k-navy mb-7" style={{ fontSize: 9, letterSpacing: '0.15em' }}>
+                {colorCount.size} COLORS USED
+              </p>
+
+              <div className="flex flex-col sm:flex-row gap-3 mb-4">
+                {SHOW_HD_RENDER && (
+                  <button
+                    onClick={renderHighResolution}
+                    disabled={isRendering}
+                    className="flex-1 inline-flex items-center justify-center gap-2 min-h-[48px] px-4 py-3 font-pixel-cn transition-transform hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed"
+                    style={{ ...toolBtnStyle(false), fontSize: 12, letterSpacing: '0.05em' }}
+                  >
+                    {isRendering ? (
+                      <><Sparkles className="w-4 h-4 animate-spin" aria-hidden="true" />渲染中</>
+                    ) : (
+                      <><Sparkles className="w-4 h-4" aria-hidden="true" />高清</>
+                    )}
+                  </button>
+                )}
+                <button
+                  onClick={() => handleAddToGallery(generateCanvasDataURL())}
+                  disabled={savedToGallery}
+                  className="flex-1 inline-flex items-center justify-center gap-2 min-h-[48px] px-4 py-3 font-pixel-cn transition-transform hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed"
+                  style={{ ...toolBtnStyle(savedToGallery), fontSize: 12, letterSpacing: '0.05em' }}
+                >
+                  {savedToGallery ? (
+                    <><Check className="w-4 h-4" aria-hidden="true" />已加入</>
                   ) : (
-                    <><Sparkles className="w-5 h-5" aria-hidden="true" />导出高清</>
+                    <><Library className="w-4 h-4" aria-hidden="true" />作品馆</>
                   )}
                 </button>
-              )}
+                <button
+                  onClick={downloadCanvas}
+                  className="flex-1 arcade-pill font-pixel-cn text-paper-bg cursor-pointer"
+                  style={{
+                    backgroundColor: 'var(--y2k-navy)',
+                    fontSize: 12,
+                    letterSpacing: '0.1em',
+                    padding: '12px 14px',
+                  }}
+                >
+                  <Download className="w-4 h-4" aria-hidden="true" />
+                  下载
+                </button>
+              </div>
+
               <button
-                onClick={() => handleAddToGallery(generateCanvasDataURL())}
-                disabled={savedToGallery}
-                className="flex-1 inline-flex items-center justify-center gap-2 min-h-[48px] px-4 py-3 bg-paper-bg border border-edge-sand text-ink-warm rounded-control font-semibold hover:bg-paper-deep transition-colors disabled:opacity-50 disabled:cursor-not-allowed focus-visible:outline-2 focus-visible:outline-moss focus-visible:outline-offset-2"
+                onClick={() => setShowCompletionModal(false)}
+                className="font-pixel-arcade text-y2k-navy hover:text-y2k-coral transition-colors"
+                style={{ fontSize: 9, letterSpacing: '0.15em' }}
               >
-                {savedToGallery ? (
-                  <><Check className="w-5 h-5 text-moss" aria-hidden="true" />已加入</>
-                ) : (
-                  <><Library className="w-5 h-5" aria-hidden="true" />作品馆</>
-                )}
-              </button>
-              <button
-                onClick={downloadCanvas}
-                className="flex-1 inline-flex items-center justify-center gap-2 min-h-[48px] px-4 py-3 bg-terracotta text-paper-bg rounded-control font-semibold hover:bg-terracotta-deep transition-colors focus-visible:outline-2 focus-visible:outline-moss focus-visible:outline-offset-2"
-                style={{ boxShadow: 'var(--shadow-lift-bead)' }}
-              >
-                <Download className="w-5 h-5" aria-hidden="true" />
-                下载
+                × CLOSE
               </button>
             </div>
-
-            <button
-              onClick={() => setShowCompletionModal(false)}
-              className="text-ink-soft hover:text-ink-warm text-sm transition-colors"
-            >
-              关闭
-            </button>
+            <CornerPearls />
           </div>
         </div>
       )}
 
-      {/* 熨烫选择模态框 */}
+      {/* IRON.EXE 熨烫选择模态框 */}
       {showIroningModal && (
         <div
           className="fixed inset-0 z-50 flex items-end sm:items-center justify-center sm:p-4"
-          style={{ backgroundColor: 'rgba(58, 52, 42, 0.6)' }}
+          style={{ backgroundColor: 'rgba(44, 58, 94, 0.6)' }}
         >
-          <div className="relative bg-paper-soft border border-edge-sand rounded-t-card sm:rounded-card max-w-2xl w-full overflow-hidden max-h-[92vh] sm:max-h-[90vh] flex flex-col animate-in slide-in-from-bottom duration-200 sm:slide-in-from-bottom-0 sm:zoom-in-95">
-            {/* 手机端 drag handle */}
-            <div className="sm:hidden absolute top-2 left-1/2 -translate-x-1/2 w-10 h-1 rounded-bead bg-edge-sand z-10" aria-hidden="true" />
+          <div className="relative max-w-2xl w-full max-h-[92vh] sm:max-h-[90vh] animate-in slide-in-from-bottom duration-200 sm:slide-in-from-bottom-0 sm:zoom-in-95">
+            <div
+              className="relative bg-paper-bg pt-7 max-h-[92vh] sm:max-h-[90vh] flex flex-col"
+              style={{
+                boxShadow: WIN95_SHADOW,
+                backgroundImage:
+                  'radial-gradient(circle, rgba(44, 58, 94, 0.05) 1px, transparent 1px)',
+                backgroundSize: '14px 14px',
+              }}
+            >
+              <TitleBar name="IRON.EXE" onClose={() => setShowIroningModal(false)} />
 
-            <div className="overflow-y-auto p-4 sm:p-8">
-              <div className="flex items-center justify-center mb-6">
-                <div
-                  className="w-14 h-14 sm:w-16 sm:h-16 bg-terracotta rounded-bead flex items-center justify-center"
-                  style={{ boxShadow: 'var(--shadow-lift-bead)' }}
-                  aria-hidden="true"
+              <div className="overflow-y-auto p-4 sm:p-8">
+                <div className="flex items-center justify-center mb-5">
+                  <div
+                    className="w-14 h-14 sm:w-16 sm:h-16 bg-y2k-coral flex items-center justify-center"
+                    style={{
+                      boxShadow: [
+                        '0 -2px 0 var(--y2k-navy)',
+                        '0 2px 0 var(--y2k-navy)',
+                        '-2px 0 0 var(--y2k-navy)',
+                        '2px 0 0 var(--y2k-navy)',
+                        '3px 3px 0 var(--y2k-navy-deep)',
+                      ].join(', '),
+                    }}
+                    aria-hidden="true"
+                  >
+                    <Flame className="w-7 h-7 sm:w-8 sm:h-8 text-paper-bg" />
+                  </div>
+                </div>
+
+                <h2
+                  className="font-pixel-cn text-ink-warm text-center mb-2"
+                  style={{ fontSize: 22, letterSpacing: '0.15em', lineHeight: 1.2 }}
                 >
-                  <Flame className="w-7 h-7 sm:w-8 sm:h-8 text-paper-bg" />
+                  选择熨烫方式
+                </h2>
+                <p
+                  className="font-pixel-arcade text-y2k-navy text-center mb-6"
+                  style={{ fontSize: 9, letterSpacing: '0.2em' }}
+                >
+                  CHOOSE IRONING STYLE
+                </p>
+
+                {/* 去除背景选项 — pixel chrome 卡 */}
+                <div
+                  className="mb-5 p-3 bg-paper-soft flex items-center"
+                  style={{ boxShadow: INPUT_SHADOW }}
+                >
+                  <label className="flex items-center gap-3 cursor-pointer min-h-[40px] w-full">
+                    <input
+                      type="checkbox"
+                      checked={removeBackground}
+                      onChange={(e) => setRemoveBackground(e.target.checked)}
+                      className="w-5 h-5 accent-y2k-navy shrink-0"
+                    />
+                    <div>
+                      <div className="font-pixel-cn text-ink-warm" style={{ fontSize: 12, letterSpacing: '0.05em' }}>去除背景</div>
+                      <div className="font-pixel-arcade text-y2k-navy mt-0.5" style={{ fontSize: 8, letterSpacing: '0.1em' }}>
+                        TRANSPARENT BG
+                      </div>
+                    </div>
+                  </label>
+                </div>
+
+                {/* 4 种熨烫方式 — pixel chrome 卡，selected = coral 硬阴 */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+                  {([
+                    { key: 'paper', label: '铜版纸烫', desc: '常见烫法，立体感适中', Icon: FileText },
+                    { key: 'towel', label: '毛巾烫', desc: '细微绒面，哑光效果', Icon: Layers },
+                    { key: 'direct', label: '直烫', desc: '光滑有光泽，最平整', Icon: Zap },
+                    { key: 'glitter', label: '格里特烫', desc: '闪片彩虹光泽，华丽', Icon: Sparkles },
+                  ] as const).map(({ key, label, desc, Icon }) => {
+                    const selected = ironingMethod === key;
+                    return (
+                      <button
+                        key={key}
+                        onClick={() => setIroningMethod(key)}
+                        className="text-left p-4 bg-paper-soft transition-transform hover:-translate-y-0.5 active:translate-x-[1px] active:translate-y-[1px]"
+                        style={{
+                          boxShadow: [
+                            '0 -2px 0 var(--y2k-navy)',
+                            '0 2px 0 var(--y2k-navy)',
+                            '-2px 0 0 var(--y2k-navy)',
+                            '2px 0 0 var(--y2k-navy)',
+                            selected ? '4px 4px 0 var(--y2k-coral)' : '4px 4px 0 var(--y2k-navy-deep)',
+                          ].join(', '),
+                        }}
+                        aria-pressed={selected}
+                      >
+                        <Icon
+                          className={`w-6 h-6 mb-3 ${selected ? 'text-y2k-coral' : 'text-y2k-navy'}`}
+                          aria-hidden="true"
+                        />
+                        <h3 className="font-pixel-cn text-ink-warm mb-1.5" style={{ fontSize: 13, letterSpacing: '0.05em' }}>
+                          {label}
+                        </h3>
+                        <p className="font-pixel-cn text-ink-soft leading-relaxed" style={{ fontSize: 10, letterSpacing: '0.02em' }}>
+                          {desc}
+                        </p>
+                      </button>
+                    );
+                  })}
+                </div>
+
+                {/* 按钮组 */}
+                <div className="flex gap-3 mt-6">
+                  <button
+                    onClick={() => setShowIroningModal(false)}
+                    className="flex-1 inline-flex items-center justify-center min-h-[48px] px-6 py-3 font-pixel-cn transition-transform hover:-translate-y-0.5"
+                    style={{ ...toolBtnStyle(false), fontSize: 13, letterSpacing: '0.1em' }}
+                  >
+                    取消
+                  </button>
+                  <button
+                    onClick={handleIroning}
+                    className="flex-1 arcade-pill font-pixel-cn text-paper-bg cursor-pointer"
+                    style={{
+                      backgroundColor: 'var(--y2k-navy)',
+                      fontSize: 13,
+                      letterSpacing: '0.1em',
+                      padding: '12px 18px',
+                    }}
+                  >
+                    <Flame className="w-4 h-4" aria-hidden="true" />
+                    <span>开始熨烫</span>
+                    <PixelArrow size={12} color="var(--bead-paper-bg)" />
+                  </button>
                 </div>
               </div>
-
-              <h2 className="text-2xl sm:text-3xl font-semibold text-center mb-2 text-ink-warm" style={{ fontFamily: 'var(--font-display)' }}>
-                选择熨烫方式
-              </h2>
-              <p className="text-center text-ink-soft mb-6 leading-relaxed">
-                不同的熨烫方式会产生不同的视觉效果
-              </p>
-
-              {/* 去除背景选项 */}
-              <div className="mb-6 p-4 bg-paper-bg border border-edge-sand rounded-surface">
-                <label className="flex items-center gap-3 cursor-pointer min-h-[44px]">
-                  <input
-                    type="checkbox"
-                    checked={removeBackground}
-                    onChange={(e) => setRemoveBackground(e.target.checked)}
-                    className="w-5 h-5 rounded border-edge-sand accent-moss shrink-0"
-                  />
-                  <div>
-                    <div className="font-semibold text-ink-warm">去除背景</div>
-                    <div className="text-xs text-ink-soft mt-0.5">导出透明背景图片，只保留主体图案</div>
-                  </div>
-                </label>
-              </div>
-
-              {/* 熨烫方式选择 */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 mb-6">
-                {([
-                  { key: 'paper', label: '铜版纸烫', desc: '最常见烫法，表面平整光滑，保留轻微孔洞，立体感适中', Icon: FileText },
-                  { key: 'towel', label: '毛巾烫', desc: '表面非常平滑，细微绒面质感，孔洞几乎不可见，哑光效果', Icon: Layers },
-                  { key: 'direct', label: '直烫', desc: '无烫纸直接熨烫，表面光滑有光泽，孔洞基本消失，最平整', Icon: Zap },
-                  { key: 'glitter', label: '格里特烫', desc: '使用闪光烫纸，表面带有细密闪片，折射彩虹光泽，华丽闪耀', Icon: Sparkles },
-                ] as const).map(({ key, label, desc, Icon }) => {
-                  const selected = ironingMethod === key;
-                  return (
-                    <button
-                      key={key}
-                      onClick={() => setIroningMethod(key)}
-                      className={`text-left p-4 sm:p-6 rounded-surface border-2 transition-colors focus-visible:outline-2 focus-visible:outline-moss focus-visible:outline-offset-2 ${
-                        selected
-                          ? 'border-terracotta bg-paper-deep'
-                          : 'border-edge-sand bg-paper-bg hover:bg-paper-deep'
-                      }`}
-                      aria-pressed={selected}
-                    >
-                      <Icon
-                        className={`w-7 h-7 mb-3 ${selected ? 'text-terracotta' : 'text-ink-soft'}`}
-                        aria-hidden="true"
-                      />
-                      <h3 className="font-semibold text-base mb-1.5 text-ink-warm">{label}</h3>
-                      <p className="text-sm text-ink-soft leading-relaxed">{desc}</p>
-                    </button>
-                  );
-                })}
-              </div>
-
-              {/* 按钮组 */}
-              <div className="flex gap-3 mt-6">
-                <button
-                  onClick={() => setShowIroningModal(false)}
-                  className="flex-1 inline-flex items-center justify-center min-h-[48px] px-6 py-3 bg-paper-bg border border-edge-sand text-ink-warm rounded-control font-semibold hover:bg-paper-deep transition-colors focus-visible:outline-2 focus-visible:outline-moss focus-visible:outline-offset-2"
-                >
-                  取消
-                </button>
-                <button
-                  onClick={handleIroning}
-                  className="flex-1 inline-flex items-center justify-center gap-2 min-h-[48px] px-6 py-3 bg-terracotta text-paper-bg rounded-control font-semibold hover:bg-terracotta-deep transition-colors focus-visible:outline-2 focus-visible:outline-moss focus-visible:outline-offset-2"
-                  style={{ boxShadow: 'var(--shadow-lift-bead)' }}
-                >
-                  <Flame className="w-5 h-5" aria-hidden="true" />
-                  开始熨烫
-                </button>
-              </div>
             </div>
+            <CornerPearls />
           </div>
         </div>
       )}
@@ -1945,88 +2158,120 @@ export function BeadCanvas({
         </div>
       )}
 
-      {/* 熨烫预览模态框 */}
+      {/* RESULT.EXE 熨烫预览模态框 */}
       {showIronPreview && ironedResult && (
         <div
           className="fixed inset-0 z-50 flex items-end sm:items-center justify-center sm:p-4"
-          style={{ backgroundColor: 'rgba(58, 52, 42, 0.7)' }}
+          style={{ backgroundColor: 'rgba(44, 58, 94, 0.7)' }}
         >
-          <div className="relative bg-paper-soft border border-edge-sand rounded-t-card sm:rounded-card p-4 sm:p-8 max-w-4xl w-full max-h-[92vh] sm:max-h-[90vh] overflow-y-auto animate-in slide-in-from-bottom duration-200 sm:slide-in-from-bottom-0 sm:zoom-in-95">
-            {/* 手机端 drag handle */}
-            <div className="sm:hidden absolute top-2 left-1/2 -translate-x-1/2 w-10 h-1 rounded-bead bg-edge-sand" aria-hidden="true" />
-
-            <div className="mb-6 mt-2 sm:mt-0">
-              <h2 className="text-xl sm:text-2xl font-semibold text-center mb-2 text-ink-warm" style={{ fontFamily: 'var(--font-headline)' }}>熨烫效果预览</h2>
-              <p className="text-center text-ink-soft text-sm">
-                {IRONING_METHODS[ironingMethod].name} · {removeBackground ? '透明背景' : '白色背景'}
-              </p>
-            </div>
-
-            <div className="bg-paper-deep border border-edge-sand rounded-surface p-4 sm:p-6 mb-6 overflow-auto max-h-[50vh] sm:max-h-[500px] flex items-center justify-center">
-              <img
-                src={ironedResult}
-                alt="熨烫效果"
-                className="max-w-full h-auto rounded-control"
-                style={{
-                  imageRendering: 'pixelated',
-                  backgroundColor: removeBackground ? 'transparent' : 'var(--bead-paper-bg)',
-                }}
-              />
-            </div>
-
-            <div className="flex flex-wrap gap-3">
-              <button
-                onClick={() => {
+          <div className="relative max-w-4xl w-full max-h-[92vh] sm:max-h-[90vh] animate-in slide-in-from-bottom duration-200 sm:slide-in-from-bottom-0 sm:zoom-in-95">
+            <div
+              className="relative bg-paper-bg pt-7 p-4 sm:p-8 max-h-[92vh] sm:max-h-[90vh] overflow-y-auto"
+              style={{
+                boxShadow: WIN95_SHADOW,
+                backgroundImage:
+                  'radial-gradient(circle, rgba(44, 58, 94, 0.05) 1px, transparent 1px)',
+                backgroundSize: '14px 14px',
+              }}
+            >
+              <TitleBar
+                name="RESULT.EXE"
+                onClose={() => {
                   setShowIronPreview(false);
                   setIronedResult(null);
                 }}
-                className="flex-1 min-w-[40%] inline-flex items-center justify-center min-h-[48px] px-4 py-3 bg-paper-bg border border-edge-sand text-ink-warm rounded-control font-semibold hover:bg-paper-deep transition-colors focus-visible:outline-2 focus-visible:outline-moss focus-visible:outline-offset-2"
-              >
-                关闭
-              </button>
-              <button
-                onClick={() => {
-                  setShowIronPreview(false);
-                  setShowIroningModal(true);
+              />
+              <div className="mb-5 text-center">
+                <h2 className="font-pixel-cn text-ink-warm mb-2" style={{ fontSize: 22, letterSpacing: '0.15em', lineHeight: 1.2 }}>
+                  熨烫效果预览
+                </h2>
+                <p className="font-pixel-arcade text-y2k-navy" style={{ fontSize: 9, letterSpacing: '0.15em' }}>
+                  {IRONING_METHODS[ironingMethod].name.toUpperCase()} · {removeBackground ? 'TRANSPARENT' : 'WHITE BG'}
+                </p>
+              </div>
+
+              <div
+                className="bg-paper-soft p-4 sm:p-6 mb-5 overflow-auto max-h-[50vh] sm:max-h-[500px] flex items-center justify-center"
+                style={{
+                  boxShadow: 'inset 0 0 0 2px var(--y2k-navy)',
+                  backgroundImage:
+                    'radial-gradient(circle, rgba(44, 58, 94, 0.08) 1px, transparent 1px)',
+                  backgroundSize: '10px 10px',
                 }}
-                className="flex-1 min-w-[40%] inline-flex items-center justify-center gap-2 min-h-[48px] px-4 py-3 bg-paper-bg border border-edge-sand text-ink-warm rounded-control font-semibold hover:bg-paper-deep transition-colors focus-visible:outline-2 focus-visible:outline-moss focus-visible:outline-offset-2"
               >
-                <Flame className="w-4 h-4" aria-hidden="true" />
-                重新熨烫
-              </button>
-              <button
-                onClick={() => {
-                  const methodNames: Record<string, string> = {
-                    paper: '铜版纸烫', towel: '毛巾烫', direct: '直烫', glitter: '格里特烫',
-                  };
-                  handleAddToGallery(ironedResult!, methodNames[ironingMethod]);
-                }}
-                disabled={savedToGallery}
-                className="flex-1 min-w-[40%] inline-flex items-center justify-center gap-2 min-h-[48px] px-4 py-3 bg-paper-bg border border-edge-sand text-ink-warm rounded-control font-semibold hover:bg-paper-deep transition-colors disabled:opacity-50 disabled:cursor-not-allowed focus-visible:outline-2 focus-visible:outline-moss focus-visible:outline-offset-2"
-              >
-                {savedToGallery ? (
-                  <><Check className="w-4 h-4 text-moss" aria-hidden="true" />已加入</>
-                ) : (
-                  <><Library className="w-4 h-4" aria-hidden="true" />加入作品馆</>
-                )}
-              </button>
-              <button
-                onClick={() => {
-                  const link = document.createElement('a');
-                  const methodNames: Record<string, string> = {
-                    paper: '铜版纸烫', towel: '毛巾烫', direct: '直烫', glitter: '格里特烫',
-                  };
-                  link.download = `拼豆作品-${methodNames[ironingMethod]}${removeBackground ? '-透明' : ''}.png`;
-                  link.href = ironedResult!;
-                  link.click();
-                }}
-                className="flex-1 min-w-[40%] inline-flex items-center justify-center gap-2 min-h-[48px] px-4 py-3 bg-terracotta text-paper-bg rounded-control font-semibold hover:bg-terracotta-deep transition-colors focus-visible:outline-2 focus-visible:outline-moss focus-visible:outline-offset-2"
-                style={{ boxShadow: 'var(--shadow-lift-bead)' }}
-              >
-                <Download className="w-5 h-5" aria-hidden="true" />
-                下载
-              </button>
+                <img
+                  src={ironedResult}
+                  alt="熨烫效果"
+                  className="max-w-full h-auto pixel-render"
+                  style={{
+                    backgroundColor: removeBackground ? 'transparent' : 'var(--bead-paper-bg)',
+                  }}
+                />
+              </div>
+
+              <div className="flex flex-wrap gap-3">
+                <button
+                  onClick={() => {
+                    setShowIronPreview(false);
+                    setIronedResult(null);
+                  }}
+                  className="flex-1 min-w-[40%] inline-flex items-center justify-center min-h-[48px] px-4 py-3 font-pixel-cn transition-transform hover:-translate-y-0.5"
+                  style={{ ...toolBtnStyle(false), fontSize: 12, letterSpacing: '0.05em' }}
+                >
+                  关闭
+                </button>
+                <button
+                  onClick={() => {
+                    setShowIronPreview(false);
+                    setShowIroningModal(true);
+                  }}
+                  className="flex-1 min-w-[40%] inline-flex items-center justify-center gap-2 min-h-[48px] px-4 py-3 font-pixel-cn transition-transform hover:-translate-y-0.5"
+                  style={{ ...toolBtnStyle(false), fontSize: 12, letterSpacing: '0.05em' }}
+                >
+                  <Flame className="w-4 h-4" aria-hidden="true" />
+                  重新熨烫
+                </button>
+                <button
+                  onClick={() => {
+                    const methodNames: Record<string, string> = {
+                      paper: '铜版纸烫', towel: '毛巾烫', direct: '直烫', glitter: '格里特烫',
+                    };
+                    handleAddToGallery(ironedResult!, methodNames[ironingMethod]);
+                  }}
+                  disabled={savedToGallery}
+                  className="flex-1 min-w-[40%] inline-flex items-center justify-center gap-2 min-h-[48px] px-4 py-3 font-pixel-cn transition-transform hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed"
+                  style={{ ...toolBtnStyle(savedToGallery), fontSize: 12, letterSpacing: '0.05em' }}
+                >
+                  {savedToGallery ? (
+                    <><Check className="w-4 h-4" aria-hidden="true" />已加入</>
+                  ) : (
+                    <><Library className="w-4 h-4" aria-hidden="true" />作品馆</>
+                  )}
+                </button>
+                <button
+                  onClick={() => {
+                    const link = document.createElement('a');
+                    const methodNames: Record<string, string> = {
+                      paper: '铜版纸烫', towel: '毛巾烫', direct: '直烫', glitter: '格里特烫',
+                    };
+                    link.download = `拼豆作品-${methodNames[ironingMethod]}${removeBackground ? '-透明' : ''}.png`;
+                    link.href = ironedResult!;
+                    link.click();
+                  }}
+                  className="flex-1 min-w-[40%] arcade-pill font-pixel-cn text-paper-bg cursor-pointer"
+                  style={{
+                    backgroundColor: 'var(--y2k-navy)',
+                    fontSize: 12,
+                    letterSpacing: '0.1em',
+                    padding: '12px 14px',
+                  }}
+                >
+                  <Download className="w-4 h-4" aria-hidden="true" />
+                  下载
+                </button>
+              </div>
             </div>
+            <CornerPearls />
           </div>
         </div>
       )}
