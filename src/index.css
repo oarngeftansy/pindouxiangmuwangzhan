@@ -319,8 +319,8 @@
   animation: arcadeBlink 1.2s steps(2, end) infinite;
 }
 
-/* chrome italic wordmark — NJ 银色 chrome 渐变（cream → sky → navy → ink），
-   配 sky→cream 渐变底是"阳光下街机 kiosk 金属反光"vibe */
+/* chrome italic wordmark — NJ 银色镜面（5 段反光带：亮→sky→亮→sky→navy），
+   中间留 cream 反光高光让字体整体保持"亮银色"，不被深 ink 拉黑 */
 .font-chrome {
   font-family: 'Playfair Display', 'Georgia', serif;
   font-style: italic;
@@ -329,16 +329,18 @@
   background: linear-gradient(
     180deg,
     var(--bead-paper-bg) 0%,
-    var(--y2k-sky) 28%,
-    var(--y2k-navy) 62%,
-    var(--bead-ink) 100%
+    var(--y2k-sky) 22%,
+    var(--bead-paper-bg) 46%,
+    var(--y2k-sky) 70%,
+    var(--y2k-navy) 100%
   );
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
-  -webkit-text-stroke: 1.5px var(--bead-ink);
+  -webkit-text-stroke: 1px var(--y2k-navy);
   paint-order: stroke fill;
-  filter: drop-shadow(2px 2px 0 var(--bead-ink));
+  /* 轻硬阴 — coral pop 让冷银 chrome 字飘起来 */
+  filter: drop-shadow(2px 2px 0 var(--y2k-coral));
 }
 
 /* 街机 chunky 胶囊按钮 — NJ "ID Card" / "Pick My Outfits" 同款

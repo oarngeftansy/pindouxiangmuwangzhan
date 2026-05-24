@@ -413,15 +413,21 @@ export function ImageUploader({ onImageProcessed, onCreateBlank }: ImageUploader
                 </>
               ) : (
                 <>
-                  {/* 中文 Cubic 11 大字 — 跟开屏"拼豆模拟器"同款，更大更醒目 */}
-                  <p className="font-pixel-cn text-ink-warm text-2xl mb-1" style={{ letterSpacing: '0.08em' }}>
-                    拖一张图进来
+                  {/* "赛博拼豆"主标题搬到这里 — 作为窗口内的产品名 + action 提示 */}
+                  <p
+                    className="font-pixel-cn text-ink-warm mb-1"
+                    style={{
+                      fontSize: 'clamp(1.6rem, 4vw, 2.2rem)',
+                      letterSpacing: '0.2em',
+                    }}
+                  >
+                    赛博拼豆
                   </p>
                   <p
                     className="font-pixel-arcade text-y2k-navy mb-5"
-                    style={{ fontSize: 9, letterSpacing: '0.2em' }}
+                    style={{ fontSize: 9, letterSpacing: '0.25em' }}
                   >
-                    DROP YOUR IMAGE HERE
+                    DROP IMAGE TO PIXELATE
                   </p>
 
                   {/* 主 CTA — NJ "ID Card" 同款：navy 深底 + coral 硬阴 + 银光泽 */}

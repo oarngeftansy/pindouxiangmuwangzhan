@@ -10,7 +10,6 @@ import {
   PixelCloud,
   PixelHeart,
   PixelStar,
-  PixelBadge,
   ChromeHalo,
 } from './components/PixelDecorations';
 import { getGallery } from './utils/galleryUtils';
@@ -190,16 +189,9 @@ function App() {
           }}
         />
       )}
-      {/* Header — 跟随 sky→cream 渐变底（半透磨砂），navy 描边作为冷锚 */}
-      <header
-        className="relative z-10"
-        style={{
-          backgroundColor: 'rgba(252, 248, 230, 0.72)',
-          backdropFilter: 'blur(8px)',
-          WebkitBackdropFilter: 'blur(8px)',
-          borderBottom: '1px solid var(--y2k-navy)',
-        }}
-      >
+      {/* Header — 完全融入渐变（无 bg、无 border、无 blur），
+          靠 logo + 两颗带 chrome 硬阴的按钮自己浮起来 */}
+      <header className="relative z-10">
         <div className="max-w-7xl mx-auto px-4 py-3 sm:py-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between gap-2">
             <div className="flex items-center gap-2 sm:gap-3 min-w-0">
@@ -345,26 +337,13 @@ function App() {
                 />
               </div>
 
-              {/* 主 tagline —— "赛博拼豆"，1UP coral / GO! mint pastel pop 徽章 */}
-              <div className="relative inline-flex items-center justify-center gap-4 mt-7">
-                <PixelBadge text="1UP" color="var(--y2k-coral)" />
-                <p
-                  className="font-pixel-cn text-ink-warm"
-                  style={{
-                    fontSize: 'clamp(1.5rem, 4.5vw, 2.5rem)',
-                    letterSpacing: '0.25em',
-                  }}
-                >
-                  赛博拼豆
-                </p>
-                <PixelBadge text="GO!" color="var(--y2k-mint)" />
-              </div>
-
+              {/* hero 留呼吸 — "赛博拼豆" 已移入 UPLOAD.EXE 窗口作主标题，
+                  hero 只保留 wordmark + 一行小版本号 */}
               <p
-                className="font-pixel-arcade text-y2k-navy mt-4"
+                className="font-pixel-arcade text-y2k-navy mt-6"
                 style={{ fontSize: 9, letterSpacing: '0.2em' }}
               >
-                EST · 2026 · V1.0
+                EST · 2026 · V1.0 · ARCADE EDITION
               </p>
             </section>
             {SHOW_BLIND_BOX_PANEL ? (
