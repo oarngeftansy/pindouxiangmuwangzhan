@@ -180,7 +180,7 @@
 
 /* 像素字体快捷类 —— 全部强制 font-smooth: none / antialias off，
    覆盖 body 的全局 -webkit-font-smoothing: antialiased，否则像素字会
-   被 webkit 抗锯齿糊成"软像素"，跟 Press Start 2P 的硬像素不在一个画风 */
+   被 webkit 抗锯齿糊成"软像素" */
 .font-pixel-en,
 .font-pixel-arcade,
 .font-pixel-cn,
@@ -190,23 +190,22 @@
   font-smooth: never;
   text-rendering: geometricPrecision;
 }
-.font-pixel-en {
-  font-family: 'VT323', 'Press Start 2P', monospace;
-  letter-spacing: 0.02em;
-}
+/* 西文像素一律用 VT323（DEC VT320 风格终端像素字）
+   —— 细笔画 + 1 单元宽度，跟 Cubic 11 是同一"细像素"家族
+   —— Press Start 2P (粗 8-bit) 跟 Cubic 11 (细 11x11) 字重对不上，已弃用
+   VT323 在 12-22px 范围渲染都清晰，无需锁倍数 */
+.font-pixel-en,
 .font-pixel-arcade {
-  /* Press Start 2P 更"机厅"重感，仅 small caps / 数字用 */
-  font-family: 'Press Start 2P', monospace;
-  letter-spacing: 0;
+  font-family: 'VT323', 'Press Start 2P', monospace;
+  letter-spacing: 0.05em;
 }
 .font-pixel-cn {
-  /* Cubic 11 是 11×11 像素 CJK 字体，专为搭配 Press Start 2P 设计；
-     字号建议用 11/22/33/44 等 11 的倍数，避免子像素分裂 */
+  /* Cubic 11 是 11×11 像素 CJK 字体，字号建议用 11/22/33/44 倍数 */
   font-family: 'Cubic 11', 'ZCOOL KuaiLe', 'Noto Sans SC', sans-serif;
 }
-/* 中英混排像素：CJK 走 Cubic 11，西文走 Press Start 2P / VT323 */
+/* 中英混排像素：CJK Cubic 11 + 西文 VT323 同细笔画 */
 .font-pixel {
-  font-family: 'Press Start 2P', 'Cubic 11', 'ZCOOL KuaiLe', 'Noto Sans SC', monospace, sans-serif;
+  font-family: 'VT323', 'Cubic 11', 'ZCOOL KuaiLe', 'Noto Sans SC', monospace, sans-serif;
 }
 
 /* 像素图像渲染（防 webkit 抗锯齿糊掉小尺寸） */
