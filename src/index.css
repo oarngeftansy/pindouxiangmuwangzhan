@@ -1,5 +1,15 @@
 /* Brand fonts: Fredoka (display Latin), ZCOOL KuaiLe (display CJK), Nunito (body Latin), Noto Sans SC (body CJK). */
 @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;600;700&family=ZCOOL+KuaiLe&display=swap');
+/* Y2K 像素字体：Press Start 2P 西文像素 + VT323 软像素备选。中文像素字体 Cubic 11 从 jsdelivr CDN 加载（声明在 @font-face 块里） */
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap');
+
+@font-face {
+  font-family: 'Cubic 11';
+  src: url('https://cdn.jsdelivr.net/gh/ACh-K/Cubic-11@1.013/fonts/Cubic_11_1.013_R.woff2') format('woff2');
+  font-display: swap;
+  font-weight: 400;
+  unicode-range: U+4E00-9FFF, U+3000-303F, U+FF00-FFEF;
+}
 @import 'tailwindcss' source(none);
 @source './**/*.{js,ts,jsx,tsx}';
 @import 'tw-animate-css';
@@ -107,4 +117,85 @@
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
   }
+}
+
+/* ──────── Y2K 像素工具类 ──────── */
+
+/* 像素锁齿外框：用 4 个方向的 box-shadow 模拟 1px 像素步进，比 border 更"硬" */
+.pixel-frame {
+  /* 主体颜色由 background 控制；这里只画边框的"步阶" */
+  box-shadow:
+    /* 外环 1px 颜色块 */
+    0 -2px 0 var(--bead-ink),
+    0 2px 0 var(--bead-ink),
+    -2px 0 0 var(--bead-ink),
+    2px 0 0 var(--bead-ink);
+  /* 四个外角被"剪掉"的视觉效果：用伪元素覆盖角 (paper bg) */
+  position: relative;
+}
+.pixel-frame::before,
+.pixel-frame::after,
+.pixel-frame > .pixel-corner-tl,
+.pixel-frame > .pixel-corner-tr,
+.pixel-frame > .pixel-corner-bl,
+.pixel-frame > .pixel-corner-br {
+  content: '';
+  position: absolute;
+  width: 2px;
+  height: 2px;
+  background: var(--bead-paper-bg);
+  pointer-events: none;
+}
+.pixel-frame::before { top: -2px; left: -2px; }
+.pixel-frame::after  { top: -2px; right: -2px; }
+
+/* 像素角珍（4 个角小方块装饰，可改色作为 Y2K 装饰点） */
+.pixel-corners-pearl {
+  position: relative;
+}
+.pixel-corners-pearl::before,
+.pixel-corners-pearl::after {
+  content: '';
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  background: var(--y2k-lavender);
+  pointer-events: none;
+}
+.pixel-corners-pearl::before { top: -2px; left: -2px; }
+.pixel-corners-pearl::after  { bottom: -2px; right: -2px; }
+
+/* 像素阴影（替代柔阴影，做"卡片浮起"效果但是硬边） */
+.pixel-shadow {
+  box-shadow:
+    2px 2px 0 var(--bead-ink),
+    4px 4px 0 var(--y2k-lavender);
+}
+.pixel-shadow-sm {
+  box-shadow:
+    2px 2px 0 var(--bead-ink);
+}
+
+/* 像素字体快捷类 */
+.font-pixel-en {
+  font-family: 'VT323', 'Press Start 2P', monospace;
+  letter-spacing: 0.02em;
+}
+.font-pixel-arcade {
+  /* Press Start 2P 更"机厅"重感，仅 small caps / 数字用 */
+  font-family: 'Press Start 2P', monospace;
+  letter-spacing: 0;
+}
+.font-pixel-cn {
+  font-family: 'Cubic 11', 'ZCOOL KuaiLe', 'Noto Sans SC', sans-serif;
+}
+/* 中英混排像素：CJK 走 Cubic 11，西文走 Press Start 2P / VT323 */
+.font-pixel {
+  font-family: 'Press Start 2P', 'Cubic 11', 'ZCOOL KuaiLe', 'Noto Sans SC', monospace, sans-serif;
+}
+
+/* 像素图像渲染（防 webkit 抗锯齿糊掉小尺寸） */
+.pixel-render {
+  image-rendering: pixelated;
+  -ms-interpolation-mode: nearest-neighbor;
 }

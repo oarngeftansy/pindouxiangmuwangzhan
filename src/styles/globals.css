@@ -22,6 +22,14 @@
   --bead-shadow: oklch(0.78 0.012 70);
   --bead-alert: oklch(0.55 0.18 18);
 
+  /* Y2K Pixel 点缀色（≤10% 出现，仅在像素 chrome / 角珍 / 像素 shadow 上使用）
+     柔紫 + 藏青 + 柔珊瑚，跟 paper-cream 暖色不冲突，比起原 anti-references 里
+     的"霓虹粉/赛博朋克"更温柔 */
+  --y2k-lavender:    oklch(0.78 0.075 295);   /* ≈#bda3d9 柔紫 */
+  --y2k-lavender-deep: oklch(0.60 0.085 285); /* ≈#7e6dad 紫罗兰 */
+  --y2k-navy:        oklch(0.55 0.06 260);    /* ≈#6f7daa 藏青/雾蓝 */
+  --y2k-coral:       oklch(0.78 0.10 22);     /* ≈#e8a48c 柔珊瑚 */
+
   /* Warm shadow base — used by all elevation tokens */
   --bead-shadow-rgba: 168, 130, 90;
 
@@ -101,6 +109,12 @@
   --color-edge-sand: var(--bead-edge);
   --color-bead-shadow: var(--bead-shadow);
   --color-alert-rose: var(--bead-alert);
+
+  /* Y2K accent tokens — bg-y2k-lavender / text-y2k-navy / border-y2k-coral */
+  --color-y2k-lavender: var(--y2k-lavender);
+  --color-y2k-lavender-deep: var(--y2k-lavender-deep);
+  --color-y2k-navy: var(--y2k-navy);
+  --color-y2k-coral: var(--y2k-coral);
 
   /* shadcn-aliased tokens — preserve standard shadcn class API */
   --color-background: var(--background);
