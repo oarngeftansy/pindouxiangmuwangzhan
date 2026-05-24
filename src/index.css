@@ -178,7 +178,18 @@
     2px 2px 0 var(--bead-ink);
 }
 
-/* 像素字体快捷类 */
+/* 像素字体快捷类 —— 全部强制 font-smooth: none / antialias off，
+   覆盖 body 的全局 -webkit-font-smoothing: antialiased，否则像素字会
+   被 webkit 抗锯齿糊成"软像素"，跟 Press Start 2P 的硬像素不在一个画风 */
+.font-pixel-en,
+.font-pixel-arcade,
+.font-pixel-cn,
+.font-pixel {
+  -webkit-font-smoothing: none !important;
+  -moz-osx-font-smoothing: grayscale;
+  font-smooth: never;
+  text-rendering: geometricPrecision;
+}
 .font-pixel-en {
   font-family: 'VT323', 'Press Start 2P', monospace;
   letter-spacing: 0.02em;
@@ -189,6 +200,8 @@
   letter-spacing: 0;
 }
 .font-pixel-cn {
+  /* Cubic 11 是 11×11 像素 CJK 字体，专为搭配 Press Start 2P 设计；
+     字号建议用 11/22/33/44 等 11 的倍数，避免子像素分裂 */
   font-family: 'Cubic 11', 'ZCOOL KuaiLe', 'Noto Sans SC', sans-serif;
 }
 /* 中英混排像素：CJK 走 Cubic 11，西文走 Press Start 2P / VT323 */

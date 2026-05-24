@@ -171,12 +171,17 @@ function App() {
     <div
       className="min-h-screen text-ink-warm relative overflow-x-hidden"
       style={{
-        // 整页 = 一面抛光镜面：sky → cream → sky 垂直对称反光带
-        // （跟 wordmark chrome 渐变同构，NJ CD 盒插页 / Y2K 全息表面 vibe）
-        // 中段 cream 留出可读区域，dot grid 保留 OS 桌面感
+        // 三层叠：
+        //   1. SVG turbulence 噪点 grain（上层，~14% 不透明，给 chrome 镜面加颗粒）
+        //   2. dot grid 桌面感（中层）
+        //   3. sky→cream→sky 镜面渐变（底层）
         backgroundColor: 'var(--bead-paper-bg)',
         backgroundImage: [
+          // 1. 噪点 grain — feTurbulence + 颜色矩阵把 RGB→alpha
+          `url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.16 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>")`,
+          // 2. dot grid
           'radial-gradient(circle, rgba(58, 52, 42, 0.06) 1px, transparent 1px)',
+          // 3. sky → cream → sky 镜面反光带
           [
             'linear-gradient(180deg,',
             'var(--y2k-sky) 0%,',
@@ -187,8 +192,8 @@ function App() {
             'var(--y2k-sky) 100%)',
           ].join(' '),
         ].join(', '),
-        backgroundSize: '24px 24px, 100% 100%',
-        backgroundAttachment: 'scroll, fixed',
+        backgroundSize: '180px 180px, 24px 24px, 100% 100%',
+        backgroundAttachment: 'scroll, scroll, fixed',
       }}
     >
       {showGallery && (
@@ -207,8 +212,8 @@ function App() {
             <div className="flex items-center gap-2 sm:gap-3 min-w-0">
               <BeadLogoMark className="w-9 h-9 sm:w-10 sm:h-10 shrink-0" />
               <h1
-                className="text-xl sm:text-3xl text-ink-warm leading-none truncate font-pixel-cn"
-                style={{ letterSpacing: '0.03em' }}
+                className="text-ink-warm leading-none truncate font-pixel-cn"
+                style={{ fontSize: 22, letterSpacing: '0.05em' }}
               >
                 拼豆模拟器
               </h1>

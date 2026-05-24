@@ -95,9 +95,13 @@ export function TrendingPatternsPanel({ onUsePattern }: TrendingPatternsPanelPro
 
   const allTags = [...new Set(patterns.flatMap(p => p.tags))];
 
-  const filtered = selectedTag
+  // 按豆子数从少到多排序 — LV.01 = 入门小图，LV.NN = 大图挑战，关卡递进感
+  const filtered = (selectedTag
     ? patterns.filter(p => p.tags.includes(selectedTag))
-    : patterns;
+    : patterns
+  )
+    .slice()
+    .sort((a, b) => a.beadCount - b.beadCount);
 
   return (
     <section className="relative">
@@ -112,7 +116,7 @@ export function TrendingPatternsPanel({ onUsePattern }: TrendingPatternsPanelPro
           />
           <h3
             className="font-pixel-cn text-ink-warm"
-            style={{ fontSize: 'clamp(1.5rem, 2.6vw, 1.9rem)', letterSpacing: '0.05em' }}
+            style={{ fontSize: 22, letterSpacing: '0.1em', lineHeight: 1.1 }}
           >
             图鉴
           </h3>

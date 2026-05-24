@@ -413,12 +413,13 @@ export function ImageUploader({ onImageProcessed, onCreateBlank }: ImageUploader
                 </>
               ) : (
                 <>
-                  {/* "赛博拼豆"主标题搬到这里 — 作为窗口内的产品名 + action 提示 */}
+                  {/* "赛博拼豆"主标题 — 锁到 33px = Cubic 11 字号 3× 倍数，硬像素无糊 */}
                   <p
                     className="font-pixel-cn text-ink-warm mb-1"
                     style={{
-                      fontSize: 'clamp(1.6rem, 4vw, 2.2rem)',
-                      letterSpacing: '0.2em',
+                      fontSize: 33,
+                      letterSpacing: '0.25em',
+                      lineHeight: 1.1,
                     }}
                   >
                     赛博拼豆
