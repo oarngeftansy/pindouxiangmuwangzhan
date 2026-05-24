@@ -1458,251 +1458,380 @@ export function BeadCanvas({
               <CornerPearls />
             </div>
           ) : (
-            /* 简洁模式：左右分屏 */
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {/* 参考图纸 */}
+            /* 简洁模式：左右分屏 — REFERENCE.EXE + EDIT.EXE */
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* REFERENCE.EXE 参考图纸窗口 */}
               {showReference && (
-                <div className="bg-paper-soft border border-edge-sand rounded-card p-6">
-                  <h3 className="text-lg font-semibold mb-4 flex items-center gap-2 text-ink-warm" style={{ fontFamily: 'var(--font-headline)' }}>
-                    <Eye className="w-5 h-5 text-moss" aria-hidden="true" />
-                    参考图纸
-                  </h3>
-                  <div className="bg-paper-bg border border-edge-sand rounded-surface p-4 overflow-auto max-h-[40vh] sm:max-h-[600px] touch-pan-x touch-pan-y">
-                    <div className="inline-block">
-                      <div
-                        className="grid gap-0 rounded-control overflow-hidden border border-edge-sand"
-                        style={{
-                          gridTemplateColumns: `repeat(${referenceGrid[0].length}, ${beadSize}px)`,
-                          width: "fit-content",
-                          backgroundColor: 'var(--bead-paper-bg)',
-                        }}
-                      >
-                        {referenceGrid.map((row, y) =>
-                          row.map((color, x) => {
-                            const shouldHighlight =
-                              lockedColor &&
-                              color === lockedColor;
-                            return (
-                              <div
-                                key={`ref-${x}-${y}`}
-                                className={`flex items-center justify-center relative ${
-                                  shouldHighlight ? 'ring-2 ring-honey' : ''
-                                }`}
-                                style={{
-                                  width: beadSize,
-                                  height: beadSize,
-                                  backgroundColor: shouldHighlight
-                                    ? 'var(--bead-honey-glow)'
-                                    : color || 'var(--bead-paper-bg)',
-                                  opacity:
-                                    lockedColor && !shouldHighlight ? 0.3 : 1,
-                                  border: '0.15px solid rgba(58, 52, 42, 0.5)',
-                                }}
-                              >
-                                {color && (
-                                  <div
-                                    className="absolute inset-0 rounded-bead m-1 pointer-events-none"
-                                    style={{
-                                      backgroundColor: color,
-                                      // 暖墨色 inset 模拟塑料反光
-                                      boxShadow: 'inset 0 1px 3px rgba(58, 52, 42, 0.2)',
-                                    }}
-                                  />
-                                )}
-                                {/* 显示已放置的豆子 */}
-                                {workingGrid[y][x] && (
-                                  <div
-                                    className="absolute inset-0 rounded-bead m-1 ring-2 ring-moss pointer-events-none"
-                                    style={{
-                                      backgroundColor: workingGrid[y][x] || '',
-                                      boxShadow:
-                                        'inset 0 1px 3px rgba(58, 52, 42, 0.2), 0 0 8px rgba(44, 107, 84, 0.5)',
-                                    }}
-                                  />
-                                )}
-                              </div>
-                            );
-                          }),
-                        )}
+                <div className="relative">
+                  <div
+                    className="relative bg-paper-bg p-4 pt-7"
+                    style={{
+                      boxShadow: WIN95_SHADOW,
+                      backgroundImage:
+                        'radial-gradient(circle, rgba(44, 58, 94, 0.05) 1px, transparent 1px)',
+                      backgroundSize: '14px 14px',
+                    }}
+                  >
+                    <TitleBar name="REFERENCE.EXE" />
+                    <div className="flex items-baseline gap-3 mb-3">
+                      <h3 className="font-pixel-cn text-ink-warm" style={{ fontSize: 22, letterSpacing: '0.1em', lineHeight: 1.1 }}>
+                        参考图纸
+                      </h3>
+                      <span className="font-pixel-arcade text-y2k-navy" style={{ fontSize: 12, letterSpacing: '0.15em' }}>
+                        REF
+                      </span>
+                    </div>
+                    <div
+                      className="bg-paper-soft overflow-auto max-h-[40vh] sm:max-h-[600px]"
+                      style={{
+                        boxShadow: 'inset 0 0 0 2px var(--y2k-navy)',
+                        touchAction: 'pan-x pan-y pinch-zoom',
+                      }}
+                    >
+                      <div className="inline-block p-2">
+                        <div
+                          className="grid gap-0"
+                          style={{
+                            gridTemplateColumns: `repeat(${referenceGrid[0].length}, ${beadSize}px)`,
+                            width: 'fit-content',
+                            backgroundColor: 'var(--bead-paper-bg)',
+                            boxShadow: 'inset 0 0 0 1px var(--y2k-navy)',
+                          }}
+                        >
+                          {referenceGrid.map((row, y) =>
+                            row.map((color, x) => {
+                              const shouldHighlight =
+                                lockedColor &&
+                                color === lockedColor;
+                              return (
+                                <div
+                                  key={`ref-${x}-${y}`}
+                                  className={`flex items-center justify-center relative ${
+                                    shouldHighlight ? 'ring-2 ring-y2k-coral' : ''
+                                  }`}
+                                  style={{
+                                    width: beadSize,
+                                    height: beadSize,
+                                    backgroundColor: shouldHighlight
+                                      ? 'var(--bead-honey-glow)'
+                                      : color || 'var(--bead-paper-bg)',
+                                    opacity:
+                                      lockedColor && !shouldHighlight ? 0.3 : 1,
+                                    border: '0.15px solid rgba(44, 58, 94, 0.5)',
+                                  }}
+                                >
+                                  {color && (
+                                    <div
+                                      className="absolute inset-0 rounded-bead m-1 pointer-events-none"
+                                      style={{
+                                        backgroundColor: color,
+                                        boxShadow: 'inset 0 1px 3px rgba(44, 58, 94, 0.2)',
+                                      }}
+                                    />
+                                  )}
+                                  {workingGrid[y][x] && (
+                                    <div
+                                      className="absolute inset-0 rounded-bead m-1 ring-2 ring-y2k-navy pointer-events-none"
+                                      style={{
+                                        backgroundColor: workingGrid[y][x] || '',
+                                        boxShadow:
+                                          'inset 0 1px 3px rgba(44, 58, 94, 0.2), 0 0 8px rgba(44, 58, 94, 0.5)',
+                                      }}
+                                    />
+                                  )}
+                                </div>
+                              );
+                            }),
+                          )}
+                        </div>
                       </div>
                     </div>
                   </div>
+                  <CornerPearls />
                 </div>
               )}
 
-              {/* 编辑画板 */}
-              <div
-                className={`bg-paper-soft border border-edge-sand rounded-card p-6 ${showReference ? "" : "lg:col-span-2"}`}
-              >
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-lg font-semibold flex items-center gap-2 text-ink-warm" style={{ fontFamily: 'var(--font-headline)' }}>
-                    <Paintbrush className="w-5 h-5 text-moss" aria-hidden="true" />
-                    编辑画板
-                  </h3>
-                  <ViewModeToggle viewMode={viewMode} onChange={setViewMode} />
-                </div>
-                <div className="bg-paper-deep border border-edge-sand rounded-surface p-4 overflow-auto max-h-[40vh] sm:max-h-[600px] touch-pan-x touch-pan-y">
-                  <div className="inline-block">
-                    <div
-                      ref={canvasRef}
-                      className="grid gap-0 rounded-control overflow-hidden border border-edge-sand"
-                      style={{
-                        gridTemplateColumns: `repeat(${workingGrid[0].length}, ${beadSize}px)`,
-                        width: "fit-content",
-                        backgroundColor: 'var(--bead-paper-bg)',
-                        touchAction: 'manipulation',
-                        userSelect: 'none',
-                      }}
-                      onTouchStart={handleTouchStart}
-                      onTouchMove={handleTouchMove}
-                      onTouchEnd={handleTouchEnd}
-                    >
-                      {workingGrid.map((row, y) =>
-                        row.map((color, x) => {
-                          const referenceColor =
-                            referenceGrid[y][x];
-                          const shouldHighlight =
-                            lockedColor &&
-                            referenceColor === lockedColor;
-                          const canPlace =
-                            !lockedColor ||
-                            referenceColor === lockedColor;
-                          const isEmpty = !color;
-
-                          return (
-                            <PegboardCell
-                              key={`edit-${x}-${y}`}
-                              x={x}
-                              y={y}
-                              color={color}
-                              beadSize={baseSize * pegboardScale * zoom}
-                              viewMode={viewMode}
-                              showGrid={showGrid}
-                              shouldHighlight={shouldHighlight}
-                              canPlace={canPlace}
-                              isEmpty={isEmpty}
-                              onMouseDown={handleMouseDown}
-                              onMouseEnter={handleMouseEnter}
-                              canvasParams={canvasParams}
-                            />
-                          );
-                        }),
-                      )}
+              {/* EDIT.EXE 编辑画板窗口 — 跟 PEGBOARD.EXE 同款正方形板 */}
+              <div className={`relative ${showReference ? '' : 'lg:col-span-2'}`}>
+                <div
+                  className="relative bg-paper-bg p-4 pt-7"
+                  style={{
+                    boxShadow: WIN95_SHADOW,
+                    backgroundImage:
+                      'radial-gradient(circle, rgba(44, 58, 94, 0.05) 1px, transparent 1px)',
+                    backgroundSize: '14px 14px',
+                  }}
+                >
+                  <TitleBar name="EDIT.EXE" />
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="flex items-baseline gap-3">
+                      <h3 className="font-pixel-cn text-ink-warm" style={{ fontSize: 22, letterSpacing: '0.1em', lineHeight: 1.1 }}>
+                        编辑画板
+                      </h3>
+                      <span className="font-pixel-arcade text-y2k-navy" style={{ fontSize: 12, letterSpacing: '0.15em' }}>
+                        CANVAS
+                      </span>
                     </div>
+                    <ViewModeToggle viewMode={viewMode} onChange={setViewMode} />
+                  </div>
+                  <div
+                    className="bg-paper-soft overflow-auto max-h-[40vh] sm:max-h-[600px]"
+                    style={{
+                      boxShadow: 'inset 0 0 0 2px var(--y2k-navy)',
+                      touchAction: 'pan-x pan-y pinch-zoom',
+                    }}
+                  >
+                    {(() => {
+                      const cols = workingGrid[0].length;
+                      const rows = workingGrid.length;
+                      // 简洁模式画布也正方形，跟 PEGBOARD.EXE 一致
+                      const boardDim = Math.max(cols, rows);
+                      const cellSize = beadSize;
+                      return (
+                        <div className="inline-block p-2">
+                          <div
+                            ref={canvasRef}
+                            className="grid gap-0"
+                            style={{
+                              gridTemplateColumns: `repeat(${boardDim}, ${cellSize}px)`,
+                              gridTemplateRows: `repeat(${boardDim}, ${cellSize}px)`,
+                              width: boardDim * cellSize,
+                              height: boardDim * cellSize,
+                              backgroundColor: 'var(--bead-paper-bg)',
+                              touchAction: 'none',
+                              overscrollBehavior: 'contain',
+                              userSelect: 'none',
+                              boxShadow: 'inset 0 0 0 1px var(--y2k-navy)',
+                            }}
+                            onTouchStart={handleTouchStart}
+                            onTouchMove={handleTouchMove}
+                            onTouchEnd={handleTouchEnd}
+                          >
+                            {Array.from({ length: boardDim * boardDim }).map((_, i) => {
+                              const x = i % boardDim;
+                              const y = Math.floor(i / boardDim);
+                              const inBounds = x < cols && y < rows;
+                              const color = inBounds ? workingGrid[y][x] : null;
+                              const referenceColor = inBounds ? referenceGrid[y]?.[x] : null;
+                              const shouldHighlight = lockedColor && referenceColor === lockedColor;
+                              const canPlace = inBounds && (!lockedColor || referenceColor === lockedColor);
+                              const isEmpty = !color;
+                              return (
+                                <PegboardCell
+                                  key={`edit-${x}-${y}`}
+                                  x={x}
+                                  y={y}
+                                  color={color}
+                                  beadSize={cellSize}
+                                  viewMode={viewMode}
+                                  showGrid={showGrid}
+                                  shouldHighlight={!!shouldHighlight}
+                                  canPlace={canPlace}
+                                  isEmpty={isEmpty}
+                                  onMouseDown={inBounds ? handleMouseDown : undefined}
+                                  onMouseEnter={inBounds ? handleMouseEnter : undefined}
+                                  canvasParams={canvasParams}
+                                />
+                              );
+                            })}
+                          </div>
+                        </div>
+                      );
+                    })()}
                   </div>
                 </div>
+                <CornerPearls />
               </div>
             </div>
           )}
         </div>
 
-        {/* 材料单 - 只在简洁模式下显示在右侧 */}
+        {/* STOCK.EXE 材料清单 — 简洁模式右侧 */}
         {viewMode === 'simple' && (
-          <div className="bg-paper-soft border border-edge-sand rounded-card p-6 h-fit sticky top-4">
-            <h3 className="text-xl font-semibold mb-4 text-ink-warm" style={{ fontFamily: 'var(--font-headline)' }}>材料清单</h3>
-            <div className="text-sm text-ink-soft mb-4">
-              点击颜色自动拾取并高亮对应区域
-            </div>
-            <div className="space-y-2 max-h-[600px] overflow-y-auto pr-2">
-              {Array.from(colorCount.entries())
-                .sort((a, b) => b[1] - a[1])
-                .map(([colorHex, total]) => {
-                  const placed = getPlacedCount(colorHex);
-                  const completed = placed >= total;
-                  const isLocked = lockedColor === colorHex;
-                  const code = getColorCode(colorHex);
-                  const progress = (placed / total) * 100;
+          <div className="relative h-fit sticky top-4">
+            <div
+              className="relative bg-paper-bg p-4 pt-7"
+              style={{
+                boxShadow: WIN95_SHADOW,
+                backgroundImage:
+                  'radial-gradient(circle, rgba(44, 58, 94, 0.05) 1px, transparent 1px)',
+                backgroundSize: '14px 14px',
+              }}
+            >
+              <TitleBar name="STOCK.EXE" />
+              <div className="flex items-baseline gap-3 mb-3">
+                <h3 className="font-pixel-cn text-ink-warm" style={{ fontSize: 22, letterSpacing: '0.1em', lineHeight: 1.1 }}>
+                  材料清单
+                </h3>
+                <span className="font-pixel-arcade text-y2k-navy" style={{ fontSize: 12, letterSpacing: '0.15em' }}>
+                  STOCK
+                </span>
+              </div>
+              <p className="font-pixel-cn text-ink-soft mb-3" style={{ fontSize: 12, letterSpacing: '0.03em' }}>
+                点击颜色拾取并高亮区域
+              </p>
 
-                  return (
-                    <button
-                      key={colorHex}
-                      onClick={() => handleColorLock(colorHex)}
-                      className={`w-full p-3 rounded-control transition-colors text-left border-2 focus-visible:outline-2 focus-visible:outline-moss focus-visible:outline-offset-2 ${
-                        isLocked
-                          ? "bg-honey-glow/40 border-honey"
-                          : completed
-                            ? "bg-paper-deep border-moss/40"
-                            : "bg-paper-bg border-edge-sand hover:bg-paper-deep"
-                      }`}
-                      aria-pressed={isLocked}
-                    >
-                      <div className="flex items-center justify-between mb-2">
-                        <div className="flex items-center gap-3 min-w-0">
-                          <div
-                            className="w-10 h-10 rounded-bead border border-edge-sand flex items-center justify-center shrink-0"
-                            style={{ backgroundColor: colorHex }}
-                            aria-hidden="true"
-                          >
-                            {completed && (
-                              <Check
-                                className="w-5 h-5"
-                                style={{
-                                  color: 'var(--bead-ink)',
-                                  filter: 'drop-shadow(0 0 2px var(--bead-paper-bg))',
-                                }}
-                                aria-hidden="true"
-                              />
-                            )}
-                          </div>
-                          <div className="min-w-0">
-                            <div className="font-bold text-sm text-ink-warm" style={{ fontFamily: 'var(--font-num)' }}>
-                              {code}
+              <div className="space-y-2 max-h-[600px] overflow-y-auto pr-1">
+                {Array.from(colorCount.entries())
+                  .sort((a, b) => b[1] - a[1])
+                  .map(([colorHex, total]) => {
+                    const placed = getPlacedCount(colorHex);
+                    const completed = placed >= total;
+                    const isLocked = lockedColor === colorHex;
+                    const code = getColorCode(colorHex);
+                    const progress = (placed / total) * 100;
+
+                    return (
+                      <button
+                        key={colorHex}
+                        onClick={() => handleColorLock(colorHex)}
+                        className="w-full p-2 text-left bg-paper-soft transition-transform hover:-translate-y-0.5 active:translate-x-[1px] active:translate-y-[1px] focus-visible:outline-2 focus-visible:outline-y2k-coral focus-visible:outline-offset-2"
+                        style={{
+                          boxShadow: [
+                            '0 -1px 0 var(--y2k-navy)',
+                            '0 1px 0 var(--y2k-navy)',
+                            '-1px 0 0 var(--y2k-navy)',
+                            '1px 0 0 var(--y2k-navy)',
+                            isLocked ? '2px 2px 0 var(--y2k-coral)' : '2px 2px 0 var(--y2k-navy-deep)',
+                          ].join(', '),
+                          opacity: completed && !isLocked ? 0.65 : 1,
+                        }}
+                        aria-pressed={isLocked}
+                      >
+                        <div className="flex items-center justify-between mb-2">
+                          <div className="flex items-center gap-2.5 min-w-0">
+                            <div
+                              className="w-8 h-8 flex items-center justify-center shrink-0"
+                              style={{
+                                backgroundColor: colorHex,
+                                boxShadow: [
+                                  '0 -1px 0 var(--y2k-navy)',
+                                  '0 1px 0 var(--y2k-navy)',
+                                  '-1px 0 0 var(--y2k-navy)',
+                                  '1px 0 0 var(--y2k-navy)',
+                                ].join(', '),
+                              }}
+                              aria-hidden="true"
+                            >
+                              {completed ? (
+                                <Check
+                                  className="w-4 h-4"
+                                  style={{
+                                    color: 'var(--bead-ink)',
+                                    filter: 'drop-shadow(0 0 2px var(--bead-paper-bg))',
+                                  }}
+                                  aria-hidden="true"
+                                />
+                              ) : (
+                                <span
+                                  className="font-pixel-arcade"
+                                  style={{
+                                    fontSize: 12,
+                                    color: 'var(--bead-ink)',
+                                    textShadow: '0 0 2px var(--bead-paper-bg)',
+                                    letterSpacing: 0,
+                                  }}
+                                >
+                                  {code}
+                                </span>
+                              )}
                             </div>
-                            <div className="text-xs text-ink-soft" style={{ fontFamily: 'var(--font-num)' }}>
-                              {placed}/{total} 颗
+                            <div className="flex flex-col min-w-0">
+                              <span className="font-pixel-cn text-ink-warm" style={{ fontSize: 12, letterSpacing: '0.05em' }}>
+                                {code}
+                              </span>
+                              <span className="font-pixel-arcade text-y2k-navy" style={{ fontSize: 12, letterSpacing: '0.05em' }}>
+                                {placed}/{total}
+                              </span>
                             </div>
                           </div>
+                          {isLocked && (
+                            <span className="font-pixel-arcade text-y2k-coral shrink-0" style={{ fontSize: 12, letterSpacing: '0.1em' }}>
+                              LOCK
+                            </span>
+                          )}
                         </div>
-                        {isLocked && (
-                          <div className="text-ink-warm font-semibold text-xs shrink-0">
-                            锁定中
-                          </div>
-                        )}
-                      </div>
-                      {/* 进度条 */}
-                      <div className="w-full h-2 bg-paper-deep rounded-bead overflow-hidden">
+                        {/* 进度条 — pixel chrome 边 */}
                         <div
-                          className={`h-full transition-all duration-300 rounded-bead ${
-                            completed ? "bg-moss" : "bg-terracotta"
-                          }`}
-                          style={{ width: `${Math.min(progress, 100)}%` }}
-                        />
-                      </div>
-                    </button>
-                  );
-                })}
-            </div>
-
-            {/* 总进度 */}
-            <div className="mt-6 pt-6 border-t border-edge-sand">
-              <div className="text-sm text-ink-soft mb-2">总进度</div>
-              <div className="flex items-baseline justify-center gap-2 text-lg font-semibold mb-2 text-ink-warm" style={{ fontFamily: 'var(--font-num)' }}>
-                <span>{getTotalPlaced()}</span>
-                <span className="text-ink-soft">/</span>
-                <span>{getTotalRequired()}</span>
+                          className="w-full h-2 bg-paper-deep overflow-hidden"
+                          style={{
+                            boxShadow: [
+                              '0 -1px 0 var(--y2k-navy)',
+                              '0 1px 0 var(--y2k-navy)',
+                              '-1px 0 0 var(--y2k-navy)',
+                              '1px 0 0 var(--y2k-navy)',
+                            ].join(', '),
+                          }}
+                        >
+                          <div
+                            className="h-full transition-all duration-300"
+                            style={{
+                              width: `${Math.min(progress, 100)}%`,
+                              backgroundColor: completed ? 'var(--bead-moss)' : 'var(--y2k-coral)',
+                            }}
+                          />
+                        </div>
+                      </button>
+                    );
+                  })}
               </div>
-              <div className="w-full h-3 bg-paper-deep rounded-bead overflow-hidden">
+
+              {/* 总进度 */}
+              <div className="mt-5 pt-4" style={{ borderTop: '2px dashed var(--y2k-navy)' }}>
+                <p className="font-pixel-arcade text-y2k-navy mb-2" style={{ fontSize: 12, letterSpacing: '0.15em' }}>
+                  TOTAL PROGRESS
+                </p>
+                <div className="flex items-baseline justify-center gap-2 mb-2 font-pixel-arcade text-ink-warm" style={{ fontSize: 18, letterSpacing: '0.05em' }}>
+                  <span>{getTotalPlaced()}</span>
+                  <span className="text-y2k-navy">/</span>
+                  <span>{getTotalRequired()}</span>
+                </div>
                 <div
-                  className="h-full bg-terracotta transition-all duration-300 rounded-bead"
+                  className="w-full h-3 bg-paper-deep overflow-hidden"
                   style={{
-                    width: `${getTotalRequired() > 0 ? (getTotalPlaced() / getTotalRequired()) * 100 : 0}%`,
+                    boxShadow: [
+                      '0 -1px 0 var(--y2k-navy)',
+                      '0 1px 0 var(--y2k-navy)',
+                      '-1px 0 0 var(--y2k-navy)',
+                      '1px 0 0 var(--y2k-navy)',
+                    ].join(', '),
                   }}
-                />
+                >
+                  <div
+                    className="h-full bg-y2k-coral transition-all duration-300"
+                    style={{
+                      width: `${getTotalRequired() > 0 ? (getTotalPlaced() / getTotalRequired()) * 100 : 0}%`,
+                    }}
+                  />
+                </div>
               </div>
-            </div>
 
-            {/* 使用提示 — 跟 phase 3 GalleryView 同款 honey-glow tip */}
-            <div className="mt-6 p-4 bg-honey-glow/40 border border-honey/40 rounded-surface flex items-start gap-2.5">
-              <Zap className="w-4 h-4 text-ink-warm shrink-0 mt-0.5" aria-hidden="true" />
-              <div className="text-sm text-ink-warm leading-relaxed">
-                <p className="font-semibold mb-1.5">滑豆模式使用提示</p>
-                <ul className="space-y-1 text-ink-soft">
-                  <li>• 点击材料清单中的颜色可锁定该颜色</li>
-                  <li>• 锁定后开启 <span className="font-semibold text-ink-warm">滑豆模式</span> 开关</li>
-                  <li>• 鼠标滑过即上色，大面积填色超高效</li>
+              {/* 滑豆模式 tip — pixel ribbon */}
+              <div
+                className="mt-4 p-3 bg-paper-soft"
+                style={{
+                  boxShadow: [
+                    '0 -1px 0 var(--y2k-navy)',
+                    '0 1px 0 var(--y2k-navy)',
+                    '-1px 0 0 var(--y2k-navy)',
+                    '1px 0 0 var(--y2k-navy)',
+                  ].join(', '),
+                }}
+              >
+                <div className="flex items-center gap-2 mb-2">
+                  <Zap className="w-4 h-4 text-y2k-coral shrink-0" aria-hidden="true" />
+                  <p className="font-pixel-cn text-ink-warm" style={{ fontSize: 13, letterSpacing: '0.05em' }}>
+                    滑豆模式
+                  </p>
+                </div>
+                <ul className="font-pixel-cn text-ink-soft space-y-1" style={{ fontSize: 12, letterSpacing: '0.02em', lineHeight: 1.5 }}>
+                  <li>• 点色卡 = 锁色</li>
+                  <li>• 工具栏开滑豆开关</li>
+                  <li>• 鼠标滑过 = 自动上色</li>
                 </ul>
               </div>
             </div>
+            <CornerPearls />
           </div>
         )}
 
