@@ -45,6 +45,8 @@ function App() {
   const DRAFT_STORAGE_KEY = 'bead_draft_v1';
   const [mode, setMode] = useState<'upload' | 'pattern' | 'canvas'>('upload');
   const [showGallery, setShowGallery] = useState(false);
+  // 引导用 — 标记本次会话是否已熨烫过（控制最后一步出现）
+  const [hasIronedSession, setHasIronedSession] = useState(false);
   const [galleryCount, setGalleryCount] = useState(() => getGallery().length);
   const [selectedColor, setSelectedColor] = useState<string>(beadColors[2].hex);
   const [beadGrid, setBeadGrid] = useState<BeadGrid>([]);
@@ -430,12 +432,21 @@ function App() {
             colorSystem={colorSystem}
             referenceGrid={referenceGrid}
             onFinish={handleBackToUpload}
+            onIronComplete={() => setHasIronedSession(true)}
           />
         )}
       </main>
 
-      {/* 首次访问引导 — 仅在 upload 主页显示，避免在创作中干扰 */}
-      <OnboardingTour enabled={mode === 'upload' && !showGallery} />
+      {/* 首次访问全流程引导 — 跨 upload/canvas/canvas-ironed 三阶段 */}
+      <OnboardingTour
+        currentMode={
+          showGallery
+            ? 'upload' // gallery 开着时按 upload 算（gallery 自带 modal 不冲突）
+            : mode === 'canvas'
+              ? (hasIronedSession ? 'canvas-ironed' : 'canvas')
+              : 'upload'
+        }
+      />
     </div>
   );
 }

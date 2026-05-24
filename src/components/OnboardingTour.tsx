@@ -1,47 +1,84 @@
 /**
- * OnboardingTour — 首次访问引导
- * 用 data-tour-id 锚定目标按钮，渲染 pixel chrome 气泡 + 箭头
- * localStorage flag "onboarding_done_v1" 防重复显示
+ * OnboardingTour — 首次访问全流程引导
+ * 跨 upload → canvas → ironed 三阶段，按 mode 自动显隐对应步骤
+ * localStorage flag "onboarding_done_v2" 防重复（v1 已废弃，全流程更新到 v2）
  */
 
 import { useEffect, useLayoutEffect, useState } from 'react';
 import { PixelArrow } from './PixelDecorations';
 
+type TourMode = 'upload' | 'canvas' | 'canvas-ironed';
+
 interface TourStep {
-  id: string;            // data-tour-id 对应值
-  title: string;         // arcade 风 title
-  desc: string;          // Cubic 11 中文描述
-  placement?: 'top' | 'bottom' | 'left' | 'right'; // 气泡相对目标位置
+  id: string;
+  mode: TourMode;
+  title: string;
+  desc: string;
+  placement?: 'top' | 'bottom' | 'left' | 'right';
 }
 
 const STEPS: TourStep[] = [
+  // ─── 主页阶段 ───
   {
     id: 'upload-zone',
-    title: 'STEP 1 / 3',
-    desc: '拖图到这里 · 或点击上传\n自动转成拼豆图纸',
+    mode: 'upload',
+    title: '先扔张图过来',
+    desc: '拽一张图扔进这里\n或者点一下选图就行\n会自动转成拼豆图纸',
     placement: 'bottom',
   },
   {
     id: 'gallery-section',
-    title: 'STEP 2 / 3',
-    desc: '没图？\n从这些现成图鉴里挑一个直接玩',
+    mode: 'upload',
+    title: '懒得找图也行',
+    desc: '下面这些都是现成的\n看哪个顺眼就点哪个\n直接开拼',
     placement: 'top',
   },
   {
     id: 'header-gallery',
-    title: 'STEP 3 / 3',
-    desc: '熨完的作品都在这里\n随时回来看',
+    mode: 'upload',
+    title: '作品馆在这',
+    desc: '拼好熨完的都丢这\n啥时候想看回来就行',
+    placement: 'bottom',
+  },
+  // ─── 创作阶段 ───
+  {
+    id: 'view-mode-toggle',
+    mode: 'canvas',
+    title: '两种视图随你切',
+    desc: '拼豆板 = 像真板子那样有钉子\n简洁 = 干净的网格\n看你喜欢哪个',
+    placement: 'bottom',
+  },
+  {
+    id: 'pour-mode',
+    mode: 'canvas',
+    title: '滑豆模式真香',
+    desc: '挑个颜色锁定 + 开滑豆\n然后手指/鼠标一划就是一片\n一个一个点累死人',
+    placement: 'bottom',
+  },
+  {
+    id: 'iron-button',
+    mode: 'canvas',
+    title: '拼完了就熨',
+    desc: '点这个一键熨烫\n默认帮你去掉背景\n还能微调亮度和质感',
+    placement: 'bottom',
+  },
+  // ─── 熨完后 ───
+  {
+    id: 'finish-button',
+    mode: 'canvas-ironed',
+    title: '熨完啦',
+    desc: '点这个绿按钮结束\n作品已经帮你存好了\n直接回主页继续整下一个',
     placement: 'bottom',
   },
 ];
 
-const STORAGE_KEY = 'onboarding_done_v1';
+const STORAGE_KEY = 'onboarding_done_v2';
 
 interface OnboardingTourProps {
-  enabled?: boolean; // 外层可强制关闭（比如其他模态打开时）
+  currentMode: TourMode;
 }
 
-export function OnboardingTour({ enabled = true }: OnboardingTourProps) {
+export function OnboardingTour({ currentMode }: OnboardingTourProps) {
   const [show, setShow] = useState(false);
   const [stepIdx, setStepIdx] = useState(0);
   const [rect, setRect] = useState<DOMRect | null>(null);
@@ -53,42 +90,44 @@ export function OnboardingTour({ enabled = true }: OnboardingTourProps) {
     } catch {
       return;
     }
-    // 延迟 600ms 等页面动画/字体加载完成，气泡位置更准
     const t = setTimeout(() => setShow(true), 600);
     return () => clearTimeout(t);
   }, []);
 
-  // 计算目标元素位置
   const step = STEPS[stepIdx];
+  // 当前步骤的 mode 跟 app mode 对得上才显示
+  const modeMatch = step && step.mode === currentMode;
+
+  // 计算目标元素位置
   useLayoutEffect(() => {
-    if (!show || !step) return;
+    if (!show || !step || !modeMatch) {
+      setRect(null);
+      return;
+    }
     const update = () => {
       const el = document.querySelector(`[data-tour-id="${step.id}"]`);
       if (el) {
         setRect(el.getBoundingClientRect());
-        // 把目标元素滚到视口可见区
         const r = el.getBoundingClientRect();
         if (r.top < 80 || r.bottom > window.innerHeight - 80) {
           el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-          // 滚完后再 update 一次
-          setTimeout(() => {
-            const newR = el.getBoundingClientRect();
-            setRect(newR);
-          }, 400);
+          setTimeout(() => setRect(el.getBoundingClientRect()), 400);
         }
       } else {
-        // 目标不存在（页面状态切换）→ 跳过这一步
         setRect(null);
       }
     };
     update();
+    // poll 一会（目标可能延迟挂载）
+    const poll = setInterval(update, 500);
     window.addEventListener('resize', update);
     window.addEventListener('scroll', update);
     return () => {
+      clearInterval(poll);
       window.removeEventListener('resize', update);
       window.removeEventListener('scroll', update);
     };
-  }, [show, step]);
+  }, [show, step, modeMatch]);
 
   const finish = () => {
     try { localStorage.setItem(STORAGE_KEY, '1'); } catch {}
@@ -103,11 +142,11 @@ export function OnboardingTour({ enabled = true }: OnboardingTourProps) {
     }
   };
 
-  if (!enabled || !show || !step) return null;
+  if (!show || !step || !modeMatch || !rect) return null;
 
   // 气泡位置算
-  const BUBBLE_W = 280;
-  const BUBBLE_H = 120;
+  const BUBBLE_W = 300;
+  const BUBBLE_H = 180;
   const GAP = 16;
 
   let bubbleStyle: React.CSSProperties = {
@@ -115,81 +154,71 @@ export function OnboardingTour({ enabled = true }: OnboardingTourProps) {
     zIndex: 1000,
     width: BUBBLE_W,
   };
+  let arrowStyle: React.CSSProperties = { position: 'absolute' };
 
-  let arrowStyle: React.CSSProperties = {
-    position: 'absolute',
-  };
-
-  if (rect) {
-    const cx = rect.left + rect.width / 2;
-    const cy = rect.top + rect.height / 2;
-    switch (step.placement || 'bottom') {
-      case 'bottom':
-        bubbleStyle.top = rect.bottom + GAP;
-        bubbleStyle.left = Math.max(8, Math.min(window.innerWidth - BUBBLE_W - 8, cx - BUBBLE_W / 2));
-        arrowStyle = { position: 'absolute', top: -10, left: cx - (bubbleStyle.left as number) - 8 };
-        break;
-      case 'top':
-        bubbleStyle.top = Math.max(8, rect.top - BUBBLE_H - GAP);
-        bubbleStyle.left = Math.max(8, Math.min(window.innerWidth - BUBBLE_W - 8, cx - BUBBLE_W / 2));
-        arrowStyle = { position: 'absolute', bottom: -10, left: cx - (bubbleStyle.left as number) - 8 };
-        break;
-      case 'left':
-        bubbleStyle.top = cy - BUBBLE_H / 2;
-        bubbleStyle.left = Math.max(8, rect.left - BUBBLE_W - GAP);
-        arrowStyle = { position: 'absolute', right: -10, top: BUBBLE_H / 2 - 8 };
-        break;
-      case 'right':
-        bubbleStyle.top = cy - BUBBLE_H / 2;
-        bubbleStyle.left = rect.right + GAP;
-        arrowStyle = { position: 'absolute', left: -10, top: BUBBLE_H / 2 - 8 };
-        break;
-    }
-  } else {
-    // 目标找不到，居中显示
-    bubbleStyle.top = window.innerHeight / 2 - BUBBLE_H / 2;
-    bubbleStyle.left = window.innerWidth / 2 - BUBBLE_W / 2;
+  const cx = rect.left + rect.width / 2;
+  const cy = rect.top + rect.height / 2;
+  switch (step.placement || 'bottom') {
+    case 'bottom':
+      bubbleStyle.top = Math.min(window.innerHeight - BUBBLE_H - 8, rect.bottom + GAP);
+      bubbleStyle.left = Math.max(8, Math.min(window.innerWidth - BUBBLE_W - 8, cx - BUBBLE_W / 2));
+      arrowStyle = { position: 'absolute', top: -10, left: Math.max(20, cx - (bubbleStyle.left as number) - 8) };
+      break;
+    case 'top':
+      bubbleStyle.top = Math.max(8, rect.top - BUBBLE_H - GAP);
+      bubbleStyle.left = Math.max(8, Math.min(window.innerWidth - BUBBLE_W - 8, cx - BUBBLE_W / 2));
+      arrowStyle = { position: 'absolute', bottom: -10, left: Math.max(20, cx - (bubbleStyle.left as number) - 8) };
+      break;
+    case 'left':
+      bubbleStyle.top = Math.max(8, Math.min(window.innerHeight - BUBBLE_H - 8, cy - BUBBLE_H / 2));
+      bubbleStyle.left = Math.max(8, rect.left - BUBBLE_W - GAP);
+      arrowStyle = { position: 'absolute', right: -10, top: BUBBLE_H / 2 - 8 };
+      break;
+    case 'right':
+      bubbleStyle.top = Math.max(8, Math.min(window.innerHeight - BUBBLE_H - 8, cy - BUBBLE_H / 2));
+      bubbleStyle.left = rect.right + GAP;
+      arrowStyle = { position: 'absolute', left: -10, top: BUBBLE_H / 2 - 8 };
+      break;
   }
+
+  // 进度
+  const progress = `${stepIdx + 1} / ${STEPS.length}`;
 
   return (
     <>
-      {/* 半透 backdrop — 不挡点击但视觉聚焦 */}
+      {/* radial 高亮 backdrop */}
       <div
         className="fixed inset-0 pointer-events-none"
         style={{
           zIndex: 999,
-          background: rect
-            ? `radial-gradient(ellipse ${Math.max(rect.width, rect.height) * 0.9}px ${Math.max(rect.width, rect.height) * 0.9}px at ${rect.left + rect.width / 2}px ${rect.top + rect.height / 2}px, transparent 30%, rgba(44, 58, 94, 0.45) 100%)`
-            : 'rgba(44, 58, 94, 0.45)',
+          background: `radial-gradient(ellipse ${Math.max(rect.width, rect.height) * 0.85}px ${Math.max(rect.width, rect.height) * 0.85}px at ${rect.left + rect.width / 2}px ${rect.top + rect.height / 2}px, transparent 30%, rgba(44, 58, 94, 0.5) 100%)`,
         }}
         aria-hidden="true"
       />
 
-      {/* 目标元素高亮环 */}
-      {rect && (
-        <div
-          className="fixed pointer-events-none animate-pulse"
-          style={{
-            zIndex: 1000,
-            top: rect.top - 6,
-            left: rect.left - 6,
-            width: rect.width + 12,
-            height: rect.height + 12,
-            boxShadow: [
-              '0 -3px 0 var(--y2k-coral)',
-              '0 3px 0 var(--y2k-coral)',
-              '-3px 0 0 var(--y2k-coral)',
-              '3px 0 0 var(--y2k-coral)',
-              '0 0 24px rgba(232, 164, 140, 0.6)',
-            ].join(', '),
-          }}
-          aria-hidden="true"
-        />
-      )}
+      {/* 目标高亮环 */}
+      <div
+        className="fixed pointer-events-none animate-pulse"
+        style={{
+          zIndex: 1000,
+          top: rect.top - 6,
+          left: rect.left - 6,
+          width: rect.width + 12,
+          height: rect.height + 12,
+          boxShadow: [
+            '0 -3px 0 var(--y2k-coral)',
+            '0 3px 0 var(--y2k-coral)',
+            '-3px 0 0 var(--y2k-coral)',
+            '3px 0 0 var(--y2k-coral)',
+            '0 0 24px rgba(232, 164, 140, 0.6)',
+          ].join(', '),
+        }}
+        aria-hidden="true"
+      />
 
-      {/* 气泡本体 */}
+      {/* 气泡 */}
       <div style={bubbleStyle} className="animate-in fade-in slide-in-from-bottom-2 duration-200">
-        {/* 箭头 — 简单三角 */}
+        {/* 三角箭头 */}
         <div
           style={{
             ...arrowStyle,
@@ -216,7 +245,6 @@ export function OnboardingTour({ enabled = true }: OnboardingTourProps) {
           aria-hidden="true"
         />
 
-        {/* 气泡 chrome 容器 */}
         <div
           className="relative bg-paper-bg p-4"
           style={{
@@ -231,44 +259,52 @@ export function OnboardingTour({ enabled = true }: OnboardingTourProps) {
             backgroundSize: '10px 10px',
           }}
         >
-          {/* TIP 标 */}
+          {/* 进度 + 跳过 */}
           <div className="flex items-baseline justify-between mb-2">
             <span
-              className="font-pixel-arcade text-y2k-coral arcade-blink"
-              style={{ fontSize: 11, letterSpacing: '0.2em' }}
+              className="font-pixel-arcade text-y2k-coral"
+              style={{ fontSize: 12, letterSpacing: '0.15em' }}
             >
-              ✦ {step.title} ✦
+              ✦ {progress}
             </span>
             <button
               onClick={finish}
               className="font-pixel-arcade text-y2k-navy hover:text-y2k-coral transition-colors"
-              style={{ fontSize: 11, letterSpacing: '0.1em' }}
+              style={{ fontSize: 12, letterSpacing: '0.1em' }}
               aria-label="跳过引导"
             >
-              SKIP
+              不看了 ×
             </button>
           </div>
 
-          {/* 描述文字 */}
+          {/* 标题 */}
           <p
-            className="font-pixel-cn text-ink-warm whitespace-pre-line mb-3"
-            style={{ fontSize: 14, letterSpacing: '0.05em', lineHeight: 1.6 }}
+            className="font-pixel-cn text-ink-warm mb-2"
+            style={{ fontSize: 18, letterSpacing: '0.08em', lineHeight: 1.2 }}
+          >
+            {step.title}
+          </p>
+
+          {/* 描述 */}
+          <p
+            className="font-pixel-cn text-ink-warm whitespace-pre-line mb-4"
+            style={{ fontSize: 13, letterSpacing: '0.04em', lineHeight: 1.6 }}
           >
             {step.desc}
           </p>
 
-          {/* 下一步 / 知道了 按钮 */}
+          {/* 下一步 */}
           <button
             onClick={next}
             className="w-full arcade-pill font-pixel-cn text-paper-bg cursor-pointer"
             style={{
               backgroundColor: 'var(--y2k-navy)',
-              fontSize: 13,
+              fontSize: 14,
               letterSpacing: '0.1em',
               padding: '10px 16px',
             }}
           >
-            <span>{stepIdx >= STEPS.length - 1 ? '开始玩吧' : '下一步'}</span>
+            <span>{stepIdx >= STEPS.length - 1 ? '玩得开心' : '下一个'}</span>
             <PixelArrow size={12} color="var(--bead-paper-bg)" />
           </button>
         </div>

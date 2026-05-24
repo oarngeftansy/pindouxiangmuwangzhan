@@ -115,6 +115,8 @@ interface BeadCanvasProps {
   referenceGrid: BeadGrid;
   // 熨完后用户点"结束作品"回主页
   onFinish?: () => void;
+  // 熨烫完成回调（引导用，App 标记 hasIronedSession）
+  onIronComplete?: () => void;
 }
 
 type Tool = "brush" | "eraser";
@@ -192,6 +194,7 @@ export function BeadCanvas({
   colorSystem = "mard",
   referenceGrid,
   onFinish,
+  onIronComplete,
 }: BeadCanvasProps) {
   const [activeTool, setActiveTool] = useState<Tool>("brush");
   const [isDrawing, setIsDrawing] = useState(false);
@@ -873,6 +876,7 @@ export function BeadCanvas({
     handleAddToGallery(ironedImageUrl, methodNames[ironingMethod]);
     // 标记作品已熨烫，工具栏会显示"结束作品"按钮回主页
     setHasIroned(true);
+    onIronComplete?.(); // 通知 App 切换引导到最后一步
 
     setIronedResult(ironedImageUrl);
     setIronProgress(0);
@@ -992,6 +996,7 @@ export function BeadCanvas({
                 即使没锁色也能预先开（开了再选色直接 pour） */}
             <button
               onClick={() => setPourMode(!pourMode)}
+              data-tour-id="pour-mode"
               className="inline-flex items-center gap-2 min-h-[44px] px-4 py-2 font-pixel-cn transition-transform hover:-translate-y-0.5 active:translate-x-[1px] active:translate-y-[1px]"
               style={{
                 ...toolBtnStyle(pourMode),
@@ -1044,6 +1049,7 @@ export function BeadCanvas({
               <button
                 onClick={() => setShowIroningModal(true)}
                 disabled={isIroning}
+                data-tour-id="iron-button"
                 className="arcade-pill font-pixel-cn text-paper-bg cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
                 style={{
                   backgroundColor: 'var(--y2k-navy)',
@@ -1081,6 +1087,7 @@ export function BeadCanvas({
               {hasIroned && onFinish && (
                 <button
                   onClick={onFinish}
+                  data-tour-id="finish-button"
                   className="arcade-pill font-pixel-cn text-paper-bg cursor-pointer whitespace-nowrap"
                   style={{
                     backgroundColor: 'var(--bead-moss)',
@@ -1521,7 +1528,7 @@ export function BeadCanvas({
                       STUDIO
                     </span>
                   </div>
-                  <ViewModeToggle viewMode={viewMode} onChange={setViewMode} />
+                  <span data-tour-id="view-mode-toggle"><ViewModeToggle viewMode={viewMode} onChange={setViewMode} /></span>
                 </div>
               {/* 手机锁色浮动徽章 */}
               {isMobile && lockedColor && (
@@ -1655,7 +1662,7 @@ export function BeadCanvas({
                         CANVAS
                       </span>
                     </div>
-                    <ViewModeToggle viewMode={viewMode} onChange={setViewMode} />
+                    <span data-tour-id="view-mode-toggle"><ViewModeToggle viewMode={viewMode} onChange={setViewMode} /></span>
                   </div>
                   <div
                     className="bg-paper-soft overflow-auto max-h-[40vh] sm:max-h-[600px]"
