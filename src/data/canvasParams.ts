@@ -98,44 +98,43 @@ export const DEFAULT_CANVAS_PARAMS: CanvasParams = {
     beadBorderRadius: 50,
     beadFlatness: 0,
 
-    // 所有"改色"层归 0，让豆子色 = 参考图色，无色差
-    // 旧版叠 5 层（内阴/高光/孔洞/外影/glow）混合后 alpha 偏移大于 20%，
-    // 亮色豆子被拉灰跟参考图明显色差。本版只保留 1 条极轻内阴做圆形感
-    beadInnerDarkBlur: 2,
-    beadInnerDarkAlpha: 0.06, // 仅保留这一条做"球面感"，已减到 6%
-    beadInnerDarkOffsetX: -0.5,
-    beadInnerDarkOffsetY: -0.5,
-    beadInnerLightBlur: 0,
-    beadInnerLightAlpha: 0, // 关闭白色高光层（变色元凶）
-    beadInnerLightOffsetX: 0,
-    beadInnerLightOffsetY: 0,
-    beadDropShadowBlur: 0,
-    beadDropShadowAlpha: 0, // 关闭外投影（给周围豆子加灰晕）
-    beadDropShadowOffsetY: 0,
+    // 立体感参数适度下调 — 既减色差又保留 halo 防露白
+    // 不能全归 0，否则圆豆角落露出白板底 = 用户反馈"白方格+中间圆豆"
+    beadInnerDarkBlur: 3,
+    beadInnerDarkAlpha: 0.10, // 0.15 → 0.10
+    beadInnerDarkOffsetX: -1,
+    beadInnerDarkOffsetY: -1,
+    beadInnerLightBlur: 3,
+    beadInnerLightAlpha: 0.16, // 0.25 → 0.16
+    beadInnerLightOffsetX: 1,
+    beadInnerLightOffsetY: 1,
+    beadDropShadowBlur: 3,
+    beadDropShadowAlpha: 0.08, // 0.12 → 0.08（halo 必须留，否则角落露白）
+    beadDropShadowOffsetY: 1,
 
-    highlightSize: 0,
-    highlightTop: 0,
-    highlightLeft: 0,
-    highlightAlpha: 0, // 关闭白色高光点（拉亮颜色元凶）
-    highlightSpread: 0,
-    highlightFocusX: 0,
-    highlightFocusY: 0,
+    highlightSize: 30, // 35 → 30
+    highlightTop: 12,
+    highlightLeft: 15,
+    highlightAlpha: 0.22, // 0.45 → 0.22（砍一半减白色高光对色相影响）
+    highlightSpread: 70,
+    highlightFocusX: 40,
+    highlightFocusY: 40,
 
     rimLightAlpha: 0,
-    rimLightWidth: 0,
-    rimLightAngle: 0,
+    rimLightWidth: 0.1,
+    rimLightAngle: 220,
 
-    holeRatio: 0,
-    holeDarkAlpha: 0, // 关闭中心孔洞暗斑（亮色豆子拉灰元凶）
-    holeLightAlpha: 0,
+    holeRatio: 0.22, // 0.28 → 0.22（孔洞缩小但保留）
+    holeDarkAlpha: 0.14, // 0.30 → 0.14（亮色豆子拉灰元凶，减一半）
+    holeLightAlpha: 0.06,
     holeRingAlpha: 0,
 
     surfaceSaturation: 1,
     surfaceBrightness: 1,
 
-    glowInnerStop: 0,
-    glowOuterStop: 0,
-    glowAlpha: 0, // 关闭周围 glow halo
+    glowInnerStop: 65,
+    glowOuterStop: 75,
+    glowAlpha: 0.05, // 0.06 → 0.05（halo 必须留填角）
 
     beadGap: 0,
 
@@ -148,8 +147,8 @@ export const DEFAULT_CANVAS_PARAMS: CanvasParams = {
   },
 };
 
-// v2: 立体感参数下调，旧缓存自动失效避免用户保留老色差
-const STORAGE_KEY = 'canvas_params_v2';
+// v3: 立体感参数回到"适度减弱"档（不是全归 0），保留 halo 防角落露白
+const STORAGE_KEY = 'canvas_params_v3';
 
 export function loadCanvasParams(): CanvasParams {
   try {
