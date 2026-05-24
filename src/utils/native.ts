@@ -14,6 +14,7 @@ import { Share } from '@capacitor/share';
 import { Filesystem, Directory } from '@capacitor/filesystem';
 import { StatusBar, Style } from '@capacitor/status-bar';
 import { SplashScreen } from '@capacitor/splash-screen';
+import { ScreenOrientation } from '@capacitor/screen-orientation';
 
 export const isNative = (): boolean => Capacitor.isNativePlatform();
 export const getPlatform = (): string => Capacitor.getPlatform(); // 'ios' | 'android' | 'web'
@@ -76,6 +77,51 @@ export async function saveOrShareImage(
     // 用户取消分享 / 文件系统失败时不要让 UI 崩
     console.warn('[native] saveOrShareImage failed:', e);
   }
+}
+
+/**
+ * 锁定屏幕方向到横屏（Capacitor native 才能真的强制）
+ * - iOS / Android app：调 native API 真锁
+ * - Web 浏览器：尝试 Screen Orientation API（多数设备失败，需要 fullscreen），失败静默
+ *
+ * 在 unmount 时记得调 unlockOrientation() 释放。
+ */
+export async function lockLandscape(): Promise<void> {
+  if (isNative()) {
+    try {
+      await ScreenOrientation.lock({ orientation: 'landscape' });
+    } catch (e) {
+      console.warn('[native] lockLandscape failed:', e);
+    }
+    return;
+  }
+  // Web fallback：Screen Orientation API（实验性，iOS Safari 不支持）
+  try {
+    const so = screen.orientation as any;
+    if (so?.lock) await so.lock('landscape');
+  } catch {
+    // 没权限/不支持，静默
+  }
+}
+
+/** 解锁屏幕方向（恢复用户偏好） */
+export async function unlockOrientation(): Promise<void> {
+  if (isNative()) {
+    try {
+      await ScreenOrientation.unlock();
+    } catch {}
+    return;
+  }
+  try {
+    const so = screen.orientation as any;
+    if (so?.unlock) so.unlock();
+  } catch {}
+}
+
+/** 判断当前是否横屏（用于 web fallback：不能 lock 就检测） */
+export function isLandscape(): boolean {
+  if (typeof window === 'undefined') return false;
+  return window.innerWidth > window.innerHeight;
 }
 
 /**
