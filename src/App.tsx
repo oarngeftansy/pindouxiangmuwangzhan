@@ -6,6 +6,7 @@ import { BeadPattern } from './components/BeadPattern';
 import { BlindBoxPanel } from './components/BlindBoxPanel';
 import { TrendingPatternsPanel } from './components/TrendingPatternsPanel';
 import { GalleryView } from './components/GalleryView';
+import { OnboardingTour } from './components/OnboardingTour';
 import {
   PixelCloud,
   PixelHeart,
@@ -221,6 +222,7 @@ function App() {
             <div className="flex items-center gap-2 shrink-0">
               <button
                 onClick={() => { setShowGallery(true); }}
+                data-tour-id="header-gallery"
                 className="relative inline-flex items-center justify-center gap-2 min-h-[44px] min-w-[44px] sm:min-w-0 px-3 sm:px-4 py-2 bg-paper-soft text-ink-warm transition-colors hover:bg-paper-deep"
                 style={{
                   // splash 风像素按钮：1px 步阶外边 + 2px lavender 硬阴影
@@ -392,7 +394,7 @@ function App() {
                 </aside>
               </div>
             ) : (
-              <section className="w-full">
+              <section className="w-full" data-tour-id="upload-zone">
                 <ImageUploader
                   onImageProcessed={handleImageProcessed}
                   onCreateBlank={handleCreateBlank}
@@ -400,7 +402,9 @@ function App() {
               </section>
             )}
             {/* 图鉴在上传区下方作为灵感入口 — 用户先看到主 CTA，再被现成图纸吸引 */}
-            <TrendingPatternsPanel onUsePattern={handleUseBlindBox} />
+            <section data-tour-id="gallery-section">
+              <TrendingPatternsPanel onUsePattern={handleUseBlindBox} />
+            </section>
           </div>
         )}
 
@@ -429,6 +433,9 @@ function App() {
           />
         )}
       </main>
+
+      {/* 首次访问引导 — 仅在 upload 主页显示，避免在创作中干扰 */}
+      <OnboardingTour enabled={mode === 'upload' && !showGallery} />
     </div>
   );
 }
