@@ -196,25 +196,7 @@ export function OnboardingTour({ currentMode }: OnboardingTourProps) {
         aria-hidden="true"
       />
 
-      {/* 目标高亮环 */}
-      <div
-        className="fixed pointer-events-none animate-pulse"
-        style={{
-          zIndex: 1000,
-          top: rect.top - 6,
-          left: rect.left - 6,
-          width: rect.width + 12,
-          height: rect.height + 12,
-          boxShadow: [
-            '0 -3px 0 var(--y2k-coral)',
-            '0 3px 0 var(--y2k-coral)',
-            '-3px 0 0 var(--y2k-coral)',
-            '3px 0 0 var(--y2k-coral)',
-            '0 0 24px rgba(232, 164, 140, 0.6)',
-          ].join(', '),
-        }}
-        aria-hidden="true"
-      />
+      {/* 目标高亮环已移除 — 用户反馈橙色边框不要 */}
 
       {/* 气泡 */}
       <div style={bubbleStyle} className="animate-in fade-in slide-in-from-bottom-2 duration-200">

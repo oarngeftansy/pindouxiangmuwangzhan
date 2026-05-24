@@ -59,6 +59,7 @@
   },
   "devDependencies": {
     "@capacitor/cli": "^8.3.4",
+    "@cloudbase/cli": "^3.4.0",
     "@tailwindcss/vite": "4.1.12",
     "@types/node": "^20.10.0",
     "@vitejs/plugin-react": "^4.7.0",
@@ -70,8 +71,9 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "deploy": "npm run build && wrangler pages deploy build --project-name=pindou-studio --commit-dirty=true",
-    "deploy:login": "wrangler login",
+    "deploy": "npm run build && cloudbase hosting deploy build -e joyce-d5g806hcaf733b68b",
+    "deploy:login": "cloudbase login",
+    "deploy:cf": "npm run build && wrangler pages deploy build --project-name=pindou-studio --commit-dirty=true",
     "ios:add": "cap add ios",
     "ios:sync": "npm run build && cap sync ios",
     "ios:open": "npm run ios:sync && cap open ios",
