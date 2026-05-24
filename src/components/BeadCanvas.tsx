@@ -19,6 +19,7 @@ import {
   Sparkles,
   Square,
   Thermometer,
+  Undo2,
   X,
   Zap,
   ZoomIn,
@@ -232,6 +233,11 @@ export function BeadCanvas({
   const [effectTexture, setEffectTexture] = useState(100);
   const [effectSparkle, setEffectSparkle] = useState(100);
   const [isRefiningIron, setIsRefiningIron] = useState(false);
+
+  // 撤销历史 — 每一笔（一次按下到松开）作为一个 snapshot，Ctrl+Z 撤销整笔
+  const MAX_HISTORY = 50;
+  const [history, setHistory] = useState<BeadGrid[]>([]);
+  const canUndo = history.length > 0;
   // (removed matchFuzzyColor - no longer needed for glitter method)
 
   // 高清渲染
@@ -434,6 +440,16 @@ export function BeadCanvas({
     return null;
   };
 
+  // 撤销 push（提前声明给 touchStart / mouseDown 共用，避免 TDZ）
+  const pushHistory = useCallback(() => {
+    const snap = stateRef.current.workingGrid.map((row) => [...row]);
+    setHistory((prev) => {
+      const next = [...prev, snap];
+      if (next.length > MAX_HISTORY) next.shift();
+      return next;
+    });
+  }, []);
+
   const handleTouchStart = (e: React.TouchEvent) => {
     // 多指（pinch）让浏览器自己缩放页面，不绘制
     if (e.touches.length > 1) {
@@ -446,6 +462,7 @@ export function BeadCanvas({
     if (!cell) return;
     const canPlace = !lockedColor || referenceGrid[cell.y]?.[cell.x] === lockedColor;
     if (canPlace) {
+      pushHistory();
       setIsDrawing(true);
       handleCellClick(cell.x, cell.y);
     }
@@ -586,10 +603,34 @@ export function BeadCanvas({
     }
   }, []);
 
+  const handleUndo = useCallback(() => {
+    setHistory((prev) => {
+      if (prev.length === 0) return prev;
+      const last = prev[prev.length - 1];
+      setWorkingGrid(last);
+      setBeadGrid(last);
+      tapHaptic(false);
+      return prev.slice(0, -1);
+    });
+  }, []);
+
+  // Ctrl+Z / Cmd+Z 撤销
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && (e.key === 'z' || e.key === 'Z') && !e.shiftKey) {
+        e.preventDefault();
+        handleUndo();
+      }
+    };
+    window.addEventListener('keydown', handler);
+    return () => window.removeEventListener('keydown', handler);
+  }, [handleUndo]);
+
   const handleMouseDown = useCallback((x: number, y: number) => {
+    pushHistory();
     setIsDrawing(true);
     handleCellClick(x, y);
-  }, [handleCellClick]);
+  }, [handleCellClick, pushHistory]);
 
   const handleMouseEnter = useCallback((x: number, y: number) => {
     setHoveredCell({ x, y });
@@ -893,6 +934,18 @@ export function BeadCanvas({
               aria-pressed={activeTool === "eraser"}
             >
               <Eraser className="w-5 h-5" aria-hidden="true" />
+            </button>
+
+            {/* 撤销 — Ctrl+Z 也可触发，每一笔（按下到松开）算一组 */}
+            <button
+              onClick={handleUndo}
+              disabled={!canUndo}
+              className="inline-flex items-center justify-center min-h-[40px] min-w-[40px] p-2.5 transition-transform hover:-translate-y-0.5 active:translate-x-[1px] active:translate-y-[1px] disabled:opacity-40 disabled:cursor-not-allowed"
+              style={toolBtnStyle(false)}
+              aria-label="撤销 Ctrl+Z"
+              title={canUndo ? '撤销 (Ctrl+Z)' : '没有可撤销操作'}
+            >
+              <Undo2 className="w-5 h-5" aria-hidden="true" />
             </button>
 
             <div className="h-7 w-px bg-y2k-navy" aria-hidden="true" />
