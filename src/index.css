@@ -31,15 +31,40 @@
   transform-origin: center;
 }
 
-/* App 开屏：豆子从顶部下落 snap 到位（cubic-bezier 模拟 spring 弹性） */
-@keyframes splashBeadDrop {
-  0%   { transform: translateY(-60vh); opacity: 0; }
-  60%  { opacity: 1; }
-  /* 弹一下: 用 cubic-bezier 在 80-100% 区间实现 overshoot */
-  100% { transform: translateY(0); opacity: 1; }
+/* App 开屏 V2：豆子从屏顶下落（重力 easing）+ 2 次弹跳 + 错峰 delay
+   每颗豆子定义自己的 --from-y（起始高度）+ --bounce（弹高）+ --delay */
+@keyframes splashBeadFall {
+  0% {
+    transform: translateY(var(--from-y, -100vh));
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  /* 主体下落：重力加速，cubic-bezier ease-in 模拟自由落体 */
+  55% {
+    transform: translateY(0);
+    animation-timing-function: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  }
+  /* 第一次弹起 */
+  68% {
+    transform: translateY(calc(var(--bounce, -14px) * 1));
+  }
+  78% {
+    transform: translateY(0);
+  }
+  /* 第二次小弹 */
+  88% {
+    transform: translateY(calc(var(--bounce, -14px) * 0.35));
+  }
+  100% {
+    transform: translateY(0);
+  }
 }
-.splash-bead {
-  animation: splashBeadDrop 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+.splash-bead-fall {
+  /* fall-then-bounce 用 ease-in (前半重力) 然后 keyframes 自带 timing-function 切到弹跳 */
+  animation: splashBeadFall 1.05s cubic-bezier(0.5, 0, 0.75, 0) both;
+  animation-delay: var(--delay, 0ms);
 }
 
 /* 文字淡入（标题在最后一颗豆落定后，副标题再之后） */

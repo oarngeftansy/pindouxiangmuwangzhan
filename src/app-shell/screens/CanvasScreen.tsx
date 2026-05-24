@@ -178,9 +178,9 @@ export function CanvasScreen({
 
   return (
     <div className="fixed inset-0 bg-paper-bg flex z-[60]">
-      {/* ─────── 左侧 40% ─────── */}
+      {/* ─────── 左侧 32%（之前 38%，画布给到 68% 更舒展） ─────── */}
       <aside
-        className="w-[38%] border-r border-edge-sand flex flex-col bg-paper-soft"
+        className="w-[32%] border-r border-edge-sand flex flex-col bg-paper-soft"
         style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}
       >
         {/* 顶部：返回 + 标题 */}
@@ -200,12 +200,15 @@ export function CanvasScreen({
           </h1>
         </header>
 
-        {/* 参考图缩略 */}
+        {/* 参考图缩略 — V2：占比加大到 42vh，是这一栏的视觉核心 */}
         <section className="shrink-0 p-3 border-b border-edge-sand">
           <div className="text-[10px] uppercase tracking-wider text-ink-soft font-semibold mb-1.5">
             参考图纸
           </div>
-          <div className="bg-paper-bg border border-edge-sand rounded-control p-2 flex items-center justify-center" style={{ maxHeight: '22vh' }}>
+          <div
+            className="bg-paper-bg border border-edge-sand rounded-control p-2 flex items-center justify-center overflow-auto"
+            style={{ maxHeight: '42vh', minHeight: '20vh' }}
+          >
             <ReferenceThumbnail
               grid={referenceGrid}
               lockedColor={lockedColor}
@@ -373,9 +376,9 @@ export function CanvasScreen({
 
 function computeCellSize(referenceGrid: BeadGrid): number {
   if (typeof window === 'undefined') return 20;
-  // 右侧画布可用空间：屏宽 * 0.62 - padding/border ≈ -50px buffer
-  const w = window.innerWidth * 0.62 - 50;
-  const h = window.innerHeight - 60; // 减 safe area + border
+  // 右侧画布可用空间：屏宽 * 0.68 - padding/border buffer
+  const w = window.innerWidth * 0.68 - 50;
+  const h = window.innerHeight - 60;
   const gridW = referenceGrid[0]?.length || 30;
   const gridH = referenceGrid.length || 30;
   return Math.max(8, Math.floor(Math.min(w / gridW, h / gridH)));
@@ -390,8 +393,16 @@ function ReferenceThumbnail({
   lockedColor: string | null;
   onTap: (hex: string) => void;
 }) {
-  // 参考图小尺寸 grid（每格 ~6-10px），点击豆子锁色
-  const size = Math.max(4, Math.min(8, Math.floor(180 / Math.max(grid[0].length, grid.length))));
+  // V2：左栏现在 32%，参考图区域 42vh - 内边距，所以可用空间约：
+  //   宽 = 屏宽 * 0.32 - padding - margin ≈ 屏宽 * 0.28
+  //   高 = 42vh - 标题/边距 ≈ 36vh
+  // 取两者较小决定每格尺寸；上限 18px（再大就糊了，下限 4px 兜底）
+  const availW =
+    typeof window !== 'undefined' ? window.innerWidth * 0.28 : 240;
+  const availH = typeof window !== 'undefined' ? window.innerHeight * 0.36 : 240;
+  const sizeByW = availW / grid[0].length;
+  const sizeByH = availH / grid.length;
+  const size = Math.max(4, Math.min(18, Math.floor(Math.min(sizeByW, sizeByH))));
   return (
     <div
       className="grid gap-0 rounded overflow-hidden border border-edge-sand"
