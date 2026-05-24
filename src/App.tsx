@@ -171,20 +171,20 @@ function App() {
     <div
       className="min-h-screen text-ink-warm relative overflow-x-hidden"
       style={{
-        // 蓝 + 暖陶土 165° 对角渐变：顶左 sky → 中段 cream 缓冲 → 底右淡 terracotta wash
-        // 配 dot grid 保留 OS 桌面感
+        // 整页 = 一面抛光镜面：sky → cream → sky 垂直对称反光带
+        // （跟 wordmark chrome 渐变同构，NJ CD 盒插页 / Y2K 全息表面 vibe）
+        // 中段 cream 留出可读区域，dot grid 保留 OS 桌面感
         backgroundColor: 'var(--bead-paper-bg)',
         backgroundImage: [
           'radial-gradient(circle, rgba(58, 52, 42, 0.06) 1px, transparent 1px)',
           [
-            'linear-gradient(165deg,',
+            'linear-gradient(180deg,',
             'var(--y2k-sky) 0%,',
-            'var(--y2k-sky) 8%,',
-            'color-mix(in oklch, var(--y2k-sky) 50%, var(--bead-paper-bg)) 22%,',
+            'var(--y2k-sky) 14%,',
             'var(--bead-paper-bg) 42%,',
-            'var(--bead-paper-bg) 60%,',
-            'color-mix(in oklch, var(--bead-terracotta) 18%, var(--bead-paper-bg)) 82%,',
-            'color-mix(in oklch, var(--bead-terracotta) 32%, var(--bead-paper-bg)) 100%)',
+            'var(--bead-paper-bg) 58%,',
+            'var(--y2k-sky) 86%,',
+            'var(--y2k-sky) 100%)',
           ].join(' '),
         ].join(', '),
         backgroundSize: '24px 24px, 100% 100%',
