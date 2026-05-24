@@ -279,94 +279,180 @@ export function ImageUploader({ onImageProcessed, onCreateBlank }: ImageUploader
 
   return (
     <div className="w-full">
-      {/* NJ photo card 风主上传区 — 白卡 + 冷软阴影 + 圆角 + 小 file-meta 行 */}
-      <div
-        className={`relative cursor-pointer mb-4 overflow-hidden transition-all nj-card ${
-          isDragging ? 'bg-nj-cloud-deep' : 'hover:-translate-y-0.5'
-        }`}
-        onDragOver={(e) => {
-          e.preventDefault();
-          setIsDragging(true);
-        }}
-        onDragLeave={() => setIsDragging(false)}
-        onDrop={handleDrop}
-        onClick={() => fileInputRef.current?.click()}
-      >
-        {/* 内容区 — 包内 dashed border 暗示"drop zone" */}
+      {/* Win95 风 UPLOAD.EXE 窗口 — 跟 SplashScreen 的 APPLE.EXE 同款 chrome
+          paper-bg 暖底 + ink 1px 步阶外框 + 6px lavender 像素硬阴影 + 4 角珍 */}
+      <div className="relative mb-6 mx-auto" style={{ maxWidth: 560 }}>
         <div
-          className={`relative border-2 border-dashed m-3 sm:m-4 p-10 sm:p-14 rounded-2xl ${
-            isDragging ? 'border-nj-navy' : 'border-nj-edge'
+          className={`relative cursor-pointer transition-transform ${
+            isDragging ? 'translate-x-[2px] translate-y-[2px]' : 'hover:-translate-y-0.5'
           }`}
+          onDragOver={(e) => {
+            e.preventDefault();
+            setIsDragging(true);
+          }}
+          onDragLeave={() => setIsDragging(false)}
+          onDrop={handleDrop}
+          onClick={() => fileInputRef.current?.click()}
+          role="button"
+          tabIndex={0}
+          aria-label="上传图片"
         >
-          {/* 装饰 sparkle */}
-          <span
-            className="sparkle sparkle-sm sparkle-twinkle absolute"
-            style={{ top: 16, right: 24, ['--sparkle-color' as string]: 'var(--y2k-lavender)' }}
-            aria-hidden="true"
-          />
-          <span
-            className="sparkle sparkle-twinkle absolute"
-            style={{ bottom: 20, left: 28, ['--sparkle-color' as string]: 'var(--nj-coral)', animationDelay: '800ms' }}
-            aria-hidden="true"
-          />
-          <span
-            className="sparkle sparkle-sm sparkle-twinkle absolute"
-            style={{ top: 40, left: 48, ['--sparkle-color' as string]: 'var(--nj-bunny-pink)', animationDelay: '400ms' }}
-            aria-hidden="true"
-          />
-        <input
-          ref={fileInputRef}
-          type="file"
-          accept="image/*"
-          onChange={handleFileSelect}
-          className="hidden"
-        />
-
-        <div className="relative flex flex-col items-center justify-center text-center">
-          {/* glossy 3D 上传圆按钮 — NJ navy 主品牌色 */}
+          {/* 主窗口体 */}
           <div
-            className="btn-glossy bg-nj-navy w-16 h-16 sm:w-20 sm:h-20 flex items-center justify-center mb-5"
-            aria-hidden="true"
+            className="relative bg-paper-bg"
+            style={{
+              padding: '32px 24px 28px 24px',
+              boxShadow: [
+                // 外阶 1px 深墨
+                '0 -2px 0 var(--bead-ink)',
+                '0 2px 0 var(--bead-ink)',
+                '-2px 0 0 var(--bead-ink)',
+                '2px 0 0 var(--bead-ink)',
+                // 像素硬阴影 (lavender)
+                '6px 6px 0 var(--y2k-lavender)',
+              ].join(', '),
+              // 暖底叠 dot grid（呼应开屏背景的 OS 桌面感）
+              backgroundImage:
+                'radial-gradient(circle, rgba(58, 52, 42, 0.07) 1px, transparent 1px)',
+              backgroundSize: '14px 14px',
+            }}
           >
-            <Upload className="w-7 h-7 sm:w-9 sm:h-9 text-nj-cloud" strokeWidth={2.2} />
+            {/* Win95 风 title bar */}
+            <div
+              className="absolute left-0 right-0 flex items-center justify-between px-2"
+              style={{
+                top: 2,
+                height: 16,
+                backgroundColor: 'var(--y2k-navy)',
+                color: 'var(--bead-paper-bg)',
+              }}
+            >
+              <span className="font-pixel-arcade" style={{ fontSize: 8, letterSpacing: 0 }}>
+                UPLOAD.EXE
+              </span>
+              <div className="flex gap-0.5">
+                <div className="w-2 h-2 bg-paper-bg/80" aria-hidden="true" />
+                <div className="w-2 h-2 bg-paper-bg/80" aria-hidden="true" />
+                <div className="w-2 h-2 bg-y2k-coral" aria-hidden="true" />
+              </div>
+            </div>
+
+            {/* 装饰 sparkle — 跟开屏一致的暖色调 */}
+            <span
+              className="sparkle sparkle-sm sparkle-twinkle absolute"
+              style={{ top: 24, right: 18, ['--sparkle-color' as string]: 'var(--y2k-lavender)' }}
+              aria-hidden="true"
+            />
+            <span
+              className="sparkle sparkle-twinkle absolute"
+              style={{ bottom: 20, left: 22, ['--sparkle-color' as string]: 'var(--y2k-coral)', animationDelay: '800ms' }}
+              aria-hidden="true"
+            />
+            <span
+              className="sparkle sparkle-sm sparkle-twinkle absolute"
+              style={{ top: 56, left: 38, ['--sparkle-color' as string]: 'var(--bead-honey)', animationDelay: '400ms' }}
+              aria-hidden="true"
+            />
+
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              onChange={handleFileSelect}
+              className="hidden"
+            />
+
+            <div className="relative flex flex-col items-center justify-center text-center pt-4">
+              {/* 上传图标 — 暖陶土圆按钮 + 1px ink 步阶外框 + 小硬阴 */}
+              <div
+                className="relative bg-terracotta flex items-center justify-center mb-5"
+                style={{
+                  width: 64,
+                  height: 64,
+                  borderRadius: '50%',
+                  boxShadow: [
+                    '0 -2px 0 var(--bead-ink)',
+                    '0 2px 0 var(--bead-ink)',
+                    '-2px 0 0 var(--bead-ink)',
+                    '2px 0 0 var(--bead-ink)',
+                    '3px 3px 0 var(--y2k-lavender)',
+                  ].join(', '),
+                }}
+                aria-hidden="true"
+              >
+                <Upload className="w-7 h-7 text-paper-bg" strokeWidth={2.4} />
+              </div>
+
+              {isProcessing ? (
+                <>
+                  <p
+                    className="font-pixel-arcade text-y2k-navy"
+                    style={{ fontSize: 11, letterSpacing: 1 }}
+                  >
+                    PROCESSING<span className="animate-pulse">...</span>
+                  </p>
+                  <div
+                    className="w-48 h-2 bg-paper-deep overflow-hidden mt-3"
+                    style={{
+                      boxShadow: [
+                        '0 -1px 0 var(--bead-ink)',
+                        '0 1px 0 var(--bead-ink)',
+                        '-1px 0 0 var(--bead-ink)',
+                        '1px 0 0 var(--bead-ink)',
+                      ].join(', '),
+                    }}
+                  >
+                    <div className="h-full bg-terracotta animate-pulse" />
+                  </div>
+                </>
+              ) : (
+                <>
+                  {/* 中文 Cubic 11 像素字 — 跟开屏"拼豆模拟器"同款 */}
+                  <p className="font-pixel-cn text-ink-warm text-xl" style={{ letterSpacing: '0.05em' }}>
+                    拖图到这里
+                  </p>
+                  <p className="text-ink-soft text-sm mt-1.5">或点击上传</p>
+                  {/* 英文 Press Start 2P 像素字 — 跟开屏 LOADING 同款 */}
+                  <p
+                    className="font-pixel-arcade text-y2k-navy mt-4"
+                    style={{ fontSize: 9, letterSpacing: '0.15em' }}
+                  >
+                    JPG · PNG · GIF
+                  </p>
+                </>
+              )}
+            </div>
           </div>
 
-          {isProcessing ? (
-            <>
-              <p
-                className="font-pixel-arcade text-nj-navy"
-                style={{ fontSize: 11, letterSpacing: 1 }}
-              >
-                PROCESSING<span className="animate-pulse">...</span>
-              </p>
-              <div
-                className="w-48 h-1.5 bg-nj-cloud-deep overflow-hidden mt-3 rounded-full"
-                style={{ boxShadow: 'inset 0 0 0 1px var(--nj-edge)' }}
-              >
-                <div className="h-full bg-nj-navy animate-pulse" />
-              </div>
-            </>
-          ) : (
-            <>
-              <p className="text-nj-ink text-lg font-semibold">拖图到这里</p>
-              <p className="text-nj-ink-soft text-sm mt-1">或点击上传</p>
-              <p
-                className="font-pixel-arcade text-nj-ink-soft mt-3"
-                style={{ fontSize: 9, letterSpacing: 1.5 }}
-              >
-                JPG · PNG · GIF
-              </p>
-            </>
-          )}
-        </div>
+          {/* 4 角像素角珍 (lavender) — 跟开屏完全一致 */}
+          <div
+            className="absolute"
+            style={{ top: -4, left: -4, width: 4, height: 4, backgroundColor: 'var(--y2k-lavender)' }}
+            aria-hidden="true"
+          />
+          <div
+            className="absolute"
+            style={{ top: -4, right: -4, width: 4, height: 4, backgroundColor: 'var(--y2k-lavender)' }}
+            aria-hidden="true"
+          />
+          <div
+            className="absolute"
+            style={{ bottom: -4, left: -4, width: 4, height: 4, backgroundColor: 'var(--y2k-lavender)' }}
+            aria-hidden="true"
+          />
+          <div
+            className="absolute"
+            style={{ bottom: -4, right: -4, width: 4, height: 4, backgroundColor: 'var(--y2k-lavender)' }}
+            aria-hidden="true"
+          />
         </div>
       </div>
 
-      {/* 辅助：空白画布入口 */}
+      {/* 辅助：空白画布入口 — 暖色 ghost link */}
       <div className="text-center">
         <button
           onClick={() => setShowBlankModal(true)}
-          className="inline-flex items-center gap-2 text-sm text-nj-ink-soft hover:text-nj-navy transition-colors px-4 py-2 rounded-2xl focus-visible:outline-2 focus-visible:outline-nj-navy focus-visible:outline-offset-2"
+          className="inline-flex items-center gap-2 text-sm text-ink-soft hover:text-terracotta transition-colors px-4 py-2 focus-visible:outline-2 focus-visible:outline-terracotta focus-visible:outline-offset-2"
         >
           <Grid className="w-4 h-4" aria-hidden="true" />
           <span>或者，从一张空白画布开始</span>

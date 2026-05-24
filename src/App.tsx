@@ -162,7 +162,15 @@ function App() {
   };
 
   return (
-    <div className="min-h-screen bg-nj-sky-mist text-nj-ink relative overflow-x-hidden">
+    <div
+      className="min-h-screen bg-paper-bg text-ink-warm relative overflow-x-hidden"
+      style={{
+        // splash 同款 desktop dot-grid 背景，暗示"在一台像素电脑里"
+        backgroundImage:
+          'radial-gradient(circle, rgba(58, 52, 42, 0.07) 1px, transparent 1px)',
+        backgroundSize: '24px 24px',
+      }}
+    >
       {showGallery && (
         <GalleryView
           onClose={() => {
@@ -171,15 +179,15 @@ function App() {
           }}
         />
       )}
-      {/* Header — NJ 风：白底 + 冷边线 + 海军蓝文字 */}
-      <header className="relative z-10 bg-nj-cloud border-b border-nj-edge">
+      {/* Header — 暖米底 + edge-sand 边线 */}
+      <header className="relative z-10 bg-paper-bg border-b border-edge-sand">
         <div className="max-w-7xl mx-auto px-4 py-3 sm:py-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between gap-2">
             <div className="flex items-center gap-2 sm:gap-3 min-w-0">
               <BeadLogoMark className="w-9 h-9 sm:w-10 sm:h-10 shrink-0" />
               <h1
-                className="text-xl sm:text-3xl text-nj-navy leading-none truncate"
-                style={{ fontFamily: 'var(--font-display)' }}
+                className="text-xl sm:text-3xl text-ink-warm leading-none truncate font-pixel-cn"
+                style={{ letterSpacing: '0.03em' }}
               >
                 拼豆模拟器
               </h1>
@@ -187,14 +195,22 @@ function App() {
             <div className="flex items-center gap-2 shrink-0">
               <button
                 onClick={() => { setShowGallery(true); }}
-                className="relative inline-flex items-center justify-center gap-2 min-h-[44px] min-w-[44px] sm:min-w-0 px-3 sm:px-4 py-2 bg-nj-cloud border border-nj-edge rounded-2xl text-nj-ink hover:bg-nj-cloud-deep transition-colors nj-shadow-card"
+                className="relative inline-flex items-center justify-center gap-2 min-h-[44px] min-w-[44px] sm:min-w-0 px-3 sm:px-4 py-2 bg-paper-soft text-ink-warm transition-colors hover:bg-paper-deep"
+                style={{
+                  // splash 风像素按钮：1px 步阶外边 + 2px lavender 硬阴影
+                  boxShadow: [
+                    '0 -2px 0 var(--bead-ink)', '0 2px 0 var(--bead-ink)',
+                    '-2px 0 0 var(--bead-ink)', '2px 0 0 var(--bead-ink)',
+                    '3px 3px 0 var(--y2k-lavender)',
+                  ].join(', '),
+                }}
                 aria-label="打开作品馆"
               >
-                <Library className="w-5 h-5 sm:w-4 sm:h-4 text-nj-navy" aria-hidden="true" />
+                <Library className="w-5 h-5 sm:w-4 sm:h-4 text-terracotta" aria-hidden="true" />
                 <span className="hidden sm:inline text-sm font-semibold">作品馆</span>
                 {galleryCount > 0 && (
                   <span
-                    className="absolute -top-1.5 -right-1.5 min-w-[20px] h-5 px-1 bg-nj-coral text-nj-cloud text-[10px] font-bold rounded-full flex items-center justify-center"
+                    className="absolute -top-1.5 -right-1.5 min-w-[20px] h-5 px-1 bg-honey text-ink-warm text-[10px] font-bold rounded-full flex items-center justify-center"
                     style={{ fontFamily: 'var(--font-num)' }}
                     aria-label={`已收藏 ${galleryCount} 个作品`}
                   >
@@ -205,7 +221,14 @@ function App() {
               {mode !== 'upload' && (
                 <button
                   onClick={handleBackToUpload}
-                  className="inline-flex items-center justify-center gap-1.5 min-h-[44px] min-w-[44px] sm:min-w-0 px-3 sm:px-4 py-2 bg-nj-cloud border border-nj-edge rounded-2xl text-sm font-semibold text-nj-ink hover:bg-nj-cloud-deep transition-colors nj-shadow-card"
+                  className="inline-flex items-center justify-center gap-1.5 min-h-[44px] min-w-[44px] sm:min-w-0 px-3 sm:px-4 py-2 bg-paper-soft text-sm font-semibold text-ink-warm hover:bg-paper-deep transition-colors"
+                  style={{
+                    boxShadow: [
+                      '0 -2px 0 var(--bead-ink)', '0 2px 0 var(--bead-ink)',
+                      '-2px 0 0 var(--bead-ink)', '2px 0 0 var(--bead-ink)',
+                      '3px 3px 0 var(--y2k-lavender)',
+                    ].join(', '),
+                  }}
                   aria-label="返回首页"
                 >
                   <ArrowLeft className="w-5 h-5 sm:w-4 sm:h-4" aria-hidden="true" />
@@ -222,47 +245,44 @@ function App() {
         {mode === 'upload' && (
           <div className="space-y-8">
             <section className="relative px-1 pt-6 pb-6 text-center">
-              {/* NewJeans wordmark — Playfair italic 深 navy，sparkle 飞舞 */}
+              {/* 大 wordmark — Playfair italic 暖墨色（不是冷 navy），sparkle 飞舞 */}
               <div className="relative inline-block">
                 <h1
-                  className="font-wordmark text-nj-navy leading-[0.95]"
+                  className="font-wordmark text-ink-warm leading-[0.95]"
                   style={{ fontSize: 'clamp(3rem, 8vw, 5.5rem)' }}
                 >
                   pindou.studio
                 </h1>
-                {/* 装饰 sparkle 散落在 wordmark 四周 */}
                 <span
                   className="sparkle sparkle-twinkle absolute"
-                  style={{ top: -8, left: -18, ['--sparkle-color' as string]: 'var(--nj-coral)' }}
+                  style={{ top: -8, left: -18, ['--sparkle-color' as string]: 'var(--y2k-lavender)' }}
                   aria-hidden="true"
                 />
                 <span
                   className="sparkle sparkle-sm sparkle-twinkle absolute"
-                  style={{ top: 4, right: -22, ['--sparkle-color' as string]: 'var(--y2k-lavender)', animationDelay: '600ms' }}
+                  style={{ top: 4, right: -22, ['--sparkle-color' as string]: 'var(--y2k-coral)', animationDelay: '600ms' }}
                   aria-hidden="true"
                 />
                 <span
                   className="sparkle sparkle-sm sparkle-twinkle absolute"
-                  style={{ bottom: -4, left: '40%', ['--sparkle-color' as string]: 'var(--nj-bunny-pink)', animationDelay: '1200ms' }}
+                  style={{ bottom: -4, left: '40%', ['--sparkle-color' as string]: 'var(--bead-honey)', animationDelay: '1200ms' }}
                   aria-hidden="true"
                 />
               </div>
-              {/* 中文 tagline — 像素字加冷调 navy */}
+              {/* 中文 tagline — Cubic 11 像素字（splash 同款） */}
               <p
-                className="font-pixel-cn text-nj-ink-soft mt-3"
+                className="font-pixel-cn text-ink-warm mt-3"
                 style={{ fontSize: 'clamp(0.95rem, 1.6vw, 1.15rem)', letterSpacing: '0.15em' }}
               >
                 ✦ 在浏览器里拼一颗豆 ✦
               </p>
-              {/* tiny pixel meta */}
               <p
-                className="font-pixel-arcade text-nj-ink-soft mt-2"
+                className="font-pixel-arcade text-y2k-navy mt-2"
                 style={{ fontSize: 9, letterSpacing: '0.2em' }}
               >
                 EST · 2026 · V1.0
               </p>
             </section>
-            <TrendingPatternsPanel onUsePattern={handleUseBlindBox} />
             {SHOW_BLIND_BOX_PANEL ? (
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
                 <section className="lg:col-span-8">
@@ -283,6 +303,8 @@ function App() {
                 />
               </section>
             )}
+            {/* 图鉴在上传区下方作为灵感入口 — 用户先看到主 CTA，再被现成图纸吸引 */}
+            <TrendingPatternsPanel onUsePattern={handleUseBlindBox} />
           </div>
         )}
 
