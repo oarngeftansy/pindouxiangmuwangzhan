@@ -64,11 +64,14 @@
     "@vitejs/plugin-react": "^4.7.0",
     "tailwindcss": "4.1.12",
     "typescript": "^6.0.3",
-    "vite": "6.3.5"
+    "vite": "6.3.5",
+    "wrangler": "^4.94.0"
   },
   "scripts": {
     "dev": "vite",
     "build": "vite build",
+    "deploy": "npm run build && wrangler pages deploy build --project-name=pindou-studio --commit-dirty=true",
+    "deploy:login": "wrangler login",
     "ios:add": "cap add ios",
     "ios:sync": "npm run build && cap sync ios",
     "ios:open": "npm run ios:sync && cap open ios",
