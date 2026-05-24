@@ -147,8 +147,8 @@ export function OnboardingTour({ currentMode }: OnboardingTourProps) {
   if (!show || !step || !modeMatch || !rect) return null;
 
   // 气泡位置算
-  const BUBBLE_W = 300;
-  const BUBBLE_H = 180;
+  const BUBBLE_W = 280;
+  const BUBBLE_H = 130;
   const GAP = 16;
 
   let bubbleStyle: React.CSSProperties = {
@@ -261,20 +261,12 @@ export function OnboardingTour({ currentMode }: OnboardingTourProps) {
             </button>
           </div>
 
-          {/* 标题 */}
+          {/* 标题（描述去掉了，引导更轻量） */}
           <p
-            className="font-pixel-cn text-ink-warm mb-2"
-            style={{ fontSize: 18, letterSpacing: '0.08em', lineHeight: 1.2 }}
+            className="font-pixel-cn text-ink-warm mb-4"
+            style={{ fontSize: 18, letterSpacing: '0.08em', lineHeight: 1.3 }}
           >
             {step.title}
-          </p>
-
-          {/* 描述 */}
-          <p
-            className="font-pixel-cn text-ink-warm whitespace-pre-line mb-4"
-            style={{ fontSize: 13, letterSpacing: '0.04em', lineHeight: 1.6 }}
-          >
-            {step.desc}
           </p>
 
           {/* 下一步 */}
