@@ -171,14 +171,13 @@ function ReferenceGridDisplay({
                 {isHighlight && (
                   <rect x={x - 0.05} y={y - 0.05} width={1.1} height={1.1} fill="var(--bead-honey-glow)" />
                 )}
+                {/* 纯色方格直接相邻，不加 stroke 描边（跟原图纸样式一致） */}
                 <rect
                   x={x}
                   y={y}
                   width={1}
                   height={1}
                   fill={color}
-                  stroke="rgba(44,58,94,0.22)"
-                  strokeWidth={0.04}
                   opacity={dimmed ? 0.3 : 1}
                 />
                 {showPlacedIndicator && isPlaced && (

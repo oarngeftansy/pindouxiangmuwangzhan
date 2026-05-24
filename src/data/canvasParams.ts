@@ -138,7 +138,10 @@ export const DEFAULT_CANVAS_PARAMS: CanvasParams = {
 
     beadGap: 0,
 
-    emptyBgAlpha: 0.03,
+    // 空 cell bg alpha 设 0 — 用户反馈"豆子下面有浅色方块"
+    // 根因：空 cell 有 3% 黑叠层让它比有豆子的 cell 暗一点，
+    // 视觉对比让有豆 cell 看起来像浮在浅色方块上
+    emptyBgAlpha: 0,
 
     highlightBorderWidth: 2.5,
     highlightBorderColor: "#F59E0B",
@@ -147,8 +150,8 @@ export const DEFAULT_CANVAS_PARAMS: CanvasParams = {
   },
 };
 
-// v3: 立体感参数回到"适度减弱"档（不是全归 0），保留 halo 防角落露白
-const STORAGE_KEY = 'canvas_params_v3';
+// v4: emptyBgAlpha 0.03 → 0 消除"豆子下浅色方块"视觉
+const STORAGE_KEY = 'canvas_params_v4';
 
 export function loadCanvasParams(): CanvasParams {
   try {
