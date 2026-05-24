@@ -160,29 +160,18 @@ function ReferenceGridDisplay({
         {referenceGrid.map((row, y) =>
           row.map((color, x) => {
             if (!color) return null;
-            const isHighlight = lockedColor === color;
-            const isPlaced = !!workingGrid[y]?.[x];
-            const dimmed = lockedColor && !isHighlight;
+            // 参考图永远保持原始状态，不响应锁色/进度，避免视觉变来变去
             return (
-              <g
+              <rect
                 key={`ref-${x}-${y}`}
+                x={x}
+                y={y}
+                width={1}
+                height={1}
+                fill={color}
                 onClick={() => onColorLock(color)}
                 style={{ cursor: 'pointer' }}
-              >
-                {isHighlight && (
-                  <rect x={x - 0.05} y={y - 0.05} width={1.1} height={1.1} fill="var(--bead-honey-glow)" />
-                )}
-                {/* 纯色方格直接相邻，不加 stroke 描边（跟原图纸样式一致） */}
-                <rect
-                  x={x}
-                  y={y}
-                  width={1}
-                  height={1}
-                  fill={color}
-                  opacity={dimmed ? 0.3 : 1}
-                />
-                {/* 已放置指示移除 — 用户拼完后每格都有 stroke 看起来像奇怪的网格描边 */}
-              </g>
+              />
             );
           }),
         )}
