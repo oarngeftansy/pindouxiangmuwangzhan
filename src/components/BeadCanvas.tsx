@@ -27,6 +27,48 @@ import {
 import { useState, useRef, useEffect, useMemo, useCallback } from "react";
 import { BeadGrid, BeadColor, ColorSystem } from "../App";
 import { generateIronedImage, IRONING_METHODS, IroningMethod } from "./IroningHelpers";
+import { DEFAULT_IRONING_PARAMS, type IroningParams } from "../data/ironingParams";
+
+// 把用户的"光泽 / 质感 / 闪片" 3 个简单滑块换算成内部 IroningParams
+// 全部 0-200 范围，100 = 默认值，0 = 关闭，200 = 加倍
+function buildIroningParams(gloss: number, texture: number, sparkle: number): IroningParams {
+  const g = gloss / 100;
+  const t = texture / 100;
+  const s = sparkle / 100;
+  const base = DEFAULT_IRONING_PARAMS;
+  return {
+    ...base,
+    paper: {
+      ...base.paper,
+      shineAlpha: Math.min(1, base.paper.shineAlpha * g),
+      holeAlpha: Math.min(1, base.paper.holeAlpha * t),
+      holeRadius: Math.min(0.4, base.paper.holeRadius * t),
+    },
+    towel: {
+      ...base.towel,
+      weaveAlpha: Math.min(1, base.towel.weaveAlpha * t),
+      crossAlpha: Math.min(1, base.towel.crossAlpha * t),
+      matteAlpha: Math.min(1, base.towel.matteAlpha * t),
+      edgeAlpha: Math.min(1, base.towel.edgeAlpha * t),
+    },
+    direct: {
+      ...base.direct,
+      shineAlpha: Math.min(1, base.direct.shineAlpha * g),
+      shineMidAlpha: Math.min(1, base.direct.shineMidAlpha * g),
+      shineEdgeAlpha: Math.min(1, base.direct.shineEdgeAlpha * g),
+      shadowAlpha: Math.min(1, base.direct.shadowAlpha * t),
+    },
+    glitter: {
+      ...base.glitter,
+      sparkleAlpha: Math.min(1, base.glitter.sparkleAlpha * s),
+      sparkleCount: Math.max(0, Math.round(base.glitter.sparkleCount * s)),
+      baseShineAlpha: Math.min(1, base.glitter.baseShineAlpha * g),
+      highlightAlpha: Math.min(1, base.glitter.highlightAlpha * g),
+      rainbowIntensity: Math.min(1, base.glitter.rainbowIntensity * s),
+      crossSparkleCount: Math.max(0, Math.round(base.glitter.crossSparkleCount * s)),
+    },
+  };
+}
 import { generateHDImage } from "./HDRenderHelpers";
 import { addToGallery } from "../utils/galleryUtils";
 import { PegboardCell } from "./PegboardCell";
@@ -111,6 +153,11 @@ export function BeadCanvas({
   const [ironedResult, setIronedResult] = useState<string | null>(null); // 熨烫结果预览
   const [showIronPreview, setShowIronPreview] = useState(false); // 显示熨烫预览
   const [removeBackground, setRemoveBackground] = useState(false); // 是否去除背景
+  // 用户简化版熨烫效果调节 — 3 滑块（光泽 / 质感 / 闪片），100 = 默认
+  const [effectGloss, setEffectGloss] = useState(100);
+  const [effectTexture, setEffectTexture] = useState(100);
+  const [effectSparkle, setEffectSparkle] = useState(100);
+  const [isRefiningIron, setIsRefiningIron] = useState(false);
   // (removed matchFuzzyColor - no longer needed for glitter method)
 
   // 高清渲染
@@ -695,10 +742,11 @@ export function BeadCanvas({
     animateIron();
     await new Promise((resolve) => setTimeout(resolve, 1700));
 
-    // 使用新的辅助函数生成熨烫效果
+    // 使用新的辅助函数生成熨烫效果，套用当前滑块参数
     const ironedImageUrl = await generateIronedImage(workingGrid, {
       method: ironingMethod,
       removeBackground,
+      params: buildIroningParams(effectGloss, effectTexture, effectSparkle),
     });
 
     // 显示预览而不是直接下载
@@ -707,6 +755,23 @@ export function BeadCanvas({
     setIsIroning(false);
     setShowIronPreview(true);
   };
+
+  // 用户在预览里拖滑块时，debounced 重生成图片
+  useEffect(() => {
+    if (!showIronPreview || !workingGrid.length || !workingGrid[0]?.length) return;
+    setIsRefiningIron(true);
+    const t = setTimeout(async () => {
+      const url = await generateIronedImage(workingGrid, {
+        method: ironingMethod,
+        removeBackground,
+        params: buildIroningParams(effectGloss, effectTexture, effectSparkle),
+      });
+      setIronedResult(url);
+      setIsRefiningIron(false);
+    }, 220);
+    return () => clearTimeout(t);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [effectGloss, effectTexture, effectSparkle, ironingMethod, removeBackground, showIronPreview]);
 
   // 高清渲染处理函数
   const handleHDRender = async () => {
@@ -2239,7 +2304,7 @@ export function BeadCanvas({
               </div>
 
               <div
-                className="bg-paper-soft p-4 sm:p-6 mb-5 overflow-auto max-h-[50vh] sm:max-h-[500px] flex items-center justify-center"
+                className="relative bg-paper-soft p-4 sm:p-6 mb-5 overflow-auto max-h-[50vh] sm:max-h-[500px] flex items-center justify-center"
                 style={{
                   boxShadow: 'inset 0 0 0 2px var(--y2k-navy)',
                   backgroundImage:
@@ -2253,8 +2318,102 @@ export function BeadCanvas({
                   className="max-w-full h-auto pixel-render"
                   style={{
                     backgroundColor: removeBackground ? 'transparent' : 'var(--bead-paper-bg)',
+                    opacity: isRefiningIron ? 0.6 : 1,
+                    transition: 'opacity 0.15s ease',
                   }}
                 />
+                {isRefiningIron && (
+                  <span
+                    className="absolute top-2 right-2 font-pixel-arcade text-y2k-coral arcade-blink"
+                    style={{ fontSize: 12, letterSpacing: '0.15em' }}
+                  >
+                    UPDATING…
+                  </span>
+                )}
+              </div>
+
+              {/* 效果调节面板 — 简化版（光泽 / 质感 / 闪片 3 个滑块） */}
+              <div
+                className="mb-5 p-4 bg-paper-soft"
+                style={{ boxShadow: 'inset 0 0 0 2px var(--y2k-navy)' }}
+              >
+                <div className="flex items-baseline justify-between mb-3">
+                  <span className="font-pixel-cn text-ink-warm" style={{ fontSize: 13, letterSpacing: '0.08em' }}>
+                    效果调节
+                  </span>
+                  <button
+                    onClick={() => {
+                      setEffectGloss(100);
+                      setEffectTexture(100);
+                      setEffectSparkle(100);
+                    }}
+                    className="font-pixel-arcade text-y2k-coral hover:text-y2k-coral/70 transition-colors"
+                    style={{ fontSize: 12, letterSpacing: '0.1em' }}
+                    aria-label="重置为默认"
+                  >
+                    × RESET
+                  </button>
+                </div>
+
+                {[
+                  {
+                    key: 'gloss',
+                    label: '光泽 (反光强度)',
+                    desc: '调低 = 哑光 · 调高 = 亮面',
+                    value: effectGloss,
+                    setter: setEffectGloss,
+                    color: 'var(--bead-honey)',
+                  },
+                  {
+                    key: 'texture',
+                    label: '质感 (表面纹理)',
+                    desc: ironingMethod === 'paper' ? '调低 = 平整 · 调高 = 显孔洞' :
+                          ironingMethod === 'towel' ? '调低 = 光滑 · 调高 = 显织纹' :
+                          ironingMethod === 'glitter' ? '调低 = 干净 · 调高 = 显闪片纹' :
+                          '调低 = 镜面 · 调高 = 微纹理',
+                    value: effectTexture,
+                    setter: setEffectTexture,
+                    color: 'var(--y2k-navy)',
+                  },
+                  ...(ironingMethod === 'glitter' ? [{
+                    key: 'sparkle',
+                    label: '闪片 (亮片数量)',
+                    desc: '调低 = 稀疏 · 调高 = 密集',
+                    value: effectSparkle,
+                    setter: setEffectSparkle,
+                    color: 'var(--y2k-coral)',
+                  }] : []),
+                ].map((slider) => (
+                  <div key={slider.key} className="mb-3 last:mb-0">
+                    <div className="flex items-baseline justify-between mb-1.5">
+                      <div className="flex items-baseline gap-2">
+                        <span className="font-pixel-cn text-ink-warm" style={{ fontSize: 12, letterSpacing: '0.05em' }}>
+                          {slider.label}
+                        </span>
+                      </div>
+                      <span className="font-pixel-arcade text-y2k-navy" style={{ fontSize: 12, letterSpacing: '0.05em' }}>
+                        {slider.value}%
+                      </span>
+                    </div>
+                    <input
+                      type="range"
+                      min={0}
+                      max={200}
+                      step={5}
+                      value={slider.value}
+                      onChange={(e) => slider.setter(Number(e.target.value))}
+                      className="w-full h-2 appearance-none cursor-pointer"
+                      style={{
+                        background: `linear-gradient(to right, ${slider.color} 0%, ${slider.color} ${slider.value / 2}%, var(--bead-paper-deep) ${slider.value / 2}%, var(--bead-paper-deep) 100%)`,
+                        boxShadow: 'inset 0 0 0 1px var(--y2k-navy)',
+                      }}
+                      aria-label={slider.label}
+                    />
+                    <p className="font-pixel-cn text-ink-soft mt-1" style={{ fontSize: 11, letterSpacing: '0.03em' }}>
+                      {slider.desc}
+                    </p>
+                  </div>
+                ))}
               </div>
 
               <div className="flex flex-wrap gap-3">
