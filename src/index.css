@@ -31,6 +31,34 @@
   transform-origin: center;
 }
 
+/* App 开屏：豆子从顶部下落 snap 到位（cubic-bezier 模拟 spring 弹性） */
+@keyframes splashBeadDrop {
+  0%   { transform: translateY(-60vh); opacity: 0; }
+  60%  { opacity: 1; }
+  /* 弹一下: 用 cubic-bezier 在 80-100% 区间实现 overshoot */
+  100% { transform: translateY(0); opacity: 1; }
+}
+.splash-bead {
+  animation: splashBeadDrop 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+/* 文字淡入（标题在最后一颗豆落定后，副标题再之后） */
+@keyframes splashFadeUp {
+  0%   { transform: translateY(8px); opacity: 0; }
+  100% { transform: translateY(0); opacity: 1; }
+}
+.splash-fade-up {
+  animation: splashFadeUp 0.35s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+/* 开屏整体淡出 */
+@keyframes splashFadeOut {
+  to { opacity: 0; pointer-events: none; }
+}
+.splash-fade-out {
+  animation: splashFadeOut 0.25s ease-out 1.5s forwards;
+}
+
 @layer base {
   /* iOS Safari URL bar 出现/消失会让 100vh 跳变，必须用 100dvh（动态 viewport）；
      overscroll-behavior:none 阻止 rubber-band 触发祖先滚动，避免 rubber-band 后 layout 错乱 */
