@@ -75,6 +75,14 @@ const STEPS: TourStep[] = [
 // ⚠️ 不要随便改这个 key —— 改了所有老用户都会被强制重看一遍引导。
 // 只有真改了步骤数量/顺序/逻辑才升版本号。纯文案 tweaks 保持 v3 不变。
 const STORAGE_KEY = 'onboarding_done_v3';
+const STEP_KEY = 'onboarding_step_v3'; // 持久化当前 stepIdx 防刷新/返回首页丢进度
+
+// 模式顺序 — 用户进 canvas 后 upload 模式步骤永远不该再出现
+const MODE_ORDER: Record<TourMode, number> = {
+  'upload': 0,
+  'canvas': 1,
+  'canvas-ironed': 2,
+};
 
 interface OnboardingTourProps {
   currentMode: TourMode;
@@ -82,8 +90,37 @@ interface OnboardingTourProps {
 
 export function OnboardingTour({ currentMode }: OnboardingTourProps) {
   const [show, setShow] = useState(false);
-  const [stepIdx, setStepIdx] = useState(0);
+  // stepIdx 从 localStorage 恢复，刷新 / 返回首页 不丢进度
+  const [stepIdx, setStepIdx] = useState<number>(() => {
+    try {
+      const saved = localStorage.getItem(STEP_KEY);
+      return saved ? Math.max(0, parseInt(saved, 10) || 0) : 0;
+    } catch { return 0; }
+  });
   const [rect, setRect] = useState<DOMRect | null>(null);
+
+  // 每次 stepIdx 变化时持久化
+  useEffect(() => {
+    try { localStorage.setItem(STEP_KEY, String(stepIdx)); } catch {}
+  }, [stepIdx]);
+
+  // 进 canvas / canvas-ironed 时自动跳过所有更"早"的模式步骤
+  // 这样回 upload 时上次已经过了的步骤不会再播
+  useEffect(() => {
+    if (!show) return;
+    const currentOrder = MODE_ORDER[currentMode];
+    let i = stepIdx;
+    while (i < STEPS.length && MODE_ORDER[STEPS[i].mode] < currentOrder) {
+      i++;
+    }
+    if (i >= STEPS.length) {
+      // 全部步骤都消化完 → 提前结束引导
+      try { localStorage.setItem(STORAGE_KEY, '1'); localStorage.removeItem(STEP_KEY); } catch {}
+      setShow(false);
+    } else if (i !== stepIdx) {
+      setStepIdx(i);
+    }
+  }, [currentMode, show, stepIdx]);
 
   // 首次访问检测
   useEffect(() => {
@@ -132,7 +169,10 @@ export function OnboardingTour({ currentMode }: OnboardingTourProps) {
   }, [show, step, modeMatch]);
 
   const finish = () => {
-    try { localStorage.setItem(STORAGE_KEY, '1'); } catch {}
+    try {
+      localStorage.setItem(STORAGE_KEY, '1');
+      localStorage.removeItem(STEP_KEY); // 引导结束清掉 step 进度
+    } catch {}
     setShow(false);
   };
 
