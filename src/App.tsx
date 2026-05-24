@@ -169,16 +169,12 @@ function App() {
 
   return (
     <div
-      className="min-h-screen text-ink-warm relative overflow-x-hidden"
+      className="min-h-screen bg-paper-bg text-ink-warm relative overflow-x-hidden"
       style={{
-        // NJ.kr 街机 kiosk vibe：sky-blue → cream 竖向渐变 + 暗淡 dot grid 桌面感
-        backgroundColor: 'var(--bead-paper-bg)',
-        backgroundImage: [
+        // 纯 cream paper 底 + 暗淡 dot grid 桌面感（跟开屏一致）
+        backgroundImage:
           'radial-gradient(circle, rgba(58, 52, 42, 0.06) 1px, transparent 1px)',
-          'linear-gradient(180deg, var(--y2k-sky) 0%, var(--y2k-sky) 12%, color-mix(in oklch, var(--y2k-sky) 50%, var(--bead-paper-bg)) 42%, var(--bead-paper-bg) 75%)',
-        ].join(', '),
-        backgroundSize: '24px 24px, 100% 100%',
-        backgroundAttachment: 'scroll, fixed',
+        backgroundSize: '24px 24px',
       }}
     >
       {showGallery && (
