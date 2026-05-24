@@ -1,6 +1,15 @@
 import { Upload, Grid, Settings, Camera, Palette, FileDown, Sparkles } from 'lucide-react';
 import { useState, useRef } from 'react';
 import { BeadGrid, beadColors } from '../App';
+import {
+  PixelCloud,
+  PixelHeart,
+  PixelStar,
+  PixelArrow,
+  PixelJoystick,
+  ArcadeButton,
+  PixelBadge,
+} from './PixelDecorations';
 import { 
   rgbToLab, 
   deltaE2000, 
@@ -279,12 +288,37 @@ export function ImageUploader({ onImageProcessed, onCreateBlank }: ImageUploader
 
   return (
     <div className="w-full">
-      {/* Win95 风 UPLOAD.EXE 窗口 — 跟 SplashScreen 的 APPLE.EXE 同款 chrome
-          paper-bg 暖底 + ink 1px 步阶外框 + 6px lavender 像素硬阴影 + 4 角珍 */}
-      <div className="relative mb-6 mx-auto" style={{ maxWidth: 560 }}>
+      {/* 街机 kiosk 容器 — UPLOAD.EXE 窗口外漂浮 pixel 装饰小物 */}
+      <div className="relative mb-6 mx-auto" style={{ maxWidth: 600 }}>
+        {/* 窗口外的浮动 pixel 装饰 — 街机机厅 vibe */}
+        <PixelCloud
+          size={38}
+          color="var(--y2k-sky)"
+          className="absolute pixel-float-slow z-10"
+          style={{ top: -16, left: -18 }}
+        />
+        <PixelCloud
+          size={28}
+          color="var(--y2k-lavender)"
+          className="absolute pixel-float z-10"
+          style={{ top: -22, right: 32 }}
+        />
+        <PixelStar
+          size={14}
+          color="var(--bead-honey)"
+          className="absolute pixel-float-fast z-10"
+          style={{ top: 28, right: -16 }}
+        />
+        <PixelHeart
+          size={16}
+          color="var(--y2k-coral)"
+          className="absolute pixel-float z-10"
+          style={{ bottom: 28, left: -22 }}
+        />
+
         <div
-          className={`relative cursor-pointer transition-transform ${
-            isDragging ? 'translate-x-[2px] translate-y-[2px]' : 'hover:-translate-y-0.5'
+          className={`relative transition-transform ${
+            isDragging ? 'translate-x-[2px] translate-y-[2px]' : ''
           }`}
           onDragOver={(e) => {
             e.preventDefault();
@@ -292,26 +326,21 @@ export function ImageUploader({ onImageProcessed, onCreateBlank }: ImageUploader
           }}
           onDragLeave={() => setIsDragging(false)}
           onDrop={handleDrop}
-          onClick={() => fileInputRef.current?.click()}
-          role="button"
-          tabIndex={0}
+          role="region"
           aria-label="上传图片"
         >
           {/* 主窗口体 */}
           <div
             className="relative bg-paper-bg"
             style={{
-              padding: '32px 24px 28px 24px',
+              padding: '36px 24px 26px 24px',
               boxShadow: [
-                // 外阶 1px 深墨
                 '0 -2px 0 var(--bead-ink)',
                 '0 2px 0 var(--bead-ink)',
                 '-2px 0 0 var(--bead-ink)',
                 '2px 0 0 var(--bead-ink)',
-                // 像素硬阴影 (lavender)
                 '6px 6px 0 var(--y2k-lavender)',
               ].join(', '),
-              // 暖底叠 dot grid（呼应开屏背景的 OS 桌面感）
               backgroundImage:
                 'radial-gradient(circle, rgba(58, 52, 42, 0.07) 1px, transparent 1px)',
               backgroundSize: '14px 14px',
@@ -337,20 +366,15 @@ export function ImageUploader({ onImageProcessed, onCreateBlank }: ImageUploader
               </div>
             </div>
 
-            {/* 装饰 sparkle — 跟开屏一致的暖色调 */}
+            {/* 窗口内角落 sparkle */}
             <span
               className="sparkle sparkle-sm sparkle-twinkle absolute"
-              style={{ top: 24, right: 18, ['--sparkle-color' as string]: 'var(--y2k-lavender)' }}
-              aria-hidden="true"
-            />
-            <span
-              className="sparkle sparkle-twinkle absolute"
-              style={{ bottom: 20, left: 22, ['--sparkle-color' as string]: 'var(--y2k-coral)', animationDelay: '800ms' }}
+              style={{ top: 28, right: 22, ['--sparkle-color' as string]: 'var(--y2k-lavender)' }}
               aria-hidden="true"
             />
             <span
               className="sparkle sparkle-sm sparkle-twinkle absolute"
-              style={{ top: 56, left: 38, ['--sparkle-color' as string]: 'var(--bead-honey)', animationDelay: '400ms' }}
+              style={{ top: 64, left: 28, ['--sparkle-color' as string]: 'var(--bead-honey)', animationDelay: '400ms' }}
               aria-hidden="true"
             />
 
@@ -362,37 +386,12 @@ export function ImageUploader({ onImageProcessed, onCreateBlank }: ImageUploader
               className="hidden"
             />
 
-            <div className="relative flex flex-col items-center justify-center text-center pt-4">
-              {/* 上传图标 — 暖陶土圆按钮 + 1px ink 步阶外框 + 小硬阴 */}
-              <div
-                className="relative bg-terracotta flex items-center justify-center mb-5"
-                style={{
-                  width: 64,
-                  height: 64,
-                  borderRadius: '50%',
-                  boxShadow: [
-                    '0 -2px 0 var(--bead-ink)',
-                    '0 2px 0 var(--bead-ink)',
-                    '-2px 0 0 var(--bead-ink)',
-                    '2px 0 0 var(--bead-ink)',
-                    '3px 3px 0 var(--y2k-lavender)',
-                  ].join(', '),
-                }}
-                aria-hidden="true"
-              >
-                <Upload className="w-7 h-7 text-paper-bg" strokeWidth={2.4} />
-              </div>
-
+            <div className="relative flex flex-col items-center justify-center text-center pt-3">
               {isProcessing ? (
                 <>
-                  <p
-                    className="font-pixel-arcade text-y2k-navy"
-                    style={{ fontSize: 11, letterSpacing: 1 }}
-                  >
-                    PROCESSING<span className="animate-pulse">...</span>
-                  </p>
+                  <PixelBadge text="PROCESSING" color="var(--bead-terracotta)" className="mb-4" />
                   <div
-                    className="w-48 h-2 bg-paper-deep overflow-hidden mt-3"
+                    className="w-56 h-3 bg-paper-deep overflow-hidden"
                     style={{
                       boxShadow: [
                         '0 -1px 0 var(--bead-ink)',
@@ -404,27 +403,70 @@ export function ImageUploader({ onImageProcessed, onCreateBlank }: ImageUploader
                   >
                     <div className="h-full bg-terracotta animate-pulse" />
                   </div>
+                  <p
+                    className="font-pixel-arcade text-y2k-navy arcade-blink mt-3"
+                    style={{ fontSize: 9, letterSpacing: '0.2em' }}
+                  >
+                    PIXELATING<span>...</span>
+                  </p>
                 </>
               ) : (
                 <>
-                  {/* 中文 Cubic 11 像素字 — 跟开屏"拼豆模拟器"同款 */}
-                  <p className="font-pixel-cn text-ink-warm text-xl" style={{ letterSpacing: '0.05em' }}>
-                    拖图到这里
+                  {/* 中文 Cubic 11 大字 — 跟开屏"拼豆模拟器"同款，更大更醒目 */}
+                  <p className="font-pixel-cn text-ink-warm text-2xl mb-1" style={{ letterSpacing: '0.08em' }}>
+                    拖一张图进来
                   </p>
-                  <p className="text-ink-soft text-sm mt-1.5">或点击上传</p>
-                  {/* 英文 Press Start 2P 像素字 — 跟开屏 LOADING 同款 */}
                   <p
-                    className="font-pixel-arcade text-y2k-navy mt-4"
-                    style={{ fontSize: 9, letterSpacing: '0.15em' }}
+                    className="font-pixel-arcade text-y2k-navy mb-5"
+                    style={{ fontSize: 9, letterSpacing: '0.2em' }}
                   >
-                    JPG · PNG · GIF
+                    DROP YOUR IMAGE HERE
                   </p>
+
+                  {/* 主 CTA — NJ "ID Card" 同款 chunky glossy 街机胶囊按钮 */}
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      fileInputRef.current?.click();
+                    }}
+                    className="arcade-pill font-pixel-cn text-paper-bg cursor-pointer"
+                    style={{
+                      backgroundColor: 'var(--bead-terracotta)',
+                      fontSize: 15,
+                      letterSpacing: '0.1em',
+                    }}
+                  >
+                    <span>插入图片</span>
+                    <PixelArrow size={14} color="var(--bead-paper-bg)" />
+                  </button>
+
+                  {/* 副提示 — 文件格式 */}
+                  <p
+                    className="font-pixel-arcade text-ink-soft mt-4"
+                    style={{ fontSize: 8, letterSpacing: '0.18em' }}
+                  >
+                    JPG · PNG · GIF · 1-10 MB
+                  </p>
+
+                  {/* 底部街机控制台栏 — 一排 mini 摇杆 + 4 个彩色按钮（纯装饰） */}
+                  <div className="mt-6 flex items-center justify-center gap-6 pt-3"
+                    style={{ borderTop: '1px dashed var(--bead-edge)' }}
+                  >
+                    <PixelJoystick size={22} ballColor="var(--y2k-coral)" />
+                    <div className="flex items-center gap-2">
+                      <ArcadeButton size={14} color="var(--bead-honey)" />
+                      <ArcadeButton size={14} color="var(--y2k-coral)" />
+                      <ArcadeButton size={14} color="var(--bead-moss)" />
+                      <ArcadeButton size={14} color="var(--y2k-navy)" />
+                    </div>
+                    <PixelJoystick size={22} ballColor="var(--y2k-lavender-deep)" />
+                  </div>
                 </>
               )}
             </div>
           </div>
 
-          {/* 4 角像素角珍 (lavender) — 跟开屏完全一致 */}
+          {/* 4 角像素角珍 (lavender) */}
           <div
             className="absolute"
             style={{ top: -4, left: -4, width: 4, height: 4, backgroundColor: 'var(--y2k-lavender)' }}
@@ -446,10 +488,20 @@ export function ImageUploader({ onImageProcessed, onCreateBlank }: ImageUploader
             aria-hidden="true"
           />
         </div>
+
+        {/* 窗口下方 PRESS START 闪烁标语 — 街机经典 */}
+        <div className="mt-7 text-center">
+          <p
+            className="font-pixel-arcade text-y2k-coral arcade-blink"
+            style={{ fontSize: 10, letterSpacing: '0.3em' }}
+          >
+            ▶ PRESS START ◀
+          </p>
+        </div>
       </div>
 
       {/* 辅助：空白画布入口 — 暖色 ghost link */}
-      <div className="text-center">
+      <div className="text-center mt-2">
         <button
           onClick={() => setShowBlankModal(true)}
           className="inline-flex items-center gap-2 text-sm text-ink-soft hover:text-terracotta transition-colors px-4 py-2 focus-visible:outline-2 focus-visible:outline-terracotta focus-visible:outline-offset-2"

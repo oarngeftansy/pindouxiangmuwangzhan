@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { getTrendingPatterns, type TrendingPattern } from '../data/trendingPatterns';
 import type { BeadGrid } from '../types';
+import { PixelStar, PixelHeart, PixelBadge, PixelArrow } from './PixelDecorations';
 
 interface TrendingPatternsPanelProps {
   onUsePattern: (grid: BeadGrid) => void;
@@ -97,10 +98,16 @@ export function TrendingPatternsPanel({ onUsePattern }: TrendingPatternsPanelPro
     : patterns;
 
   return (
-    <section>
-      {/* 标题区 — 中文 Cubic 11 像素字 + 英文 Press Start 2P 像素 ITEMS 计数 */}
+    <section className="relative">
+      {/* 标题区 — STAGE SELECT 街机风 */}
       <div className="flex items-baseline justify-between mb-5 px-1">
         <div className="flex items-baseline gap-3">
+          <PixelStar
+            size={16}
+            color="var(--y2k-coral)"
+            className="pixel-float-fast self-center"
+            style={{ marginBottom: 4 }}
+          />
           <h3
             className="font-pixel-cn text-ink-warm"
             style={{ fontSize: 'clamp(1.5rem, 2.6vw, 1.9rem)', letterSpacing: '0.05em' }}
@@ -109,16 +116,16 @@ export function TrendingPatternsPanel({ onUsePattern }: TrendingPatternsPanelPro
           </h3>
           <span
             className="font-pixel-arcade text-y2k-navy"
-            style={{ fontSize: 10, letterSpacing: '0.1em' }}
+            style={{ fontSize: 10, letterSpacing: '0.15em' }}
           >
-            GALLERY
+            STAGE SELECT
           </span>
         </div>
         <span
           className="font-pixel-arcade text-y2k-navy"
           style={{ fontSize: 10, letterSpacing: '0.1em' }}
         >
-          {String(patterns.length).padStart(2, '0')} ITEMS
+          {String(patterns.length).padStart(2, '0')} STAGES
         </span>
       </div>
 
@@ -155,96 +162,113 @@ export function TrendingPatternsPanel({ onUsePattern }: TrendingPatternsPanelPro
         </div>
       )}
 
-      {/* 图鉴卡片 — 每张都是 mini Win95 window：paper-bg 暖底 + 1px ink 步阶外框 + 4px lavender 硬阴影 + 4 角珍 */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-5 sm:gap-6 p-1">
-        {filtered.map(p => (
-          <div key={p.id} className="relative">
-            <button
-              onClick={() => onUsePattern(p.grid)}
-              className="group relative text-left w-full cursor-pointer focus-visible:outline-2 focus-visible:outline-y2k-navy focus-visible:outline-offset-4 transition-transform hover:-translate-y-1 active:translate-y-0"
-              style={{
-                backgroundColor: 'var(--bead-paper-bg)',
-                boxShadow: PIXEL_WINDOW_SHADOW,
-              }}
-            >
-              {/* 主图区 — paper-soft 暖底 + 暗淡 dot grid，让豆子缩略图浮出来 */}
-              <div
-                className="relative flex items-center justify-center bg-paper-soft p-3 aspect-[4/3]"
+      {/* 图鉴卡片 — 每张都是 mini Win95 window + LV.XX 街机徽章 + PLAY ▶ hover */}
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6 sm:gap-7 p-1">
+        {filtered.map((p, idx) => {
+          // 难度 → 街机徽章色
+          const badgeColor =
+            p.difficulty === 'easy'
+              ? 'var(--bead-moss)'
+              : p.difficulty === 'medium'
+              ? 'var(--bead-honey)'
+              : 'var(--bead-terracotta)';
+          // 序号 LV.01 / LV.02 / ...
+          const levelText = `LV.${String(idx + 1).padStart(2, '0')}`;
+
+          return (
+            <div key={p.id} className="relative">
+              <button
+                onClick={() => onUsePattern(p.grid)}
+                className="group relative text-left w-full cursor-pointer focus-visible:outline-2 focus-visible:outline-y2k-navy focus-visible:outline-offset-4 transition-transform hover:-translate-y-1 active:translate-y-0"
                 style={{
-                  backgroundImage:
-                    'radial-gradient(circle, rgba(58, 52, 42, 0.06) 1px, transparent 1px)',
-                  backgroundSize: '10px 10px',
-                  // 主图区底部加一根 1px ink 分隔线（像素卡 separator）
-                  boxShadow: 'inset 0 -2px 0 var(--bead-ink)',
+                  backgroundColor: 'var(--bead-paper-bg)',
+                  boxShadow: PIXEL_WINDOW_SHADOW,
                 }}
               >
-                {p.previewImage ? (
-                  <img
-                    src={p.previewImage}
-                    alt={p.name}
-                    className="max-h-full max-w-full object-contain pixel-render"
-                  />
-                ) : (
-                  <PatternThumbnail grid={p.grid} size={100} />
-                )}
-                {/* hover 时角标 +（terracotta 硬色块按钮，跟上传按钮同色） */}
-                <span
-                  className="absolute top-2 right-2 w-6 h-6 bg-terracotta text-paper-bg flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity font-pixel-arcade"
-                  aria-hidden="true"
+                {/* 主图区 — paper-soft 暖底 + dot grid */}
+                <div
+                  className="relative flex items-center justify-center bg-paper-soft p-3 aspect-[4/3]"
                   style={{
-                    fontSize: 12,
-                    boxShadow: [
-                      '0 -1px 0 var(--bead-ink)',
-                      '0 1px 0 var(--bead-ink)',
-                      '-1px 0 0 var(--bead-ink)',
-                      '1px 0 0 var(--bead-ink)',
-                    ].join(', '),
+                    backgroundImage:
+                      'radial-gradient(circle, rgba(58, 52, 42, 0.06) 1px, transparent 1px)',
+                    backgroundSize: '10px 10px',
+                    boxShadow: 'inset 0 -2px 0 var(--bead-ink)',
                   }}
                 >
-                  +
-                </span>
-              </div>
-              {/* 信息条 — 像素 ID card 风：左 难度 dot + 中文像素 label，右 b 计数像素字 */}
-              <div className="flex items-center justify-between px-3 py-2 bg-paper-bg">
-                <span className="inline-flex items-center gap-1.5 font-pixel-cn text-ink-warm" style={{ fontSize: 11 }}>
-                  <span
-                    className={`w-1.5 h-1.5 ${DIFFICULTY_DOT[p.difficulty]}`}
-                    aria-hidden="true"
-                  />
-                  {DIFFICULTY_LABELS[p.difficulty]}
-                </span>
-                <span
-                  className="font-pixel-arcade text-y2k-navy"
-                  style={{ fontSize: 9, letterSpacing: '0.05em' }}
-                >
-                  {p.beadCount}b
-                </span>
-              </div>
-            </button>
+                  {p.previewImage ? (
+                    <img
+                      src={p.previewImage}
+                      alt={p.name}
+                      className="max-h-full max-w-full object-contain pixel-render"
+                    />
+                  ) : (
+                    <PatternThumbnail grid={p.grid} size={100} />
+                  )}
 
-            {/* 4 角像素角珍 (lavender) — 跟开屏一致 */}
-            <div
-              className="absolute pointer-events-none"
-              style={{ top: -3, left: -3, width: 3, height: 3, backgroundColor: 'var(--y2k-lavender)' }}
-              aria-hidden="true"
-            />
-            <div
-              className="absolute pointer-events-none"
-              style={{ top: -3, right: -3, width: 3, height: 3, backgroundColor: 'var(--y2k-lavender)' }}
-              aria-hidden="true"
-            />
-            <div
-              className="absolute pointer-events-none"
-              style={{ bottom: -3, left: -3, width: 3, height: 3, backgroundColor: 'var(--y2k-lavender)' }}
-              aria-hidden="true"
-            />
-            <div
-              className="absolute pointer-events-none"
-              style={{ bottom: -3, right: -3, width: 3, height: 3, backgroundColor: 'var(--y2k-lavender)' }}
-              aria-hidden="true"
-            />
-          </div>
-        ))}
+                  {/* hover 时全图 PLAY ▶ 覆盖层 — 街机机厅 stage select 同款 */}
+                  <div
+                    className="absolute inset-0 flex items-center justify-center bg-y2k-navy/85 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"
+                    aria-hidden="true"
+                  >
+                    <span
+                      className="font-pixel-arcade text-paper-bg flex items-center gap-2"
+                      style={{ fontSize: 13, letterSpacing: '0.15em' }}
+                    >
+                      PLAY
+                      <PixelArrow size={12} color="var(--bead-paper-bg)" />
+                    </span>
+                  </div>
+                </div>
+                {/* 信息条 — 像素 ID card 风：左 难度 dot + 中文像素 label，右 b 计数像素字 */}
+                <div className="flex items-center justify-between px-3 py-2 bg-paper-bg">
+                  <span className="inline-flex items-center gap-1.5 font-pixel-cn text-ink-warm" style={{ fontSize: 11 }}>
+                    <span
+                      className={`w-1.5 h-1.5 ${DIFFICULTY_DOT[p.difficulty]}`}
+                      aria-hidden="true"
+                    />
+                    {DIFFICULTY_LABELS[p.difficulty]}
+                  </span>
+                  <span
+                    className="font-pixel-arcade text-y2k-navy"
+                    style={{ fontSize: 9, letterSpacing: '0.05em' }}
+                  >
+                    {p.beadCount}b
+                  </span>
+                </div>
+              </button>
+
+              {/* LV.XX 街机徽章 — 浮在卡片左上角外 */}
+              <div
+                className="absolute pointer-events-none z-20"
+                style={{ top: -10, left: -8 }}
+              >
+                <PixelBadge text={levelText} color={badgeColor} />
+              </div>
+
+              {/* 4 角像素角珍 (lavender) */}
+              <div
+                className="absolute pointer-events-none"
+                style={{ top: -3, left: -3, width: 3, height: 3, backgroundColor: 'var(--y2k-lavender)' }}
+                aria-hidden="true"
+              />
+              <div
+                className="absolute pointer-events-none"
+                style={{ top: -3, right: -3, width: 3, height: 3, backgroundColor: 'var(--y2k-lavender)' }}
+                aria-hidden="true"
+              />
+              <div
+                className="absolute pointer-events-none"
+                style={{ bottom: -3, left: -3, width: 3, height: 3, backgroundColor: 'var(--y2k-lavender)' }}
+                aria-hidden="true"
+              />
+              <div
+                className="absolute pointer-events-none"
+                style={{ bottom: -3, right: -3, width: 3, height: 3, backgroundColor: 'var(--y2k-lavender)' }}
+                aria-hidden="true"
+              />
+            </div>
+          );
+        })}
       </div>
     </section>
   );
