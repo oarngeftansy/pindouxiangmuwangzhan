@@ -133,6 +133,14 @@ export function OnboardingTour({ currentMode }: OnboardingTourProps) {
     return () => clearTimeout(t);
   }, []);
 
+  // 引导一旦显示就立即标记 "已看过"，后续刷新/返回首页绝不重播
+  // 用户即使中途关页面，下次也不会再被打扰
+  useEffect(() => {
+    if (show) {
+      try { localStorage.setItem(STORAGE_KEY, '1'); } catch {}
+    }
+  }, [show]);
+
   const step = STEPS[stepIdx];
   // 当前步骤的 mode 跟 app mode 对得上才显示
   const modeMatch = step && step.mode === currentMode;
