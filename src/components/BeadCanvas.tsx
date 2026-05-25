@@ -866,9 +866,9 @@ export function BeadCanvas({
     animateIron();
     await new Promise((resolve) => setTimeout(resolve, 1700));
 
-    // 动画 100% 后切到"渲染中"状态，让用户知道还在生成图片（大图可能几秒）
+    // 动画 100% 后切到"渲染中"，进度条重置 0 → generateIronedImage 内部 onProgress 推到 100
     setIsFinalizingIron(true);
-    // 让 React 把"渲染中"先 commit 上去再开始 block 主线程的 canvas 操作
+    setIronProgress(0);
     await new Promise((resolve) => setTimeout(resolve, 50));
 
     try {
@@ -876,6 +876,7 @@ export function BeadCanvas({
         method: ironingMethod,
         removeBackground,
         params: buildIroningParams(effectGloss, effectTexture, effectSparkle),
+        onProgress: (pct) => setIronProgress(pct),
       });
 
       const methodNames: Record<string, string> = {

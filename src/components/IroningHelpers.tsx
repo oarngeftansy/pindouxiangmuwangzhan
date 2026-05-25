@@ -9,7 +9,11 @@ export interface IroningOptions {
   removeBackground: boolean;
   partialBeads?: Set<string>; // 格式: "x,y" - 需要熨烫的豆子位置集合
   params?: IroningParams;     // 可选，传入自定义参数（dev工具用）
+  onProgress?: (pct: number) => void; // 0-100，每完成一个阶段上报
 }
+
+// 让出主线程，UI 才能更新进度条
+const yieldToUI = () => new Promise<void>((resolve) => setTimeout(resolve, 0));
 
 // 伪随机：基于坐标的确定性随机数，保证每次渲染结果一致
 function seededRandom(x: number, y: number, i: number): number {
@@ -67,6 +71,10 @@ export async function generateIronedImage(
       ctx.fillRect(x * cellSize, y * cellSize, cellSize, cellSize);
     });
   });
+
+  // 阶段 1/4: 底色填充完成
+  options.onProgress?.(25);
+  await yieldToUI();
 
   // 添加豆子间融合效果
   const gw = params.fusionGradientWidth;
@@ -132,8 +140,16 @@ export async function generateIronedImage(
     });
   });
 
-  // 根据不同熨烫方式添加效果
-  workingGrid.forEach((row, y) => {
+  // 阶段 2/4: 融合效果完成
+  options.onProgress?.(50);
+  await yieldToUI();
+
+  // 根据不同熨烫方式添加效果 — 改 for 循环，每 N 行 yield 一次防止主线程卡死
+  // glitter 方式在每豆上画 15+ sparkle，大图特别耗时
+  const rowsPerYield = Math.max(1, Math.floor(workingGrid.length / 16)); // 大图最多分 16 段 yield，进度条更新得了
+  const totalRows = workingGrid.length;
+  for (let y = 0; y < totalRows; y++) {
+    const row = workingGrid[y];
     row.forEach((color, x) => {
       if (!color) return;
 
@@ -324,7 +340,17 @@ export async function generateIronedImage(
         }
       }
     });
-  });
+    // 每 N 行 yield 一次 + 在 50-80% 之间更新进度，UI 才能动
+    if ((y + 1) % rowsPerYield === 0 && y < totalRows - 1) {
+      const phaseProgress = 50 + Math.round(((y + 1) / totalRows) * 30); // 50 → 80
+      options.onProgress?.(phaseProgress);
+      await yieldToUI();
+    }
+  }
+
+  // 阶段 3/4: 烫法特效完成（最重的阶段，glitter 慢就在这）
+  options.onProgress?.(80);
+  await yieldToUI();
 
   // 方形 mask：每颗有色豆子方形 fillRect，紧密拼接——pixel art 风的锯齿外缘
   // 真实烫熔的拼豆外缘就是方形锯齿，不要圆角化
@@ -343,6 +369,10 @@ export async function generateIronedImage(
   ctx.globalCompositeOperation = 'destination-in';
   ctx.drawImage(maskCanvas, 0, 0);
   ctx.globalCompositeOperation = 'source-over';
+
+  // 阶段 4/4: mask + 最终合成
+  options.onProgress?.(100);
+  await yieldToUI();
 
   if (!options.removeBackground) {
     const finalCanvas = document.createElement('canvas');
