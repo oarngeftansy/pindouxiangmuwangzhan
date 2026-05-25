@@ -219,6 +219,7 @@ export function BeadCanvas({
   const [ironingMethod, setIroningMethod] = useState<IroningMethod>('paper'); // 熨烫方式
   const [isIroning, setIsIroning] = useState(false); // 熨烫动画状态
   const [ironProgress, setIronProgress] = useState(0); // 熨烫进度
+  const [isFinalizingIron, setIsFinalizingIron] = useState(false); // 动画 100% 后还在生成图片的状态
   const [ironPosition, setIronPosition] = useState({ x: 0, y: 0 }); // 熨斗位置
   const [ironedResult, setIronedResult] = useState<string | null>(null); // 熨烫结果预览
   const [showIronPreview, setShowIronPreview] = useState(false); // 显示熨烫预览
@@ -865,26 +866,38 @@ export function BeadCanvas({
     animateIron();
     await new Promise((resolve) => setTimeout(resolve, 1700));
 
-    // 使用新的辅助函数生成熨烫效果，套用当前滑块参数
-    const ironedImageUrl = await generateIronedImage(workingGrid, {
-      method: ironingMethod,
-      removeBackground,
-      params: buildIroningParams(effectGloss, effectTexture, effectSparkle),
-    });
+    // 动画 100% 后切到"渲染中"状态，让用户知道还在生成图片（大图可能几秒）
+    setIsFinalizingIron(true);
+    // 让 React 把"渲染中"先 commit 上去再开始 block 主线程的 canvas 操作
+    await new Promise((resolve) => setTimeout(resolve, 50));
 
-    // 自动加入作品馆（用户反馈不想手动点）
-    const methodNames: Record<string, string> = {
-      paper: '铜版纸烫', towel: '毛巾烫', direct: '直烫', glitter: '格里特烫',
-    };
-    handleAddToGallery(ironedImageUrl, methodNames[ironingMethod]);
-    // 标记作品已熨烫，工具栏会显示"结束作品"按钮回主页
-    setHasIroned(true);
-    onIronComplete?.(); // 通知 App 切换引导到最后一步
+    try {
+      const ironedImageUrl = await generateIronedImage(workingGrid, {
+        method: ironingMethod,
+        removeBackground,
+        params: buildIroningParams(effectGloss, effectTexture, effectSparkle),
+      });
 
-    setIronedResult(ironedImageUrl);
-    setIronProgress(0);
-    setIsIroning(false);
-    setShowIronPreview(true);
+      const methodNames: Record<string, string> = {
+        paper: '铜版纸烫', towel: '毛巾烫', direct: '直烫', glitter: '格里特烫',
+      };
+      handleAddToGallery(ironedImageUrl, methodNames[ironingMethod]);
+      setHasIroned(true);
+      onIronComplete?.();
+
+      setIronedResult(ironedImageUrl);
+      setIronProgress(0);
+      setIsFinalizingIron(false);
+      setIsIroning(false);
+      setShowIronPreview(true);
+    } catch (err) {
+      console.error('[iron] generateIronedImage failed', err);
+      // 不卡死，至少弹出错误 UI 让用户能关
+      setIronProgress(0);
+      setIsFinalizingIron(false);
+      setIsIroning(false);
+      alert('图片渲染失败，可能是图太大或浏览器内存不够。试试减小画板尺寸或换个浏览器。');
+    }
   };
 
   // 用户在预览里拖滑块时，debounced 重生成图片
@@ -2618,11 +2631,14 @@ export function BeadCanvas({
         >
           <div className="relative bg-paper-soft border border-edge-sand rounded-t-card sm:rounded-card p-4 sm:p-8 max-w-3xl w-full max-h-[92vh] sm:max-h-none overflow-y-auto animate-in slide-in-from-bottom duration-200 sm:slide-in-from-bottom-0 sm:zoom-in-95">
             <h3 className="text-xl sm:text-2xl font-semibold mb-2 mt-2 sm:mt-0 text-center text-ink-warm flex items-center justify-center gap-2" style={{ fontFamily: 'var(--font-headline)' }}>
-              <Flame className="w-6 h-6 text-terracotta" aria-hidden="true" />
-              熨烫中…
+              <Flame className={`w-6 h-6 text-terracotta ${isFinalizingIron ? 'animate-pulse' : ''}`} aria-hidden="true" />
+              {isFinalizingIron ? '图片渲染中…' : '熨烫中…'}
             </h3>
             <p className="text-ink-soft mb-6 text-center text-sm">
-              正在用 <span className="text-ink-warm font-semibold">{IRONING_METHODS[ironingMethod].name}</span> 方式熨烫您的作品
+              {isFinalizingIron
+                ? '正在生成高清效果图，大一点的作品可能要几秒～请稍等'
+                : <>正在用 <span className="text-ink-warm font-semibold">{IRONING_METHODS[ironingMethod].name}</span> 方式熨烫您的作品</>
+              }
             </p>
 
             {/* 拼豆板和熨斗动画 */}
