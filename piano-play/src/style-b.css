@@ -1,0 +1,74 @@
+.piano-scroll{overflow-x:hidden;overflow-y:hidden;border-radius:14px;background:#111219;padding:0 0 3px}.piano{height:260px;position:relative;display:flex;width:100%;min-width:0}.white{position:relative;flex:1;min-width:0;height:250px;border:0;border-right:1px solid #d9dae0;border-radius:0 0 9px 9px;background:linear-gradient(180deg,#ffffff 0%,#fbfbfc 73%,#e8e9ee 100%);cursor:pointer;box-shadow:inset 0 -7px 10px rgba(112,117,132,.10),inset 0 -1px #cdd0d8;transition:.08s}.white:first-child{border-radius:0 0 9px 9px}.white:hover{background:linear-gradient(180deg,#fff 0%,#f6f5ff 70%,#dedbff 100%)}.white.active{background:linear-gradient(180deg,#e9e7ff,#bbb5ff);transform:translateY(3px);height:247px}.white.target{outline:3px solid #8e86ff;outline-offset:-3px;background:linear-gradient(180deg,#fff,#eeeaff 72%,#d8d3ff)}.key-label{position:absolute;bottom:15px;left:0;right:0;text-align:center;font:800 14px ui-monospace,SFMono-Regular,Menlo,monospace;color:#565b68}.note-label{position:absolute;bottom:37px;left:0;right:0;text-align:center;font-size:8px;color:#b1b4be}.black{position:absolute;top:0;width:25px;height:150px;border:0;border-radius:0 0 7px 7px;background:linear-gradient(90deg,#0c0d11,#292b34 55%,#0a0a0e);z-index:4;cursor:pointer;box-shadow:0 5px 8px rgba(0,0,0,.38);transition:.08s}.black:hover{background:linear-gradient(90deg,#24202d,#514b66 55%,#16131c)}.black.active{background:linear-gradient(180deg,#827af7,#4f47d0);height:146px}.black.target{background:linear-gradient(180deg,#8d84ff,#5147d9);box-shadow:0 0 0 3px #bdb8ff,0 5px 8px rgba(0,0,0,.38)}.black .key-label{bottom:10px;color:#e8e8ef;font-size:8px}.white .key-label.shifted,.black .key-label.shifted{font-size:7px;line-height:1.1;white-space:pre-line}.black .note-label{bottom:26px;color:#777b88;font-size:7px}
+.modal{position:fixed;inset:0;background:rgba(20,21,28,.45);backdrop-filter:blur(5px);display:none;place-items:center;z-index:50}.modal.show{display:grid}.dialog{width:min(620px,calc(100% - 28px));background:white;border:1px solid var(--line);border-radius:18px;box-shadow:0 24px 80px rgba(23,24,32,.22);overflow:hidden}.dialog-head{font-size:15px;font-weight:750;padding:16px 18px;border-bottom:1px solid var(--line)}.dialog-body{padding:16px 18px}.field{margin-bottom:12px}.field label{display:block;font-size:11px;font-weight:700;margin-bottom:6px}.field input,.field textarea,.field select{width:100%;border:1px solid var(--line);background:#fafbfc;border-radius:10px;padding:9px 10px;outline:none}.field textarea{min-height:120px;font-family:ui-monospace,monospace}.dialog-actions{padding:12px 18px;border-top:1px solid var(--line);display:flex;justify-content:flex-end;gap:8px}.dialog-actions .retro-btn.primary{background:var(--accent);color:white}
+
+.full-import-note{padding:7px 10px;border-radius:10px;background:#f4f2ff;color:#6258d8;font-size:10px;font-weight:650}.badge.full{background:#16171d;color:#fff;border-color:#16171d}.badge.simple{background:#eef4ff;color:#4a67c8;border-color:#d9e4ff}
+.file-drop{border:1px dashed #cfcbea;background:#faf9ff;border-radius:14px;padding:18px;text-align:center;color:#747887;font-size:11px}.file-drop input{margin-top:10px;width:100%}.import-help{font-size:10px;color:#979ba7;line-height:1.6;margin-top:8px}
+
+@media(max-width:950px){body{overflow:auto}.app{height:auto}.workspace{grid-template-columns:1fr;height:auto}.sidebar{max-height:300px}.main{grid-template-rows:auto auto auto}.piano{min-width:820px}.piano-card{margin-bottom:18px}.song-list{max-height:160px}}
+@media(max-height:760px) and (min-width:951px){.app{padding:10px}.workspace{gap:10px}.main{gap:8px}.now-card{min-height:68px;padding:10px 15px}.album{width:44px;height:44px}.song-head h2{font-size:19px}.practice-toolbar{height:42px}.score-window{min-height:92px;max-height:118px;padding-top:8px}.piano{height:226px}.white{height:218px}.white.active{height:215px}.black{height:132px}.piano-card{padding-top:10px}.piano-top{height:28px}}
+
+/* ===== Closed game visual pass ===== */
+.app{padding:12px 14px;background:radial-gradient(circle at 64% 45%,rgba(108,98,255,.10),transparent 34%),var(--bg)}
+.workspace{grid-template-columns:214px minmax(0,1fr);gap:12px}
+.sidebar{border-radius:18px;background:rgba(251,251,253,.94);box-shadow:0 10px 34px rgba(30,32,44,.07)}
+.brand{height:70px;padding:14px 14px 10px}.brand-mark{width:36px;height:36px;border-radius:11px;font-size:20px}.brand h1{font-size:15px}.brand p{font-size:9px}
+.library-head{padding:11px 11px 8px}.search input{height:34px}.cats{padding:0 11px 8px}.song-list{padding:0 8px 12px}.song{padding:9px 9px}.song-title{font-size:11px}.song-meta{font-size:8px}
+.main{grid-template-rows:auto minmax(370px,1fr) minmax(164px,210px);gap:10px}
+.now-card{grid-row:1;min-height:62px;padding:10px 14px;border-radius:18px;box-shadow:0 8px 28px rgba(30,32,44,.06)}
+.album{width:42px;height:42px;border-radius:12px;font-size:19px}.song-head h2{font-size:19px;margin-bottom:4px}.meta-line{font-size:10px}.stat-chip{padding:5px 7px;font-size:9px}.soft-btn{height:32px}
+.piano-card{grid-row:2;display:grid;grid-template-rows:auto minmax(0,1fr);min-height:0;border-radius:24px;padding:12px 12px 10px;background:linear-gradient(180deg,#20222b,#15161c);box-shadow:0 24px 54px rgba(25,26,34,.22)}
+.piano-top{height:38px;padding:0 6px 10px}.piano-title b{font-size:13px}.piano-title span{font-size:10px}.keyboard-map{gap:6px}.mini-key{height:24px;padding:0 7px;font-size:9px}
+.piano-scroll{height:100%;min-height:0;border-radius:16px;display:flex;align-items:stretch;background:#0f1015;overflow:hidden;padding:0 2px 4px}
+.piano{height:100%;min-height:318px;width:100%;display:flex}
+.white{height:100%;min-height:308px;border-radius:0 0 10px 10px}.white.active{height:calc(100% - 4px)}
+.black{height:60%;min-height:182px;max-height:220px;width:clamp(20px,2.15vw,30px)}
+.key-label{font-size:12px;bottom:16px}.note-label{font-size:8px;bottom:38px}.white .key-label.shifted,.black .key-label.shifted{font-size:7px;line-height:1.05}
+.center{grid-row:3;min-height:0;display:block}
+.practice{height:100%;border-radius:18px;grid-template-rows:38px minmax(0,1fr) 28px;box-shadow:0 8px 28px rgba(30,32,44,.06)}
+.practice-toolbar{height:38px;padding:5px 9px}.mode-pill,.section-select{height:28px;font-size:10px}.audio-status{font-size:9px}
+.score-shell{min-height:0}.score-window{min-height:78px;max-height:none;padding:8px 140px 9px 8px;align-content:center;flex-wrap:nowrap;overflow-x:auto;overflow-y:hidden;scrollbar-width:thin}
+.measure{padding-top:2px;padding-bottom:2px}.note-token{height:38px;min-width:31px;width:31px;border-radius:9px;font-size:12px}.note-token.current{height:44px;min-width:40px;font-size:16px}
+.current-key{right:12px;bottom:9px;padding:8px 11px;border-radius:12px;z-index:8}.current-key small{font-size:8px}.current-key b{font-size:16px;min-width:56px;text-align:center}.press-label{font-size:9px}.current-note{font-size:9px}
+.statusbar{height:28px;padding:0 10px;font-size:9px}.kbd-help{margin-left:auto}
+@media(max-width:1100px){.workspace{grid-template-columns:186px minmax(0,1fr)}.song-stats{display:none}.keyboard-map .mini-key:not(.em){display:none}.piano{min-height:300px}.white{min-height:290px}}
+@media(max-width:820px){body{overflow:auto}.app{height:auto;padding:8px}.workspace{display:block}.sidebar{max-height:260px;margin-bottom:8px}.main{display:flex;flex-direction:column}.now-card{order:1}.piano-card{order:2;min-height:390px}.center{order:3;height:200px}.piano{min-width:900px}.piano-scroll{overflow-x:auto}.keyboard-map{display:none}}
+
+.catalog-note{margin-top:auto;border-top:1px solid var(--line);padding:10px 12px;font-size:9px;line-height:1.45;color:#999dab;background:#fafafd}
+
+
+/* ===== Full-score continuous play pass ===== */
+.main{grid-template-rows:auto minmax(246px,.72fr) minmax(318px,1.28fr);gap:10px}
+.piano-card{grid-row:2;min-height:246px;max-height:none;padding:10px 11px 9px}
+.piano-top{height:34px;padding-bottom:7px}
+.piano-scroll{min-height:0}
+.piano{min-height:214px;height:100%}
+.white{min-height:204px;height:100%}
+.white.active{height:calc(100% - 4px)}
+.black{height:58%;min-height:122px;max-height:160px}
+.key-label{bottom:12px;font-size:11px}.note-label{bottom:31px}
+.black .key-label{bottom:7px}.black .note-label{bottom:22px}
+.center{grid-row:3;min-height:0}
+.practice{height:100%;grid-template-rows:38px minmax(0,1fr) 28px}
+.score-shell{padding:8px 12px 8px;display:block;overflow:hidden}
+.score-window{display:block;width:100%;height:100%;min-height:0;max-height:none;overflow-y:auto;overflow-x:hidden;padding:4px 142px 14px 4px;scroll-behavior:smooth;scrollbar-gutter:stable}
+.score-section{display:block;width:100%;padding:3px 0 8px;border-bottom:1px dashed #ececf2;margin-bottom:5px;scroll-margin-top:6px}
+.score-section:last-child{border-bottom:0;margin-bottom:0}
+.score-section-head{height:22px;display:flex;align-items:center;gap:8px;position:sticky;top:0;z-index:3;background:rgba(253,253,255,.94);backdrop-filter:blur(5px);font-size:9px;color:#767b8b;font-weight:750;letter-spacing:.15px}
+.score-section-head small{font-size:8px;color:#b0b3bd;font-weight:600}
+.score-section-body{display:flex;flex-wrap:wrap;align-items:center;align-content:flex-start;gap:2px 0;width:100%}
+.measure-row{display:inline-flex;max-width:100%;flex:0 0 auto;align-items:center;margin:1px 0}
+.measure{display:flex;align-items:center;flex-wrap:wrap;gap:4px;padding:3px 10px 3px 0;margin-right:10px;max-width:100%}
+.measure:after{height:22px}
+.note-token{height:34px;min-width:28px;width:28px;border-radius:8px;font-size:11px}
+.note-token.current{height:40px;min-width:38px;font-size:15px;transform:translateY(-2px)}
+.note-token small{font-size:7px}
+.current-key{right:8px;bottom:8px;padding:7px 9px 7px 10px;background:rgba(22,23,29,.96)}
+.current-key b{height:28px;font-size:14px;min-width:62px}
+.section-select{max-width:190px}
+@media(max-height:780px) and (min-width:951px){
+ .main{grid-template-rows:auto minmax(210px,.66fr) minmax(270px,1.34fr)}
+ .piano{min-height:185px}.white{min-height:177px}.black{min-height:105px}
+ .score-section-head{height:19px}.note-token{height:31px}.note-token.current{height:37px}
+}
+@media(max-width:1100px){.piano{min-height:205px}.white{min-height:197px}.score-window{padding-right:128px}}
+@media(max-width:820px){.piano-card{min-height:310px}.piano{min-height:280px}.center{height:420px}.score-window{padding-right:8px;padding-bottom:72px}.current-key{position:absolute}}
