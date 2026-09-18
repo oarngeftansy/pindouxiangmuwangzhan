@@ -36,6 +36,11 @@ jobs:
           PAGES_BASE: /pindouxiangmuwangzhan/
         run: npm run build
 
+      - name: Include Piano Play
+        run: |
+          mkdir -p build/piano-play
+          cp -R piano-play/. build/piano-play/
+
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
