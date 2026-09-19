@@ -1,6 +1,8 @@
 import { builtinSongs } from './catalog.js';
 import { castleChart } from './castle-chart.js';
 import { juebieshuChart } from './juebieshu-chart.js';
+import { riverChart } from './river-chart.js';
+import { summerChart } from './summer-chart.js';
 import { createRhythmGame } from './rhythm.js';
 
 const WHITE_KEYS='ABCDEFGHIJKLMNOPQRSTUVWX'.split('');
@@ -21,7 +23,7 @@ function nearestSample(note){const m=noteMidi(note);return sampleRoots.reduce((a
 function playNote(note,duration=.9){initAudio().then(()=>{if(!audioReady)return;const root=nearestSample(note),src=audioCtx.createBufferSource(),g=audioCtx.createGain();src.buffer=buffers[root];src.playbackRate.value=Math.pow(2,(noteMidi(note)-noteMidi(root))/12);g.gain.setValueAtTime(.66,audioCtx.currentTime);g.gain.exponentialRampToValueAtTime(.0001,audioCtx.currentTime+Math.max(.25,duration));src.connect(g).connect(audioCtx.destination);src.start();src.stop(audioCtx.currentTime+Math.max(.35,duration)+.05)})}
 
 let songs=[...builtinSongs],current=songs.find(s=>s.id==='river-flows-in-you')||songs[0],category='全部',query='',step=0,mode='guide',demoTimer=null;
-const STRUCTURE_REVIEW_IDS=new Set(['river-flows-in-you','merry-christmas-mr-lawrence','kikujiro-summer']);
+const STRUCTURE_REVIEW_IDS=new Set(['merry-christmas-mr-lawrence']);
 function rebuildCastleFromCanonicalTimeline(){
   const song=songs.find(s=>s.id==='castle-in-the-sky'); if(!song)return;
   const barSec=(60/castleChart.bpm)*4, bars=new Map();
@@ -58,6 +60,36 @@ function rebuildJuebieFromStructuredTimeline(){
   song.description='邓垚《诀别书》完整时间轴转谱测试版；用于验证整曲结构，非官方原版钢琴谱。';
 }
 rebuildJuebieFromStructuredTimeline();
+function rebuildFullRightHandTimeline(songId,chart,source,description,sectionSize=9){
+  const song=songs.find(s=>s.id===songId); if(!song||!chart?.events?.length)return;
+  const beatSec=60/(chart.tempo||90), byMeasure=new Map();
+  chart.events.forEach((e,i)=>{
+    const k=noteToKey[e.n]; if(!k)return;
+    const next=chart.events[i+1];
+    const gap=next?Math.max(.12,next.t-e.t):Math.max(.12,e.d||beatSec);
+    const token={k,n:e.n,w:Math.max(.5,Math.min(6,gap/beatSec))};
+    const m=Number(e.measure)||1;
+    if(!byMeasure.has(m))byMeasure.set(m,[]);
+    byMeasure.get(m).push(token);
+  });
+  const measures=[...byMeasure.keys()].sort((a,b)=>a-b).map(m=>byMeasure.get(m)).filter(x=>x.length);
+  const sections=[]; for(let i=0;i<measures.length;i+=sectionSize)sections.push({name:`第 ${sections.length+1} 段`,measures:measures.slice(i,i+sectionSize)});
+  song.sections=sections;song.fullLength=true;song.verified=true;song.midiReady=true;song.source=source;song.description=description;
+}
+rebuildFullRightHandTimeline(
+  'river-flows-in-you',
+  riverChart,
+  `完整右手单音化 · MusicXML ${riverChart.measureCount} 小节 · ${riverChart.events.length} 音`,
+  '基于完整钢琴 MusicXML 的右手声部重建；和弦取最高音以适配单键跟练，保留整曲结构。',
+  8
+);
+rebuildFullRightHandTimeline(
+  'kikujiro-summer',
+  summerChart,
+  `完整右手单音化 · MusicXML ${summerChart.measureCount} 小节 · ${summerChart.events.length} 音`,
+  '基于 1–54 小节完整 MusicXML 右手 Voice 1 重建；和弦单音化以适配跟练。',
+  9
+);
 let songEntries=[],sectionStarts=[],rhythmGame=null;
 const $=id=>document.getElementById(id);
 const appRoot=document.querySelector('.app');
@@ -82,6 +114,7 @@ function renderCats(){$('cats').innerHTML=categories().map(c=>`<button class="ca
 function songBadge(s){
   if(STRUCTURE_REVIEW_IDS.has(s.id))return '<span class="badge pending">结构复核</span>';
   if(s.id==='castle-in-the-sky')return '<span class="badge simple">完整主旋律</span>';
+  if(s.id==='river-flows-in-you'||s.id==='kikujiro-summer')return '<span class="badge simple">完整右手</span>';
   if(s.id==='juebieshu')return '<span class="badge simple">编配测试版</span>';
   if(s.id==='mariage-damour')return '<span class="badge simple">完整右手轨</span>';
   return s.fullLength?'<span class="badge full">完整版</span>':s.verified?'<span class="badge verified">已校谱</span>':s.midiReady?'<span class="badge simple">主旋律版</span>':'<span class="badge pending">待校谱</span>';
