@@ -31,15 +31,41 @@
       <div class="center">
         <section class="practice">
           <div class="practice-toolbar">
-            <button class="mode-pill active" id="guideMode">自由跟弹</button><button class="mode-pill" id="freeMode">自由弹奏</button>
+            <button class="mode-pill active" id="guideMode">跟练模式</button><button class="mode-pill" id="rhythmMode">音游模式</button>
             <select class="section-select" id="sectionSelect" title="完整乐谱 / 跳转段落"></select>
             <span class="spacer"></span><span class="audio-status" id="audioStatus">点击琴键后加载钢琴音色</span>
           </div>
           <div class="score-shell">
             <div class="score-window" id="score"></div>
+            <div class="rhythm-shell" id="rhythmShell">
+              <div class="rhythm-hud">
+                <div class="hud-stat"><span>Score</span><b id="rhythmScore">000000</b></div>
+                <div class="rhythm-combo"><b id="rhythmCombo">0</b><span>COMBO</span></div>
+                <div class="hud-stat"><span>Accuracy</span><b id="rhythmAcc">100.0%</b></div>
+              </div>
+              <div class="rhythm-stage" id="rhythmStage">
+                <div class="rhythm-progress"><i id="rhythmProgressBar"></i></div>
+                <div class="rhythm-field" id="rhythmField">
+                  <div class="rhythm-lane" data-key="A"></div><div class="rhythm-lane" data-key="S"></div><div class="rhythm-lane" data-key="D"></div>
+                  <div class="rhythm-lane" data-key="J"></div><div class="rhythm-lane" data-key="K"></div><div class="rhythm-lane" data-key="L"></div>
+                </div>
+                <div class="rhythm-line"></div>
+                <div class="rhythm-judgement" id="rhythmJudgement"></div>
+                <div class="rhythm-countdown" id="rhythmCountdown"></div>
+                <div class="rhythm-result" id="rhythmResult"></div>
+              </div>
+              <div class="rhythm-footer">
+                <div class="rhythm-caption">天空之城 · 92 BPM · 固定六键节奏实验</div>
+                <div class="rhythm-pads">
+                  <button class="rhythm-pad">A</button><button class="rhythm-pad">S</button><button class="rhythm-pad">D</button>
+                  <button class="rhythm-pad">J</button><button class="rhythm-pad">K</button><button class="rhythm-pad">L</button>
+                </div>
+                <div class="rhythm-actions"><button id="rhythmStart">开始</button><button id="rhythmPause">暂停</button></div>
+              </div>
+            </div>
             <div class="current-key"><small>下一键</small><span class="press-label">按</span><b id="expected">—</b><span id="expectedNote" class="current-note">—</span></div>
           </div>
-          <div class="statusbar"><span>进度 <b id="progress">0 / 0</b></span><span>模式 <b id="modeText">自由跟弹</b></span><span class="kbd-help">整首乐谱连续显示 · 按对自动前进 · 无时间限制</span></div>
+          <div class="statusbar"><span>进度 <b id="progress">0 / 0</b></span><span>模式 <b id="modeText">跟练模式</b></span><span class="kbd-help">整首乐谱连续显示 · 按对自动前进 · 无时间限制</span></div>
         </section>
       </div>
 
