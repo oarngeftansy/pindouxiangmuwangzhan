@@ -1,5 +1,6 @@
 import { builtinSongs } from './catalog.js';
 import { castleChart } from './castle-chart.js';
+import { juebieshuChart } from './juebieshu-chart.js';
 import { createRhythmGame } from './rhythm.js';
 
 const WHITE_KEYS='ABCDEFGHIJKLMNOPQRSTUVWX'.split('');
@@ -39,6 +40,24 @@ function rebuildCastleFromCanonicalTimeline(){
   song.description='基于完整节奏时间轴重建的主旋律跟练版；与音游模式共用同一结构。';
 }
 rebuildCastleFromCanonicalTimeline();
+function rebuildJuebieFromStructuredTimeline(){
+  const song=songs.find(s=>s.id==='juebieshu'); if(!song)return;
+  const beat=.6, barSec=beat*4, bars=new Map();
+  juebieshuChart.events.forEach((e,i)=>{
+    const k=noteToKey[e.n]; if(!k)return;
+    const next=juebieshuChart.events[i+1];
+    const gap=next?Math.max(.18,next.t-e.t):Math.max(.18,e.d||.6);
+    const token={k,n:e.n,w:Math.max(.5,Math.min(6,gap/beat))};
+    const bi=Math.max(0,Math.floor(e.t/barSec));
+    if(!bars.has(bi))bars.set(bi,[]); bars.get(bi).push(token);
+  });
+  const measures=[...bars.keys()].sort((a,b)=>a-b).map(i=>bars.get(i));
+  const sections=[]; for(let i=0;i<measures.length;i+=16)sections.push({name:`第 ${sections.length+1} 段`,measures:measures.slice(i,i+16)});
+  song.sections=sections;song.fullLength=false;song.verified=false;song.midiReady=true;
+  song.source=`完整编配测试 · F调结构化时间轴 · ${juebieshuChart.events.length} 时间点`;
+  song.description='邓垚《诀别书》完整时间轴转谱测试版；用于验证整曲结构，非官方原版钢琴谱。';
+}
+rebuildJuebieFromStructuredTimeline();
 let songEntries=[],sectionStarts=[],rhythmGame=null;
 const $=id=>document.getElementById(id);
 const appRoot=document.querySelector('.app');
@@ -63,6 +82,7 @@ function renderCats(){$('cats').innerHTML=categories().map(c=>`<button class="ca
 function songBadge(s){
   if(STRUCTURE_REVIEW_IDS.has(s.id))return '<span class="badge pending">结构复核</span>';
   if(s.id==='castle-in-the-sky')return '<span class="badge simple">完整主旋律</span>';
+  if(s.id==='juebieshu')return '<span class="badge simple">编配测试版</span>';
   if(s.id==='mariage-damour')return '<span class="badge simple">完整右手轨</span>';
   return s.fullLength?'<span class="badge full">完整版</span>':s.verified?'<span class="badge verified">已校谱</span>':s.midiReady?'<span class="badge simple">主旋律版</span>':'<span class="badge pending">待校谱</span>';
 }
