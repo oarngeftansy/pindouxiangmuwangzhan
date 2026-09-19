@@ -105,7 +105,7 @@ export function createRhythmGame({root, chart, playNote, onProgress=()=>{}, onMo
   function start(){
     stop(false);buildNotes();resetStats();resultEl.classList.remove('show');resultEl.innerHTML='';
     startAt=performance.now()+PREROLL*1000;pausedTotal=0;paused=false;running=true;startBtn.textContent='重新开始';pauseBtn.textContent='暂停';
-    onModeMessage(`天空之城 · ${chart.bpm} BPM · ${chart.events.length} 个节奏音符`);
+    onModeMessage(`${chart.title||'音游'} · ${chart.bpm} BPM · ${chart.events.length} 个节奏音符`);
     raf=requestAnimationFrame(frame);
   }
   function pause(){
