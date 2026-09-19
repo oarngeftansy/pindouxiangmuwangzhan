@@ -195,9 +195,40 @@ function handleKey(key){
   else{const cur=$('score').querySelector('.note-token.current');if(cur){cur.classList.add('wrong');setTimeout(()=>cur.classList.remove('wrong'),420)}}
 }
 function renderPiano(){const p=$('piano');p.innerHTML='';WHITE_KEYS.forEach((k,i)=>{const el=document.createElement('button');el.className='white';el.dataset.key=k;const lab=k.startsWith('⇧')?'Shift +\n'+k.slice(1):k;el.innerHTML=`<span class="note-label">${WHITE_NOTES[i]}</span><span class="key-label ${k.startsWith('⇧')?'shifted':''}">${lab}</span>`;el.onpointerdown=()=>handleKey(k);p.appendChild(el)});requestAnimationFrame(()=>{const w=p.clientWidth/WHITE_KEYS.length;BLACK_NOTES.forEach((n,i)=>{const sem=noteMidi(n),belowMidi=sem-1;let wi=WHITE_NOTES.findIndex(x=>noteMidi(x)===belowMidi);if(wi<0)wi=WHITE_NOTES.findIndex(x=>noteMidi(x)===sem-2);if(wi<0)return;const key=BLACK_KEYS[i],b=document.createElement('button');b.className='black';b.dataset.key=key;b.style.left=((wi+1)*w-13)+'px';const lab=key.startsWith('⇧')?'Shift +\n'+key.slice(1):key;b.innerHTML=`<span class="note-label">${n}</span><span class="key-label ${key.startsWith('⇧')?'shifted':''}">${escapeHtml(lab)}</span>`;b.onpointerdown=e=>{e.stopPropagation();handleKey(key)};p.appendChild(b)})});requestAnimationFrame(()=>syncScoreState(false))}
+function exactTimelineForCurrent(){
+  if(current.id==='river-flows-in-you')return riverChart.events;
+  if(current.id==='kikujiro-summer')return summerChart.events;
+  if(current.id==='castle-in-the-sky')return castleChart.events;
+  if(current.id==='juebieshu')return juebieshuChart.events;
+  return null;
+}
 function demo(){
-  stopDemo();if(!songEntries.length||mode==='rhythm')return;let i=0;
-  const tick=()=>{if(i>=songEntries.length){demoTimer=null;return}const e=songEntries[i++];playNote(e.note,Math.max(.3,e.weight*.22));pianoKey(e.key,true);setTimeout(()=>pianoKey(e.key,false),140);demoTimer=setTimeout(tick,Math.max(170,Math.min(900,e.weight*230)))};tick()
+  stopDemo();if(!songEntries.length||mode==='rhythm')return;
+  const timeline=exactTimelineForCurrent();
+  if(timeline?.length){
+    const playable=timeline.filter(e=>noteToKey[e.n]);
+    if(!playable.length)return;
+    let i=0;
+    const base=playable[0].t||0;
+    $('audioStatus').textContent='试听中 · 原始时间轴';
+    const tick=()=>{
+      if(i>=playable.length){demoTimer=null;$('audioStatus').textContent=audioReady?'真实钢琴采样已就绪':'点击琴键后加载钢琴音色';return}
+      const e=playable[i],next=playable[i+1],key=noteToKey[e.n];
+      playNote(e.n,Math.max(.22,Math.min(2.8,e.d||.6)));
+      pianoKey(key,true);setTimeout(()=>pianoKey(key,false),Math.min(240,Math.max(90,(e.d||.2)*650)));
+      i++;
+      const gap=next?Math.max(35,(next.t-e.t)*1000):300;
+      demoTimer=setTimeout(tick,gap);
+    };
+    tick();return;
+  }
+  let i=0;
+  const tick=()=>{
+    if(i>=songEntries.length){demoTimer=null;return}
+    const e=songEntries[i++];playNote(e.note,Math.max(.3,e.weight*.22));pianoKey(e.key,true);setTimeout(()=>pianoKey(e.key,false),140);
+    demoTimer=setTimeout(tick,Math.max(170,Math.min(900,e.weight*230)));
+  };
+  tick();
 }
 window.addEventListener('keydown',e=>{
   if(e.target.matches('input,textarea,select')||e.repeat)return;
