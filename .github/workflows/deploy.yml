@@ -12,7 +12,7 @@ permissions:
 
 # 同时只允许一个部署在跑；新 push 会取消正在排队的旧部署，但不打断正在部署的
 concurrency:
-  group: pages
+  group: pages-v2
   cancel-in-progress: true
 
 jobs:
