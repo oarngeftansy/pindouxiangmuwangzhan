@@ -41,6 +41,11 @@ jobs:
           mkdir -p build/piano-play
           cp -R piano-play/. build/piano-play/
 
+      - name: Include Piano Rhythm Preview
+        run: |
+          mkdir -p build/piano-play-rhythm-preview
+          cp -R piano-play-rhythm-preview/. build/piano-play-rhythm-preview/
+
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
