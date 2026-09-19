@@ -122,7 +122,7 @@ function normalizeStandaloneRhythmChart(base){
   const first=base.events[0].t||0;
   const events=base.events.map(e=>({...e,t:+((e.t-first)+RHYTHM_LEAD_IN).toFixed(3)}));
   const last=events.at(-1);
-  return {...base,events,duration:+(last.t+Math.max(.6,last.d||.3)+.8).toFixed(3)};
+  return {...base,events,beatOrigin:RHYTHM_LEAD_IN,duration:+(last.t+Math.max(.6,last.d||.3)+.8).toFixed(3)};
 }
 function buildSixLaneChart(song,source,bpm,accompaniment=[]){
   if(!song||!source?.length)return null;
@@ -143,7 +143,7 @@ function buildSixLaneChart(song,source,bpm,accompaniment=[]){
   const lastMelody=events.at(-1),lastAccomp=shiftedAccomp.at(-1);
   const end=Math.max(lastMelody?.t+(lastMelody?.d||0),lastAccomp?.t+(lastAccomp?.d||0),0);
   return {
-    title:song.title,bpm:Math.round(bpm||90),keys:RHYTHM_KEYS,
+    title:song.title,bpm:Math.round(bpm||90),keys:RHYTHM_KEYS,beatOrigin:RHYTHM_LEAD_IN,
     duration:+(end+.8).toFixed(3),events,accompaniment:shiftedAccomp
   };
 }
