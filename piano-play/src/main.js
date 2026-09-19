@@ -3,6 +3,8 @@ import { castleChart } from './castle-chart.js';
 import { juebieshuChart } from './juebieshu-chart.js';
 import { riverChart } from './river-chart.js';
 import { summerChart } from './summer-chart.js';
+import { riverAccomp } from './river-accomp.js';
+import { summerAccomp } from './summer-accomp.js';
 import { createRhythmGame } from './rhythm.js';
 
 const WHITE_KEYS='ABCDEFGHIJKLMNOPQRSTUVWX'.split('');
@@ -20,7 +22,7 @@ let audioCtx=null,buffers={},audioReady=false;
 const noteMidi=n=>{const m=n.match(/^([A-G])(#?)(\d)$/);if(!m)return 60;const pc={C:0,D:2,E:4,F:5,G:7,A:9,B:11}[m[1]]+(m[2]?1:0);return 12*(+m[3]+1)+pc};
 async function initAudio(){if(audioCtx){if(audioCtx.state==='suspended')await audioCtx.resume();return;} audioCtx=new (window.AudioContext||window.webkitAudioContext)(); const status=document.getElementById('audioStatus');try{const base='https://tonejs.github.io/audio/salamander/';await Promise.all(sampleRoots.map(async n=>{const r=await fetch(base+sampleName(n));if(!r.ok)throw new Error('sample');buffers[n]=await audioCtx.decodeAudioData(await r.arrayBuffer())}));audioReady=true;status.textContent='真实钢琴采样已就绪';}catch(e){status.textContent='钢琴采样加载失败，请检查网络';audioReady=false}}
 function nearestSample(note){const m=noteMidi(note);return sampleRoots.reduce((a,b)=>Math.abs(noteMidi(a)-m)<=Math.abs(noteMidi(b)-m)?a:b)}
-function playNote(note,duration=.9){initAudio().then(()=>{if(!audioReady)return;const root=nearestSample(note),src=audioCtx.createBufferSource(),g=audioCtx.createGain();src.buffer=buffers[root];src.playbackRate.value=Math.pow(2,(noteMidi(note)-noteMidi(root))/12);g.gain.setValueAtTime(.66,audioCtx.currentTime);g.gain.exponentialRampToValueAtTime(.0001,audioCtx.currentTime+Math.max(.25,duration));src.connect(g).connect(audioCtx.destination);src.start();src.stop(audioCtx.currentTime+Math.max(.35,duration)+.05)})}
+function playNote(note,duration=.9,volume=.66){initAudio().then(()=>{if(!audioReady)return;const root=nearestSample(note),src=audioCtx.createBufferSource(),g=audioCtx.createGain();src.buffer=buffers[root];src.playbackRate.value=Math.pow(2,(noteMidi(note)-noteMidi(root))/12);g.gain.setValueAtTime(Math.max(.02,Math.min(.9,volume)),audioCtx.currentTime);g.gain.exponentialRampToValueAtTime(.0001,audioCtx.currentTime+Math.max(.25,duration));src.connect(g).connect(audioCtx.destination);src.start();src.stop(audioCtx.currentTime+Math.max(.35,duration)+.05)})}
 
 let songs=[...builtinSongs],current=songs.find(s=>s.id==='river-flows-in-you')||songs[0],category='全部',query='',step=0,mode='guide',demoTimer=null;
 function normalizeCatalogMetadata(){
@@ -114,30 +116,44 @@ const RHYTHM_KEYS=['A','S','D','J','K','L'];
 const RHYTHM_SUPPORTED_IDS=new Set(['castle-in-the-sky','river-flows-in-you','kikujiro-summer']);
 const isRhythmSupportedSong=s=>!!s&&RHYTHM_SUPPORTED_IDS.has(s.id);
 const rhythmChartCache=new Map();
-function buildSixLaneChart(song,source,bpm){
+const RHYTHM_LEAD_IN=.65;
+function normalizeStandaloneRhythmChart(base){
+  if(!base?.events?.length)return base;
+  const first=base.events[0].t||0;
+  const events=base.events.map(e=>({...e,t:+((e.t-first)+RHYTHM_LEAD_IN).toFixed(3)}));
+  const last=events.at(-1);
+  return {...base,events,duration:+(last.t+Math.max(.6,last.d||.3)+.8).toFixed(3)};
+}
+function buildSixLaneChart(song,source,bpm,accompaniment=[]){
   if(!song||!source?.length)return null;
   const playable=source.filter(e=>e?.n&&noteToKey[e.n]).sort((a,b)=>a.t-b.t);
   if(!playable.length)return null;
+  const accomp=(accompaniment||[]).filter(e=>Array.isArray(e.notes)&&e.notes.length).sort((a,b)=>a.t-b.t);
+  const origin=Math.min(playable[0]?.t??Infinity,accomp[0]?.t??Infinity);
   const midis=playable.map(e=>noteMidi(e.n)).sort((a,b)=>a-b);
   const lo=midis[Math.floor(midis.length*.04)]??midis[0];
   const hi=midis[Math.min(midis.length-1,Math.floor(midis.length*.96))]??midis.at(-1);
-  const span=Math.max(1,hi-lo),first=playable[0].t||0;
+  const span=Math.max(1,hi-lo);
   const events=playable.map(e=>{
-    const m=noteMidi(e.n);
-    const norm=Math.max(0,Math.min(1,(m-lo)/span));
+    const m=noteMidi(e.n),norm=Math.max(0,Math.min(1,(m-lo)/span));
     const l=Math.max(0,Math.min(5,Math.round(norm*5)));
-    return {t:+((e.t-first)+1.6).toFixed(3),d:Math.max(.12,e.d||.3),n:e.n,l};
+    return {t:+((e.t-origin)+RHYTHM_LEAD_IN).toFixed(3),d:Math.max(.12,e.d||.3),n:e.n,l};
   });
-  const last=events.at(-1);
-  return {title:song.title,bpm:Math.round(bpm||90),keys:RHYTHM_KEYS,duration:+(last.t+Math.max(.6,last.d||.3)+.8).toFixed(3),events};
+  const shiftedAccomp=accomp.map(e=>({...e,t:+((e.t-origin)+RHYTHM_LEAD_IN).toFixed(3)})).filter(e=>e.t>=0);
+  const lastMelody=events.at(-1),lastAccomp=shiftedAccomp.at(-1);
+  const end=Math.max(lastMelody?.t+(lastMelody?.d||0),lastAccomp?.t+(lastAccomp?.d||0),0);
+  return {
+    title:song.title,bpm:Math.round(bpm||90),keys:RHYTHM_KEYS,
+    duration:+(end+.8).toFixed(3),events,accompaniment:shiftedAccomp
+  };
 }
 function rhythmChartForSong(song){
   if(!song)return null;
-  if(song.id==='castle-in-the-sky')return castleChart;
   if(rhythmChartCache.has(song.id))return rhythmChartCache.get(song.id);
   let chart=null;
-  if(song.id==='river-flows-in-you')chart=buildSixLaneChart(song,riverChart.events,riverChart.tempo||80);
-  if(song.id==='kikujiro-summer')chart=buildSixLaneChart(song,summerChart.events,summerChart.tempo||90);
+  if(song.id==='castle-in-the-sky')chart=normalizeStandaloneRhythmChart(castleChart);
+  if(song.id==='river-flows-in-you')chart=buildSixLaneChart(song,riverChart.events,riverChart.tempo||80,riverAccomp.events);
+  if(song.id==='kikujiro-summer')chart=buildSixLaneChart(song,summerChart.events,summerChart.tempo||90,summerAccomp.events);
   if(chart)rhythmChartCache.set(song.id,chart);
   return chart;
 }
