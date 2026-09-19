@@ -10,6 +10,7 @@ const BLACK_KEYS=['1','2','3','4','5','6','7','8','9','0','-','=','[',']',';','\
 WHITE_NOTES.push('F6','G6','A6','B6','C7'); WHITE_KEYS.push('⇧A','⇧D','⇧G','⇧J','⇧K');
 BLACK_NOTES.push('F#6','G#6','A#6','C#7'); BLACK_KEYS.push('⇧S','⇧F','⇧H','⇧L');
 const keyToNote={};WHITE_KEYS.forEach((k,i)=>keyToNote[k]=WHITE_NOTES[i]);BLACK_KEYS.forEach((k,i)=>keyToNote[k]=BLACK_NOTES[i]);
+const noteToKey=Object.fromEntries(Object.entries(keyToNote).map(([k,n])=>[n,k]));
 const sampleRoots=['C3','D#3','F#3','A3','C4','D#4','F#4','A4','C5','D#5','F#5','A5','C6','D#6','F#6','A6','C7'];
 const sampleName=n=>n.replace('#','s')+'.mp3';
 let audioCtx=null,buffers={},audioReady=false;
@@ -19,6 +20,25 @@ function nearestSample(note){const m=noteMidi(note);return sampleRoots.reduce((a
 function playNote(note,duration=.9){initAudio().then(()=>{if(!audioReady)return;const root=nearestSample(note),src=audioCtx.createBufferSource(),g=audioCtx.createGain();src.buffer=buffers[root];src.playbackRate.value=Math.pow(2,(noteMidi(note)-noteMidi(root))/12);g.gain.setValueAtTime(.66,audioCtx.currentTime);g.gain.exponentialRampToValueAtTime(.0001,audioCtx.currentTime+Math.max(.25,duration));src.connect(g).connect(audioCtx.destination);src.start();src.stop(audioCtx.currentTime+Math.max(.35,duration)+.05)})}
 
 let songs=[...builtinSongs],current=songs.find(s=>s.id==='river-flows-in-you')||songs[0],category='全部',query='',step=0,mode='guide',demoTimer=null;
+const STRUCTURE_REVIEW_IDS=new Set(['river-flows-in-you','merry-christmas-mr-lawrence','kikujiro-summer']);
+function rebuildCastleFromCanonicalTimeline(){
+  const song=songs.find(s=>s.id==='castle-in-the-sky'); if(!song)return;
+  const barSec=(60/castleChart.bpm)*4, bars=new Map();
+  castleChart.events.forEach((e,i)=>{
+    const k=noteToKey[e.n]; if(!k)return;
+    const next=castleChart.events[i+1];
+    const gap=next?Math.max(.25,next.t-e.t):Math.max(.25,e.d||.5);
+    const token={k,n:e.n,w:Math.max(.5,Math.min(6,gap/(60/castleChart.bpm)))};
+    const bi=Math.max(0,Math.floor(e.t/barSec));
+    if(!bars.has(bi))bars.set(bi,[]); bars.get(bi).push(token);
+  });
+  const measures=[...bars.keys()].sort((a,b)=>a-b).map(i=>bars.get(i));
+  const sections=[]; for(let i=0;i<measures.length;i+=9)sections.push({name:`第 ${sections.length+1} 段`,measures:measures.slice(i,i+9)});
+  song.sections=sections;song.fullLength=true;song.verified=true;song.midiReady=true;
+  song.source=`完整主旋律 · 54 小节时间轴 · ${castleChart.events.length} 音`;
+  song.description='基于完整节奏时间轴重建的主旋律跟练版；与音游模式共用同一结构。';
+}
+rebuildCastleFromCanonicalTimeline();
 let songEntries=[],sectionStarts=[],rhythmGame=null;
 const $=id=>document.getElementById(id);
 const appRoot=document.querySelector('.app');
@@ -40,7 +60,13 @@ function ensureRhythmGame(){
 function categories(){return ['全部',...new Set(songs.map(s=>s.category))]}
 function filtered(){return songs.filter(s=>(category==='全部'||s.category===category)&&(!query||(s.title+s.composer).toLowerCase().includes(query.toLowerCase())))}
 function renderCats(){$('cats').innerHTML=categories().map(c=>`<button class="cat ${c===category?'active':''}" data-cat="${c}">${c}</button>`).join('');document.querySelectorAll('[data-cat]').forEach(b=>b.onclick=()=>{category=b.dataset.cat;renderCats();renderSongList()})}
-function renderSongList(){const list=filtered();$('songCount').textContent=`(${songs.length})`;$('songList').innerHTML=list.map(s=>`<div class="song ${s.id===current.id?'active':''}" data-song="${s.id}"><div class="song-title"><span>${escapeHtml(s.title)}</span>${s.fullLength?'<span class="badge full">完整版</span>':s.verified?'<span class="badge verified">已校谱</span>':s.midiReady?'<span class="badge simple">主旋律版</span>':'<span class="badge pending">待校谱</span>'}</div><div class="song-meta">${escapeHtml(s.category)} · ${'★'.repeat(s.difficulty)}${'☆'.repeat(3-s.difficulty)}</div></div>`).join('')||'<div class="empty">没有匹配曲谱</div>';document.querySelectorAll('[data-song]').forEach(el=>el.onclick=()=>selectSong(el.dataset.song))}
+function songBadge(s){
+  if(STRUCTURE_REVIEW_IDS.has(s.id))return '<span class="badge pending">结构复核</span>';
+  if(s.id==='castle-in-the-sky')return '<span class="badge simple">完整主旋律</span>';
+  if(s.id==='mariage-damour')return '<span class="badge simple">完整右手轨</span>';
+  return s.fullLength?'<span class="badge full">完整版</span>':s.verified?'<span class="badge verified">已校谱</span>':s.midiReady?'<span class="badge simple">主旋律版</span>':'<span class="badge pending">待校谱</span>';
+}
+function renderSongList(){const list=filtered();$('songCount').textContent=`(${songs.length})`;$('songList').innerHTML=list.map(s=>`<div class="song ${s.id===current.id?'active':''}" data-song="${s.id}"><div class="song-title"><span>${escapeHtml(s.title)}</span>${songBadge(s)}</div><div class="song-meta">${escapeHtml(s.category)} · ${'★'.repeat(s.difficulty)}${'☆'.repeat(3-s.difficulty)}</div></div>`).join('')||'<div class="empty">没有匹配曲谱</div>';document.querySelectorAll('[data-song]').forEach(el=>el.onclick=()=>selectSong(el.dataset.song))}
 function escapeHtml(s=''){return String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
 function stopDemo(){if(demoTimer){clearTimeout(demoTimer);demoTimer=null}}
 function selectSong(id){
