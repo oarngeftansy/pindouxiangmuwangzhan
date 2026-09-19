@@ -23,6 +23,18 @@ function nearestSample(note){const m=noteMidi(note);return sampleRoots.reduce((a
 function playNote(note,duration=.9){initAudio().then(()=>{if(!audioReady)return;const root=nearestSample(note),src=audioCtx.createBufferSource(),g=audioCtx.createGain();src.buffer=buffers[root];src.playbackRate.value=Math.pow(2,(noteMidi(note)-noteMidi(root))/12);g.gain.setValueAtTime(.66,audioCtx.currentTime);g.gain.exponentialRampToValueAtTime(.0001,audioCtx.currentTime+Math.max(.25,duration));src.connect(g).connect(audioCtx.destination);src.start();src.stop(audioCtx.currentTime+Math.max(.35,duration)+.05)})}
 
 let songs=[...builtinSongs],current=songs.find(s=>s.id==='river-flows-in-you')||songs[0],category='全部',query='',step=0,mode='guide',demoTimer=null;
+function normalizeCatalogMetadata(){
+  const meta={
+    'energy-flow':{composer:'坂本龙一 / Ryuichi Sakamoto'},
+    'night-piano-5':{composer:'石进'},
+    'merry-christmas-mr-lawrence':{composer:'坂本龙一 / Ryuichi Sakamoto'},
+    'castle-in-the-sky':{composer:'久石让 / Joe Hisaishi'},
+    'kikujiro-summer':{composer:'久石让 / Joe Hisaishi'},
+    'river-flows-in-you':{composer:'Yiruma'}
+  };
+  songs.forEach(song=>{if(meta[song.id])Object.assign(song,meta[song.id])});
+}
+normalizeCatalogMetadata();
 const STRUCTURE_REVIEW_IDS=new Set(['merry-christmas-mr-lawrence']);
 function rebuildCastleFromCanonicalTimeline(){
   const song=songs.find(s=>s.id==='castle-in-the-sky'); if(!song)return;
