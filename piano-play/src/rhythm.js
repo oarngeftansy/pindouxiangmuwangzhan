@@ -1,6 +1,6 @@
 export function createRhythmGame({root, chart, playNote, onProgress=()=>{}, onModeMessage=()=>{}}){
   const keys=chart.keys;
-  const PERFECT=.085, GOOD=.18, MISS=.22, APPROACH=1.85, PREROLL=3.0;
+  const PERFECT=.085, GOOD=.18, MISS=.22, APPROACH=1.25, PREROLL=3.0;
   const stage=root.querySelector('#rhythmStage');
   const field=root.querySelector('#rhythmField');
   const scoreEl=root.querySelector('#rhythmScore');
