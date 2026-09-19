@@ -60,10 +60,12 @@ export function createRhythmGame({root, chart, playNote, onProgress=()=>{}, onMo
     if(!running||paused)return;
     const t=currentTime();
     setPads(lane,true);setTimeout(()=>setPads(lane,false),95);
-    const candidates=notes.filter(n=>n.l===lane&&n.state==='wait'&&Math.abs(n.t-t)<=GOOD).sort((a,b)=>Math.abs(a.t-t)-Math.abs(b.t-t));
-    if(!candidates.length)return;
-    const n=candidates[0],d=Math.abs(n.t-t);
-    judge(n,d<=PERFECT?'Perfect':'Good');
+    const laneNotes=notes.filter(n=>n.l===lane&&n.state==='wait').sort((a,b)=>Math.abs(a.t-t)-Math.abs(b.t-t));
+    const n=laneNotes[0];
+    if(!n)return;
+    const signed=n.t-t,d=Math.abs(signed);
+    if(d<=GOOD){judge(n,d<=PERFECT?'Perfect':'Good');return}
+    if(d<=.36)flashJudge(signed>0?'EARLY':'LATE',signed>0?'early':'late');
   }
   function frame(now){
     if(!running)return;
@@ -80,9 +82,11 @@ export function createRhythmGame({root, chart, playNote, onProgress=()=>{}, onMo
     const hitTop=hitY-NOTE_H;
     const spawnY=-NOTE_H-10;
     const travel=hitTop-spawnY;
+    const armed=new Set();
     for(const n of notes){
       if(n.state!=='wait')continue;
       const dt=n.t-t;
+      if(dt>=0&&dt<=.46)armed.add(n.l);
       if(dt < -MISS){judge(n,'Miss');continue;}
       const y=hitTop-(dt/APPROACH)*travel;
       if(y>spawnY-120 && y<hitTop+NOTE_H+80){
@@ -92,6 +96,8 @@ export function createRhythmGame({root, chart, playNote, onProgress=()=>{}, onMo
         if(tail)tail.style.height=Math.max(22,Math.min(170,n.d/APPROACH*travel))+'px';
       }else n.el.style.display='none';
     }
+    laneEls.forEach((el,i)=>el.classList.toggle('armed',armed.has(i)));
+    padEls.forEach((el,i)=>el.classList.toggle('armed',armed.has(i)));
     const pct=Math.max(0,Math.min(1,t/chart.duration));progressBar.style.width=(pct*100)+'%';onProgress(pct,t);
     if(t>chart.duration+1.2){finish();return;}
     raf=requestAnimationFrame(frame);
@@ -118,6 +124,7 @@ export function createRhythmGame({root, chart, playNote, onProgress=()=>{}, onMo
   function stop(clear=true){
     running=false;paused=false;cancelAnimationFrame(raf);raf=0;startAt=0;pausedTotal=0;
     countdownEl.classList.remove('show');progressBar.style.width='0%';
+    laneEls.forEach(el=>el.classList.remove('armed'));padEls.forEach(el=>el.classList.remove('armed'));
     if(clear){clearNotes();resultEl.classList.remove('show');}
   }
   startBtn.onclick=start; pauseBtn.onclick=pause;
