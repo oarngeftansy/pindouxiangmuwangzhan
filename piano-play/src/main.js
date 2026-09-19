@@ -37,7 +37,7 @@ function rebuildCastleFromCanonicalTimeline(){
   });
   const measures=[...bars.keys()].sort((a,b)=>a-b).map(i=>bars.get(i));
   const sections=[]; for(let i=0;i<measures.length;i+=9)sections.push({name:`第 ${sections.length+1} 段`,measures:measures.slice(i,i+9)});
-  song.sections=sections;song.fullLength=true;song.verified=true;song.midiReady=true;
+  song.sections=sections;song.fullLength=true;song.verified=true;song.midiReady=true;song.composer='久石让';
   song.source=`完整主旋律 · 54 小节时间轴 · ${castleChart.events.length} 音`;
   song.description='基于完整节奏时间轴重建的主旋律跟练版；与音游模式共用同一结构。';
 }
@@ -55,7 +55,7 @@ function rebuildJuebieFromStructuredTimeline(){
   });
   const measures=[...bars.keys()].sort((a,b)=>a-b).map(i=>bars.get(i));
   const sections=[]; for(let i=0;i<measures.length;i+=16)sections.push({name:`第 ${sections.length+1} 段`,measures:measures.slice(i,i+16)});
-  song.sections=sections;song.fullLength=false;song.verified=false;song.midiReady=true;
+  song.sections=sections;song.fullLength=false;song.verified=false;song.midiReady=true;song.composer='邓垚';
   song.source=`完整编配测试 · F调结构化时间轴 · ${juebieshuChart.events.length} 时间点`;
   song.description='邓垚《诀别书》完整时间轴转谱测试版；用于验证整曲结构，非官方原版钢琴谱。';
 }
@@ -75,6 +75,8 @@ function rebuildFullRightHandTimeline(songId,chart,source,description,sectionSiz
   const measures=[...byMeasure.keys()].sort((a,b)=>a-b).map(m=>byMeasure.get(m)).filter(x=>x.length);
   const sections=[]; for(let i=0;i<measures.length;i+=sectionSize)sections.push({name:`第 ${sections.length+1} 段`,measures:measures.slice(i,i+sectionSize)});
   song.sections=sections;song.fullLength=true;song.verified=true;song.midiReady=true;song.source=source;song.description=description;
+  if(songId==='river-flows-in-you')song.composer='Yiruma';
+  if(songId==='kikujiro-summer')song.composer='久石让';
 }
 rebuildFullRightHandTimeline(
   'river-flows-in-you',
