@@ -1,4 +1,6 @@
 import { builtinSongs } from './catalog.js';
+import { castleChart } from './castle-chart.js';
+import { createRhythmGame } from './rhythm.js';
 
 const WHITE_KEYS='ABCDEFGHIJKLMNOPQRSTUVWX'.split('');
 const WHITE_NOTES=[];for(const o of [3,4,5])for(const n of ['C','D','E','F','G','A','B'])WHITE_NOTES.push(n+o);WHITE_NOTES.push('C6','D6','E6');
@@ -17,15 +19,36 @@ function nearestSample(note){const m=noteMidi(note);return sampleRoots.reduce((a
 function playNote(note,duration=.9){initAudio().then(()=>{if(!audioReady)return;const root=nearestSample(note),src=audioCtx.createBufferSource(),g=audioCtx.createGain();src.buffer=buffers[root];src.playbackRate.value=Math.pow(2,(noteMidi(note)-noteMidi(root))/12);g.gain.setValueAtTime(.66,audioCtx.currentTime);g.gain.exponentialRampToValueAtTime(.0001,audioCtx.currentTime+Math.max(.25,duration));src.connect(g).connect(audioCtx.destination);src.start();src.stop(audioCtx.currentTime+Math.max(.35,duration)+.05)})}
 
 let songs=[...builtinSongs],current=songs.find(s=>s.id==='river-flows-in-you')||songs[0],category='全部',query='',step=0,mode='guide',demoTimer=null;
-let songEntries=[],sectionStarts=[];
+let songEntries=[],sectionStarts=[],rhythmGame=null;
 const $=id=>document.getElementById(id);
+const appRoot=document.querySelector('.app');
+const isCastleSong=s=>!!s&&String(s.title||'').includes('天空之城');
+function ensureRhythmGame(){
+  if(rhythmGame)return rhythmGame;
+  rhythmGame=createRhythmGame({
+    root:$('rhythmShell'),
+    chart:castleChart,
+    playNote,
+    onProgress:(pct,t)=>{
+      $('progress').textContent=`${Math.max(0,Math.floor(t))}s / ${Math.floor(castleChart.duration)}s`;
+      $('progressText').textContent=`音游 · ${Math.round(Math.max(0,pct)*100)}%`;
+    },
+    onModeMessage:msg=>{$('audioStatus').textContent=msg}
+  });
+  return rhythmGame;
+}
 function categories(){return ['全部',...new Set(songs.map(s=>s.category))]}
 function filtered(){return songs.filter(s=>(category==='全部'||s.category===category)&&(!query||(s.title+s.composer).toLowerCase().includes(query.toLowerCase())))}
 function renderCats(){$('cats').innerHTML=categories().map(c=>`<button class="cat ${c===category?'active':''}" data-cat="${c}">${c}</button>`).join('');document.querySelectorAll('[data-cat]').forEach(b=>b.onclick=()=>{category=b.dataset.cat;renderCats();renderSongList()})}
 function renderSongList(){const list=filtered();$('songCount').textContent=`(${songs.length})`;$('songList').innerHTML=list.map(s=>`<div class="song ${s.id===current.id?'active':''}" data-song="${s.id}"><div class="song-title"><span>${escapeHtml(s.title)}</span>${s.fullLength?'<span class="badge full">完整版</span>':s.verified?'<span class="badge verified">已校谱</span>':s.midiReady?'<span class="badge simple">主旋律版</span>':'<span class="badge pending">待校谱</span>'}</div><div class="song-meta">${escapeHtml(s.category)} · ${'★'.repeat(s.difficulty)}${'☆'.repeat(3-s.difficulty)}</div></div>`).join('')||'<div class="empty">没有匹配曲谱</div>';document.querySelectorAll('[data-song]').forEach(el=>el.onclick=()=>selectSong(el.dataset.song))}
 function escapeHtml(s=''){return String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
 function stopDemo(){if(demoTimer){clearTimeout(demoTimer);demoTimer=null}}
-function selectSong(id){stopDemo();current=songs.find(s=>s.id===id)||current;step=0;renderSongList();renderSong()}
+function selectSong(id){
+  stopDemo();
+  const next=songs.find(s=>s.id===id)||current;
+  if(mode==='rhythm'&&!isCastleSong(next))setMode('guide');
+  current=next;step=0;renderSongList();renderSong();
+}
 function tokKey(x){return typeof x==='string'?x:(x&&x.k)||''}
 function tokNote(x){const k=tokKey(x);return typeof x==='object'&&x.n?x.n:(keyToNote[k]||'')}
 function tokWeight(x){return typeof x==='object'&&x.w?Math.max(.5,Math.min(6,x.w)):1}
@@ -45,16 +68,66 @@ function syncScoreState(forceScroll=false){const total=songEntries.length,entry=
  document.querySelectorAll('#score .note-token.current').forEach(el=>el.classList.remove('current'));
  if(mode==='guide'&&entry){const cur=$('score').querySelector(`[data-step="${step}"]`);if(cur)cur.classList.add('current')}
  const rawExpected=mode==='guide'&&entry?entry.key:'';$('expected').textContent=mode==='guide'?(entry?formatKey(entry.key):'完成 ✓'):'—';$('expectedNote').textContent=mode==='guide'?(entry?entry.note:'✓'):'—';updateTargetKey(rawExpected);if(mode==='guide'&&entry)ensureCurrentVisible(forceScroll)}
-function setMode(m){mode=m;$('guideMode').classList.toggle('active',m==='guide');$('freeMode').classList.toggle('active',m==='free');$('modeText').textContent=m==='guide'?'自由跟弹':'自由弹奏';syncScoreState(false)}
+function setMode(m){
+  stopDemo();
+  if(m==='rhythm'){
+    const castle=songs.find(isCastleSong);
+    if(!castle)return;
+    if(current!==castle){current=castle;step=0;renderSongList();renderSong()}
+    mode='rhythm';
+    appRoot.classList.add('rhythm-mode');
+    $('guideMode').classList.remove('active');$('rhythmMode').classList.add('active');
+    $('modeText').textContent='音游模式';
+    document.querySelector('.kbd-help').textContent='固定六键 A S D / J K L · Perfect ±85ms · Good ±180ms';
+    $('progress').textContent=`0s / ${Math.floor(castleChart.duration)}s`;
+    $('progressText').textContent=`音游 · 0%`;
+    $('audioStatus').textContent=`天空之城 · ${castleChart.bpm} BPM · 点击开始`;
+    ensureRhythmGame().stop();
+    syncScoreState(false);
+    return;
+  }
+  if(rhythmGame)rhythmGame.stop();
+  mode='guide';appRoot.classList.remove('rhythm-mode');
+  $('guideMode').classList.add('active');$('rhythmMode').classList.remove('active');
+  $('modeText').textContent='跟练模式';
+  document.querySelector('.kbd-help').textContent='整首乐谱连续显示 · 按对自动前进 · 无时间限制';
+  $('audioStatus').textContent=audioReady?'真实钢琴采样已就绪':'点击琴键后加载钢琴音色';
+  syncScoreState(false);
+}
 function resetProgressClasses(){document.querySelectorAll('#score [data-step]').forEach(el=>{const idx=+el.dataset.step;el.classList.toggle('done',idx<step);el.classList.toggle('current',mode==='guide'&&idx===step)})}
 function jumpToSection(si){const target=sectionStarts.find(x=>x.sectionIndex===si);if(!target)return;step=target.start;resetProgressClasses();syncScoreState(true);const sec=$('score').querySelector(`[data-score-section="${si}"]`);if(sec)$('score').scrollTo({top:Math.max(0,sec.offsetTop-8),behavior:'smooth'})}
 function pianoKey(key,down=true){const el=document.querySelector(`[data-key="${CSS.escape(key)}"]`);if(el)el.classList.toggle('active',down)}
-function handleKey(key){key=key.toUpperCase();if(!keyToNote[key])return;playNote(keyToNote[key]);pianoKey(key,true);setTimeout(()=>pianoKey(key,false),160);if(mode!=='guide')return;if(!songEntries.length)return;const expected=songEntries[step]?.key;if(key===expected){const prev=$('score').querySelector(`[data-step="${step}"]`);if(prev){prev.classList.remove('current');prev.classList.add('done')}step++;syncScoreState(false)}else{const cur=$('score').querySelector('.note-token.current');if(cur){cur.classList.add('wrong');setTimeout(()=>cur.classList.remove('wrong'),420)}}}
+function handleKey(key){
+  key=key.toUpperCase();
+  if(mode==='rhythm'){
+    const lane=castleChart.keys.indexOf(key);
+    if(lane>=0)ensureRhythmGame().inputLane(lane);
+    return;
+  }
+  if(!keyToNote[key])return;playNote(keyToNote[key]);pianoKey(key,true);setTimeout(()=>pianoKey(key,false),160);
+  if(mode!=='guide'||!songEntries.length)return;
+  const expected=songEntries[step]?.key;
+  if(key===expected){const prev=$('score').querySelector(`[data-step="${step}"]`);if(prev){prev.classList.remove('current');prev.classList.add('done')}step++;syncScoreState(false)}
+  else{const cur=$('score').querySelector('.note-token.current');if(cur){cur.classList.add('wrong');setTimeout(()=>cur.classList.remove('wrong'),420)}}
+}
 function renderPiano(){const p=$('piano');p.innerHTML='';WHITE_KEYS.forEach((k,i)=>{const el=document.createElement('button');el.className='white';el.dataset.key=k;const lab=k.startsWith('⇧')?'Shift +\n'+k.slice(1):k;el.innerHTML=`<span class="note-label">${WHITE_NOTES[i]}</span><span class="key-label ${k.startsWith('⇧')?'shifted':''}">${lab}</span>`;el.onpointerdown=()=>handleKey(k);p.appendChild(el)});requestAnimationFrame(()=>{const w=p.clientWidth/WHITE_KEYS.length;BLACK_NOTES.forEach((n,i)=>{const sem=noteMidi(n),belowMidi=sem-1;let wi=WHITE_NOTES.findIndex(x=>noteMidi(x)===belowMidi);if(wi<0)wi=WHITE_NOTES.findIndex(x=>noteMidi(x)===sem-2);if(wi<0)return;const key=BLACK_KEYS[i],b=document.createElement('button');b.className='black';b.dataset.key=key;b.style.left=((wi+1)*w-13)+'px';const lab=key.startsWith('⇧')?'Shift +\n'+key.slice(1):key;b.innerHTML=`<span class="note-label">${n}</span><span class="key-label ${key.startsWith('⇧')?'shifted':''}">${escapeHtml(lab)}</span>`;b.onpointerdown=e=>{e.stopPropagation();handleKey(key)};p.appendChild(b)})});requestAnimationFrame(()=>syncScoreState(false))}
-function demo(){stopDemo();if(!songEntries.length)return;let i=0;setMode('free');const tick=()=>{if(i>=songEntries.length){demoTimer=null;return}const e=songEntries[i++];handleKey(e.key);demoTimer=setTimeout(tick,Math.max(170,Math.min(900,e.weight*230)))};tick()}
-window.addEventListener('keydown',e=>{if(e.target.matches('input,textarea,select'))return;if(e.repeat)return;const base=e.key.length===1?e.key.toUpperCase():'';const shifted=e.shiftKey&&'ASDFGHJKL'.includes(base)?'⇧'+base:'';const k=shifted&&keyToNote[shifted]?shifted:base;if(keyToNote[k]){e.preventDefault();handleKey(k)}});
+function demo(){
+  stopDemo();if(!songEntries.length||mode==='rhythm')return;let i=0;
+  const tick=()=>{if(i>=songEntries.length){demoTimer=null;return}const e=songEntries[i++];playNote(e.note,Math.max(.3,e.weight*.22));pianoKey(e.key,true);setTimeout(()=>pianoKey(e.key,false),140);demoTimer=setTimeout(tick,Math.max(170,Math.min(900,e.weight*230)))};tick()
+}
+window.addEventListener('keydown',e=>{
+  if(e.target.matches('input,textarea,select')||e.repeat)return;
+  const base=e.key.length===1?e.key.toUpperCase():'';
+  if(mode==='rhythm'){
+    if(castleChart.keys.includes(base)){e.preventDefault();handleKey(base)}
+    return;
+  }
+  const shifted=e.shiftKey&&'ASDFGHJKL'.includes(base)?'⇧'+base:'';
+  const k=shifted&&keyToNote[shifted]?shifted:base;
+  if(keyToNote[k]){e.preventDefault();handleKey(k)}
+});
 $('search').oninput=e=>{query=e.target.value;renderSongList()};
 $('sectionSelect').onchange=e=>{if(e.target.value!=='')jumpToSection(+e.target.value);e.target.value=''};
-$('restartBtn').onclick=()=>{stopDemo();step=0;setMode('guide');resetProgressClasses();syncScoreState(true)};
-$('demoBtn').onclick=demo;$('guideMode').onclick=()=>setMode('guide');$('freeMode').onclick=()=>setMode('free');
+$('restartBtn').onclick=()=>{stopDemo();if(mode==='rhythm'){ensureRhythmGame().start();return}step=0;resetProgressClasses();syncScoreState(true)};
+$('demoBtn').onclick=demo;$('guideMode').onclick=()=>setMode('guide');$('rhythmMode').onclick=()=>setMode('rhythm');
 renderPiano();renderCats();renderSongList();renderSong();document.body.addEventListener('pointerdown',()=>initAudio(),{once:true});
