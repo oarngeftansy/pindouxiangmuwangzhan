@@ -74,7 +74,10 @@ function rebuildFullRightHandTimeline(songId,chart,source,description,sectionSiz
   });
   const measures=[...byMeasure.keys()].sort((a,b)=>a-b).map(m=>byMeasure.get(m)).filter(x=>x.length);
   const sections=[]; for(let i=0;i<measures.length;i+=sectionSize)sections.push({name:`第 ${sections.length+1} 段`,measures:measures.slice(i,i+sectionSize)});
-  song.sections=sections;song.fullLength=true;song.verified=true;song.midiReady=true;song.source=source;song.description=description;
+  song.sections=sections;song.fullLength=true;song.verified=true;song.midiReady=true;
+  if(songId==='river-flows-in-you')song.composer='Yiruma';
+  if(songId==='kikujiro-summer')song.composer='Joe Hisaishi';
+  song.source=source;song.description=description;
   if(songId==='river-flows-in-you')song.composer='Yiruma';
   if(songId==='kikujiro-summer')song.composer='久石让';
 }
