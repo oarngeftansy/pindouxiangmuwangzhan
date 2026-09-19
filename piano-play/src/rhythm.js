@@ -12,12 +12,31 @@ export function createRhythmGame({root, chart, playNote, onProgress=()=>{}, onMo
   const pauseBtn=root.querySelector('#rhythmPause');
   const progressBar=root.querySelector('#rhythmProgressBar');
   const resultEl=root.querySelector('#rhythmResult');
+  const accompBtn=root.querySelector('#rhythmAccomp');
+  const accompaniment=Array.isArray(chart.accompaniment)?chart.accompaniment:[];
   const laneEls=[...root.querySelectorAll('.rhythm-lane')];
   const padEls=[...root.querySelectorAll('.rhythm-pad')];
   let notes=[], raf=0, startAt=0, pauseAt=0, pausedTotal=0, running=false, paused=false;
+  let accompIndex=0,accompEnabled=accompaniment.length>0;
   let score=0,combo=0,maxCombo=0,perfect=0,good=0,miss=0,judged=0;
 
   function resetStats(){score=0;combo=0;maxCombo=0;perfect=0;good=0;miss=0;judged=0;syncHud();}
+  function syncAccompButton(){
+    if(!accompBtn)return;
+    accompBtn.disabled=!accompaniment.length;
+    accompBtn.textContent=accompaniment.length?(accompEnabled?'伴奏 ON':'伴奏 OFF'):'伴奏 —';
+    accompBtn.classList.toggle('active',accompEnabled&&accompaniment.length>0);
+  }
+  function playAccompanimentUntil(t){
+    if(!accompEnabled||!accompaniment.length)return;
+    while(accompIndex<accompaniment.length&&accompaniment[accompIndex].t<=t){
+      const e=accompaniment[accompIndex++];
+      if(e.t<t-.12)continue;
+      const notes=Array.isArray(e.notes)?e.notes:[e.n].filter(Boolean);
+      const gain=Math.max(.075,.25/Math.sqrt(Math.max(1,notes.length)));
+      notes.forEach(n=>playNote(n,Math.max(.18,Math.min(2.8,e.d||.45)),gain));
+    }
+  }
   function syncHud(){
     scoreEl.textContent=String(Math.round(score)).padStart(6,'0');
     comboEl.textContent=combo;
@@ -98,13 +117,14 @@ export function createRhythmGame({root, chart, playNote, onProgress=()=>{}, onMo
     }
     laneEls.forEach((el,i)=>el.classList.toggle('armed',armed.has(i)));
     padEls.forEach((el,i)=>el.classList.toggle('armed',armed.has(i)));
+    playAccompanimentUntil(t);
     const pct=Math.max(0,Math.min(1,t/chart.duration));progressBar.style.width=(pct*100)+'%';onProgress(pct,t);
     if(t>chart.duration+1.2){finish();return;}
     raf=requestAnimationFrame(frame);
   }
   function start(){
     stop(false);buildNotes();resetStats();resultEl.classList.remove('show');resultEl.innerHTML='';
-    startAt=performance.now()+PREROLL*1000;pausedTotal=0;paused=false;running=true;startBtn.textContent='重新开始';pauseBtn.textContent='暂停';
+    startAt=performance.now()+PREROLL*1000;pausedTotal=0;paused=false;running=true;accompIndex=0;startBtn.textContent='重新开始';pauseBtn.textContent='暂停';
     onModeMessage(`${chart.title||'音游'} · ${chart.bpm} BPM · ${chart.events.length} 个节奏音符`);
     raf=requestAnimationFrame(frame);
   }
@@ -124,10 +144,12 @@ export function createRhythmGame({root, chart, playNote, onProgress=()=>{}, onMo
   function stop(clear=true){
     running=false;paused=false;cancelAnimationFrame(raf);raf=0;startAt=0;pausedTotal=0;
     countdownEl.classList.remove('show');progressBar.style.width='0%';
-    laneEls.forEach(el=>el.classList.remove('armed'));padEls.forEach(el=>el.classList.remove('armed'));
+    laneEls.forEach(el=>el.classList.remove('armed'));padEls.forEach(el=>el.classList.remove('armed'));accompIndex=0;
     if(clear){clearNotes();resultEl.classList.remove('show');}
   }
   startBtn.onclick=start; pauseBtn.onclick=pause;
+  if(accompBtn)accompBtn.onclick=()=>{if(!accompaniment.length)return;accompEnabled=!accompEnabled;syncAccompButton()};
+  syncAccompButton();
   padEls.forEach((p,i)=>{p.onpointerdown=e=>{e.preventDefault();inputLane(i)}});
   return {start,stop,pause,inputLane,isRunning:()=>running,isPaused:()=>paused};
 }
