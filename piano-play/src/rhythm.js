@@ -73,13 +73,19 @@ export function createRhythmGame({root, chart, playNote, onProgress=()=>{}, onMo
     if(t>=0&&t<.35){countdownEl.textContent='GO';countdownEl.classList.add('show')}
     else if(t>=.35)countdownEl.classList.remove('show');
     const rect=stage.getBoundingClientRect();
-    const hitY=rect.height-30, spawnY=-34, travel=hitY-spawnY;
+    // Visual hit geometry: note bottom reaches the hit line exactly at note.t.
+    // The lane keycaps sit below this line, so timing and key identity share one axis.
+    const NOTE_H=24, HIT_BOTTOM=72;
+    const hitY=rect.height-HIT_BOTTOM;
+    const hitTop=hitY-NOTE_H;
+    const spawnY=-NOTE_H-10;
+    const travel=hitTop-spawnY;
     for(const n of notes){
       if(n.state!=='wait')continue;
       const dt=n.t-t;
       if(dt < -MISS){judge(n,'Miss');continue;}
-      const y=hitY-(dt/APPROACH)*travel;
-      if(y>spawnY-120 && y<hitY+80){
+      const y=hitTop-(dt/APPROACH)*travel;
+      if(y>spawnY-120 && y<hitTop+NOTE_H+80){
         n.el.style.display='block';
         n.el.style.transform=`translate3d(0,${y}px,0)`;
         const tail=n.el.querySelector('.fall-note-tail');
