@@ -177,8 +177,8 @@ function ensureRhythmGame(){
   });
   return rhythmGame;
 }
-function categories(){return ['全部',...new Set(songs.map(s=>s.category))]}
-function filtered(){return songs.filter(s=>(category==='全部'||s.category===category)&&(!query||(s.title+s.composer).toLowerCase().includes(query.toLowerCase())))}
+function categories(){return ['全部','关卡',...new Set(songs.map(s=>s.category))]}
+function filtered(){return songs.filter(s=>((category==='全部')||(category==='关卡'&&hasRhythmLevel(s))||s.category===category)&&(!query||(s.title+s.composer).toLowerCase().includes(query.toLowerCase())))}
 function renderCats(){$('cats').innerHTML=categories().map(c=>`<button class="cat ${c===category?'active':''}" data-cat="${c}">${c}</button>`).join('');document.querySelectorAll('[data-cat]').forEach(b=>b.onclick=()=>{category=b.dataset.cat;renderCats();renderSongList()})}
 function songBadge(s){
   if(isJuebie(s)&&juebieMidiChart)return '<span class="badge full">MIDI 正式版</span>';
@@ -189,7 +189,7 @@ function songBadge(s){
   return s.fullLength?'<span class="badge full">完整版</span>':s.verified?'<span class="badge verified">已校谱</span>':s.midiReady?'<span class="badge simple">主旋律版</span>':'<span class="badge pending">待校谱</span>';
 }
 function renderSongList(){
-  const list=filtered();$('songCount').textContent=`(${songs.length})`;
+  const list=filtered();$('songCount').textContent=`(${songs.length}首 · ${levelSongs().length}关)`;
   $('songList').innerHTML=list.map(s=>{
     const ready=hasRhythmLevel(s),rec=recordFor(s);
     const levelMeta=ready
