@@ -1,4 +1,4 @@
-export function createRhythmGame({root, chart, playNote, onProgress=()=>{}, onModeMessage=()=>{}}){
+export function createRhythmGame({root, chart, playNote, onProgress=()=>{}, onModeMessage=()=>{}, onResult=()=>{}, onNext=null}){
   let activeChart=chart;
   const PERFECT=.085, GOOD=.18, MISS=.22, APPROACH=1.45, PREROLL=2.4;
   const stage=root.querySelector('#rhythmStage');
@@ -159,9 +159,13 @@ export function createRhythmGame({root, chart, playNote, onProgress=()=>{}, onMo
     if(!running)return;
     running=false;cancelAnimationFrame(raf);
     const acc=judged?(perfect+good*.7)/judged*100:0;
-    resultEl.innerHTML=`<div class="result-card"><small>演奏完成</small><strong>${Math.round(score).toLocaleString()}</strong><div><span>Perfect <b>${perfect}</b></span><span>Good <b>${good}</b></span><span>Miss <b>${miss}</b></span><span>Max Combo <b>${maxCombo}</b></span><span>Accuracy <b>${acc.toFixed(1)}%</b></span></div><button id="rhythmAgain">再来一次</button></div>`;
+    const result={score:Math.round(score),perfect,good,miss,maxCombo,accuracy:Number(acc.toFixed(1)),speed,chart:activeChart};
+    resultEl.innerHTML=`<div class="result-card"><small>关卡完成</small><strong>${result.score.toLocaleString()}</strong><div><span>Perfect <b>${perfect}</b></span><span>Good <b>${good}</b></span><span>Miss <b>${miss}</b></span><span>Max Combo <b>${maxCombo}</b></span><span>Accuracy <b>${acc.toFixed(1)}%</b></span></div><div class="result-actions"><button id="rhythmAgain">再来一次</button>${onNext?'<button id="rhythmNext">下一关</button>':''}</div></div>`;
     resultEl.classList.add('show');
     resultEl.querySelector('#rhythmAgain').onclick=start;
+    const nextBtn=resultEl.querySelector('#rhythmNext');
+    if(nextBtn)nextBtn.onclick=()=>onNext(result);
+    onResult(result);
     onProgress(1,activeChart?.duration||0,activeChart,speed);
   }
   function stop(clear=true){
