@@ -178,7 +178,7 @@ export function createRhythmGame({root, chart, playNote, onProgress=()=>{}, onMo
 
   startBtn.onclick=start;
   pauseBtn.onclick=pause;
-  speedSelect?.addEventListener('change',()=>{speed=Number(speedSelect.value)||1.15;});
+  speedSelect?.addEventListener('change',()=>{if(!running)speed=Number(speedSelect.value)||1.15;});
   padEls.forEach((p,i)=>{p.onpointerdown=e=>{e.preventDefault();inputLane(i);}});
   return {start,stop,pause,inputLane,setChart,getChart:()=>activeChart,isRunning:()=>running,isPaused:()=>paused};
 }
