@@ -59,8 +59,18 @@
                 <div class="rhythm-result" id="rhythmResult"></div>
               </div>
               <div class="rhythm-footer">
-                <div class="rhythm-caption">天空之城 · 92 BPM · 固定六键节奏实验</div>
-                <div class="rhythm-actions"><button id="rhythmStart">开始</button><button id="rhythmPause">暂停</button></div>
+                <div class="rhythm-caption" id="rhythmCaption">六键音游关卡 · A S D / J K L</div>
+                <div class="rhythm-actions">
+                  <label class="rhythm-speed">速度
+                    <select id="rhythmSpeed" aria-label="音游速度">
+                      <option value="0.95">0.95×</option>
+                      <option value="1">1.00×</option>
+                      <option value="1.15" selected>1.15×</option>
+                      <option value="1.3">1.30×</option>
+                    </select>
+                  </label>
+                  <button id="rhythmStart">开始</button><button id="rhythmPause">暂停</button>
+                </div>
               </div>
             </div>
             <div class="current-key"><small>下一键</small><span class="press-label">按</span><b id="expected">—</b><span id="expectedNote" class="current-note">—</span></div>
