@@ -2,6 +2,7 @@ import { builtinSongs } from './catalog.js';
 import { castleChart } from './castle-chart.js';
 import { createRhythmGame } from './rhythm.js';
 import { buildRhythmChart, juebieSong, juebiePreviewChart } from './rhythm-levels.js';
+import { rhythmChartFromMidi } from './midi-chart.js';
 
 const WHITE_KEYS='ABCDEFGHIJKLMNOPQRSTUVWX'.split('');
 const WHITE_NOTES=[];for(const o of [3,4,5])for(const n of ['C','D','E','F','G','A','B'])WHITE_NOTES.push(n+o);WHITE_NOTES.push('C6','D6','E6');
@@ -44,14 +45,63 @@ function rebuildCastleFromCanonicalTimeline(){
   song.description='基于完整节奏时间轴重建的主旋律跟练版；与音游模式共用同一结构。';
 }
 rebuildCastleFromCanonicalTimeline();
-let songEntries=[],sectionStarts=[],rhythmGame=null,rhythmChart=castleChart;
+let songEntries=[],sectionStarts=[],rhythmGame=null,rhythmChart=castleChart,juebieMidiChart=null;
 const $=id=>document.getElementById(id);
 const appRoot=document.querySelector('.app');
 
+const isJuebie=s=>s?.id==='juebie-shu'||String(s?.title||'').includes('诀别书');
 function chartForCurrent(){
   if(current?.id==='castle-in-the-sky')return castleChart;
-  if((current?.id==='juebie-shu'||String(current?.title||'').includes('诀别书'))&&!songEntries.length)return juebiePreviewChart;
+  if(isJuebie(current)&&juebieMidiChart)return juebieMidiChart;
+  if(isJuebie(current)&&!songEntries.length)return juebiePreviewChart;
   return buildRhythmChart(current,songEntries);
+}
+async function loadBundledJuebieMidi(){
+  try{
+    const r=await fetch('./assets/juebie-shu.mid',{cache:'no-store'});
+    if(!r.ok)return false;
+    const buf=await r.arrayBuffer();
+    juebieMidiChart=rhythmChartFromMidi(buf,{id:'juebie-shu',title:'诀别书'});
+    const song=songs.find(isJuebie);
+    if(song){
+      song.source=`正式 MIDI · ${juebieMidiChart.bpm} BPM · ${juebieMidiChart.events.length} 主旋律音符`;
+      song.description='从校验后的 MIDI 自动提取主旋律并生成六键音游关卡。';
+    }
+    if(isJuebie(current)){
+      renderSongList();
+      if(mode==='rhythm')syncRhythmChart();
+    }
+    return true;
+  }catch(e){return false}
+}
+function installMidiDevImporter(){
+  const params=new URLSearchParams(location.search);
+  if(!params.has('dev'))return;
+  const actions=document.querySelector('.rhythm-actions');
+  if(!actions||document.getElementById('midiImportBtn'))return;
+  const input=document.createElement('input');
+  input.type='file';input.accept='.mid,.midi,audio/midi,audio/x-midi';input.hidden=true;input.id='midiImport';
+  const btn=document.createElement('button');
+  btn.id='midiImportBtn';btn.type='button';btn.textContent='导入 MIDI';
+  btn.onclick=()=>input.click();
+  input.onchange=async()=>{
+    const file=input.files?.[0];if(!file)return;
+    try{
+      const chart=rhythmChartFromMidi(await file.arrayBuffer(),{id:'juebie-shu',title:'诀别书'});
+      juebieMidiChart=chart;
+      const song=songs.find(isJuebie);
+      if(song){
+        song.source=`开发 MIDI · ${chart.bpm} BPM · ${chart.events.length} 主旋律音符`;
+        song.description=`已识别 MIDI 主旋律轨 #${chart.sourceTrack.index+1}，原轨 ${chart.sourceTrack.notes} 音符。`;
+      }
+      if(!isJuebie(current)&&song){current=song;step=0;renderSong();renderSongList()}
+      syncRhythmChart();
+      $('audioStatus').textContent=`MIDI 已导入 · 主旋律轨 ${chart.sourceTrack.index+1} · ${chart.events.length} 音符`;
+    }catch(err){
+      $('audioStatus').textContent='MIDI 导入失败：'+(err?.message||err);
+    }
+  };
+  actions.prepend(btn);actions.appendChild(input);
 }
 function syncRhythmChart(){
   rhythmChart=chartForCurrent();
@@ -79,6 +129,7 @@ function categories(){return ['全部',...new Set(songs.map(s=>s.category))]}
 function filtered(){return songs.filter(s=>(category==='全部'||s.category===category)&&(!query||(s.title+s.composer).toLowerCase().includes(query.toLowerCase())))}
 function renderCats(){$('cats').innerHTML=categories().map(c=>`<button class="cat ${c===category?'active':''}" data-cat="${c}">${c}</button>`).join('');document.querySelectorAll('[data-cat]').forEach(b=>b.onclick=()=>{category=b.dataset.cat;renderCats();renderSongList()})}
 function songBadge(s){
+  if(isJuebie(s)&&juebieMidiChart)return '<span class="badge full">MIDI 正式版</span>';
   if(s.rhythmOnly)return '<span class="badge simple">节奏试玩</span>';
   if(STRUCTURE_REVIEW_IDS.has(s.id))return '<span class="badge pending">结构复核</span>';
   if(s.id==='castle-in-the-sky')return '<span class="badge simple">完整主旋律</span>';
@@ -175,4 +226,4 @@ $('search').oninput=e=>{query=e.target.value;renderSongList()};
 $('sectionSelect').onchange=e=>{if(e.target.value!=='')jumpToSection(+e.target.value);e.target.value=''};
 $('restartBtn').onclick=()=>{stopDemo();if(mode==='rhythm'){ensureRhythmGame().start();return}step=0;resetProgressClasses();syncScoreState(true)};
 $('demoBtn').onclick=demo;$('guideMode').onclick=()=>setMode('guide');$('rhythmMode').onclick=()=>setMode('rhythm');
-renderPiano();renderCats();renderSongList();renderSong();document.body.addEventListener('pointerdown',()=>initAudio(),{once:true});
+renderPiano();renderCats();renderSongList();renderSong();installMidiDevImporter();loadBundledJuebieMidi();document.body.addEventListener('pointerdown',()=>initAudio(),{once:true});
