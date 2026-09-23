@@ -50,6 +50,53 @@ const $=id=>document.getElementById(id);
 const appRoot=document.querySelector('.app');
 
 const isJuebie=s=>s?.id==='juebie-shu'||String(s?.title||'').includes('诀别书');
+const LEVEL_RECORD_KEY='piano-play-level-records-v1';
+let levelRecords=(()=>{
+  try{return JSON.parse(localStorage.getItem(LEVEL_RECORD_KEY)||'{}')||{}}
+  catch(e){return {}}
+})();
+function hasRhythmLevel(s){
+  if(!s)return false;
+  if(s.id==='castle-in-the-sky'||isJuebie(s)||s.rhythmOnly)return true;
+  return !!(s.sections||[]).some(sec=>(sec.measures||[]).some(m=>(m||[]).some(x=>tokKey(x)!=='·'&&!!tokNote(x))));
+}
+function levelSongs(){return songs.filter(hasRhythmLevel)}
+function levelNumber(s){
+  const i=levelSongs().findIndex(x=>x.id===s?.id);
+  return i<0?null:i+1;
+}
+function levelLabel(s){
+  const n=levelNumber(s);
+  return n?`Lv.${String(n).padStart(2,'0')}`:'待谱';
+}
+function recordFor(s){return s?.id?levelRecords[s.id]:null}
+function saveLevelResult(result){
+  if(!current?.id)return;
+  const prev=levelRecords[current.id]||{};
+  levelRecords[current.id]={
+    cleared:true,
+    plays:(prev.plays||0)+1,
+    bestScore:Math.max(prev.bestScore||0,result.score||0),
+    bestAccuracy:Math.max(prev.bestAccuracy||0,result.accuracy||0),
+    bestCombo:Math.max(prev.bestCombo||0,result.maxCombo||0),
+    lastSpeed:result.speed||1
+  };
+  try{localStorage.setItem(LEVEL_RECORD_KEY,JSON.stringify(levelRecords))}catch(e){}
+  renderSongList();
+  syncRhythmChart();
+}
+function nextRhythmLevel(){
+  const levels=levelSongs();
+  if(!levels.length)return;
+  const i=levels.findIndex(x=>x.id===current?.id);
+  const next=levels[(i+1+levels.length)%levels.length];
+  current=next;step=0;
+  renderSongList();renderSong();
+  const chart=syncRhythmChart();
+  const game=ensureRhythmGame();
+  game.setChart(chart);
+  setTimeout(()=>game.start(),120);
+}
 function chartForCurrent(){
   if(current?.id==='castle-in-the-sky')return castleChart;
   if(isJuebie(current)&&juebieMidiChart)return juebieMidiChart;
@@ -106,7 +153,9 @@ function installMidiDevImporter(){
 function syncRhythmChart(){
   rhythmChart=chartForCurrent();
   const tag=rhythmChart.preview?'节奏试玩':'六键关卡';
-  if($('rhythmCaption'))$('rhythmCaption').textContent=`${current.title} · ${rhythmChart.bpm} BPM · ${rhythmChart.events.length} 音符 · ${tag}`;
+  const rec=recordFor(current);
+  const best=rec?.cleared?` · BEST ${Number(rec.bestAccuracy||0).toFixed(1)}%`:'';
+  if($('rhythmCaption'))$('rhythmCaption').textContent=`${levelLabel(current)} · ${current.title} · ${rhythmChart.bpm} BPM · ${rhythmChart.events.length} 音符 · ${tag}${best}`;
   if(rhythmGame)rhythmGame.setChart(rhythmChart);
   return rhythmChart;
 }
@@ -119,9 +168,11 @@ function ensureRhythmGame(){
     onProgress:(pct,t,chart)=>{
       const duration=chart?.duration||rhythmChart.duration||0;
       $('progress').textContent=`${Math.max(0,Math.floor(t))}s / ${Math.floor(duration)}s`;
-      $('progressText').textContent=`音游 · ${Math.round(Math.max(0,pct)*100)}%`;
+      $('progressText').textContent=`关卡 · ${Math.round(Math.max(0,pct)*100)}%`;
     },
-    onModeMessage:msg=>{$('audioStatus').textContent=msg}
+    onModeMessage:msg=>{$('audioStatus').textContent=msg},
+    onResult:result=>saveLevelResult(result),
+    onNext:()=>nextRhythmLevel()
   });
   return rhythmGame;
 }
@@ -136,14 +187,29 @@ function songBadge(s){
   if(s.id==='mariage-damour')return '<span class="badge simple">完整右手轨</span>';
   return s.fullLength?'<span class="badge full">完整版</span>':s.verified?'<span class="badge verified">已校谱</span>':s.midiReady?'<span class="badge simple">主旋律版</span>':'<span class="badge pending">待校谱</span>';
 }
-function renderSongList(){const list=filtered();$('songCount').textContent=`(${songs.length})`;$('songList').innerHTML=list.map(s=>`<div class="song ${s.id===current.id?'active':''}" data-song="${s.id}"><div class="song-title"><span>${escapeHtml(s.title)}</span>${songBadge(s)}</div><div class="song-meta">${escapeHtml(s.category)} · ${'★'.repeat(s.difficulty)}${'☆'.repeat(3-s.difficulty)} · ${s.rhythmOnly?'节奏试玩':(s.sections?.length?'可音游':'待谱')}</div></div>`).join('')||'<div class="empty">没有匹配曲谱</div>';document.querySelectorAll('[data-song]').forEach(el=>el.onclick=()=>selectSong(el.dataset.song))}
+function renderSongList(){
+  const list=filtered();$('songCount').textContent=`(${songs.length})`;
+  $('songList').innerHTML=list.map(s=>{
+    const ready=hasRhythmLevel(s),rec=recordFor(s);
+    const levelMeta=ready
+      ?`${levelLabel(s)} · ${rec?.cleared?`BEST ${Number(rec.bestAccuracy||0).toFixed(1)}%`:'关卡未完成'}`
+      :'待谱';
+    return `<div class="song ${s.id===current.id?'active':''}" data-song="${s.id}"><div class="song-title"><span>${escapeHtml(s.title)}</span>${songBadge(s)}</div><div class="song-meta">${escapeHtml(s.category)} · ${'★'.repeat(s.difficulty)}${'☆'.repeat(3-s.difficulty)} · ${levelMeta}</div></div>`;
+  }).join('')||'<div class="empty">没有匹配曲谱</div>';
+  document.querySelectorAll('[data-song]').forEach(el=>el.onclick=()=>selectSong(el.dataset.song));
+}
 function escapeHtml(s=''){return String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
 function stopDemo(){if(demoTimer){clearTimeout(demoTimer);demoTimer=null}}
 function selectSong(id){
   stopDemo();
   const next=songs.find(s=>s.id===id)||current;
   current=next;step=0;renderSongList();renderSong();
-  if(mode==='rhythm')syncRhythmChart();
+  if(mode==='rhythm'){
+    if(!hasRhythmLevel(current)){
+      setMode('guide');
+      $('audioStatus').textContent='这首曲目暂无关卡谱面';
+    }else syncRhythmChart();
+  }
 }
 function tokKey(x){return typeof x==='string'?x:(x&&x.k)||''}
 function tokNote(x){const k=tokKey(x);return typeof x==='object'&&x.n?x.n:(keyToNote[k]||'')}
@@ -167,14 +233,18 @@ function syncScoreState(forceScroll=false){const total=songEntries.length,entry=
 function setMode(m){
   stopDemo();
   if(m==='rhythm'){
+    if(!hasRhythmLevel(current)){
+      $('audioStatus').textContent='当前曲目暂无关卡谱面，请选择带 Lv. 编号的曲目';
+      return;
+    }
     mode='rhythm';
     appRoot.classList.add('rhythm-mode');
     $('guideMode').classList.remove('active');$('rhythmMode').classList.add('active');
-    $('modeText').textContent='音游模式';
-    document.querySelector('.kbd-help').textContent='固定六键 A S D / J K L · Perfect ±85ms · Good ±180ms · 默认 1.15×';
+    $('modeText').textContent='关卡模式';
+    document.querySelector('.kbd-help').textContent='固定六键 A S D / J K L · Perfect ±85ms · Good ±180ms · 自动记录 BEST';
     const chart=syncRhythmChart();
     $('progress').textContent=`0s / ${Math.floor(chart.duration||0)}s`;
-    $('progressText').textContent='音游 · 0%';
+    $('progressText').textContent='关卡 · 0%';
     $('audioStatus').textContent=`${current.title} · ${chart.bpm} BPM · 点击开始`;
     ensureRhythmGame().setChart(chart);
     syncScoreState(false);
