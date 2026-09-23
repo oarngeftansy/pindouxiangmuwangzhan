@@ -50,7 +50,7 @@ const appRoot=document.querySelector('.app');
 
 function chartForCurrent(){
   if(current?.id==='castle-in-the-sky')return castleChart;
-  if(current?.id==='juebie-shu'&&!songEntries.length)return juebiePreviewChart;
+  if((current?.id==='juebie-shu'||String(current?.title||'').includes('诀别书'))&&!songEntries.length)return juebiePreviewChart;
   return buildRhythmChart(current,songEntries);
 }
 function syncRhythmChart(){
@@ -85,7 +85,7 @@ function songBadge(s){
   if(s.id==='mariage-damour')return '<span class="badge simple">完整右手轨</span>';
   return s.fullLength?'<span class="badge full">完整版</span>':s.verified?'<span class="badge verified">已校谱</span>':s.midiReady?'<span class="badge simple">主旋律版</span>':'<span class="badge pending">待校谱</span>';
 }
-function renderSongList(){const list=filtered();$('songCount').textContent=`(${songs.length})`;$('songList').innerHTML=list.map(s=>`<div class="song ${s.id===current.id?'active':''}" data-song="${s.id}"><div class="song-title"><span>${escapeHtml(s.title)}</span>${songBadge(s)}</div><div class="song-meta">${escapeHtml(s.category)} · ${'★'.repeat(s.difficulty)}${'☆'.repeat(3-s.difficulty)}</div></div>`).join('')||'<div class="empty">没有匹配曲谱</div>';document.querySelectorAll('[data-song]').forEach(el=>el.onclick=()=>selectSong(el.dataset.song))}
+function renderSongList(){const list=filtered();$('songCount').textContent=`(${songs.length})`;$('songList').innerHTML=list.map(s=>`<div class="song ${s.id===current.id?'active':''}" data-song="${s.id}"><div class="song-title"><span>${escapeHtml(s.title)}</span>${songBadge(s)}</div><div class="song-meta">${escapeHtml(s.category)} · ${'★'.repeat(s.difficulty)}${'☆'.repeat(3-s.difficulty)} · ${s.rhythmOnly?'节奏试玩':(s.sections?.length?'可音游':'待谱')}</div></div>`).join('')||'<div class="empty">没有匹配曲谱</div>';document.querySelectorAll('[data-song]').forEach(el=>el.onclick=()=>selectSong(el.dataset.song))}
 function escapeHtml(s=''){return String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
 function stopDemo(){if(demoTimer){clearTimeout(demoTimer);demoTimer=null}}
 function selectSong(id){
