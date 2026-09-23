@@ -1,6 +1,7 @@
 import { builtinSongs } from './catalog.js';
 import { castleChart } from './castle-chart.js';
 import { createRhythmGame } from './rhythm.js';
+import { buildRhythmChart, juebieSong, juebiePreviewChart } from './rhythm-levels.js';
 
 const WHITE_KEYS='ABCDEFGHIJKLMNOPQRSTUVWX'.split('');
 const WHITE_NOTES=[];for(const o of [3,4,5])for(const n of ['C','D','E','F','G','A','B'])WHITE_NOTES.push(n+o);WHITE_NOTES.push('C6','D6','E6');
@@ -19,7 +20,11 @@ async function initAudio(){if(audioCtx){if(audioCtx.state==='suspended')await au
 function nearestSample(note){const m=noteMidi(note);return sampleRoots.reduce((a,b)=>Math.abs(noteMidi(a)-m)<=Math.abs(noteMidi(b)-m)?a:b)}
 function playNote(note,duration=.9){initAudio().then(()=>{if(!audioReady)return;const root=nearestSample(note),src=audioCtx.createBufferSource(),g=audioCtx.createGain();src.buffer=buffers[root];src.playbackRate.value=Math.pow(2,(noteMidi(note)-noteMidi(root))/12);g.gain.setValueAtTime(.66,audioCtx.currentTime);g.gain.exponentialRampToValueAtTime(.0001,audioCtx.currentTime+Math.max(.25,duration));src.connect(g).connect(audioCtx.destination);src.start();src.stop(audioCtx.currentTime+Math.max(.35,duration)+.05)})}
 
-let songs=[...builtinSongs],current=songs.find(s=>s.id==='river-flows-in-you')||songs[0],category='全部',query='',step=0,mode='guide',demoTimer=null;
+let songs=[...builtinSongs];
+let juebie=songs.find(s=>s.id==='juebie-shu'||String(s.title||'').includes('诀别书'));
+if(!juebie){songs.unshift(juebieSong);juebie=juebieSong}
+else {juebie.rhythmBpm=juebie.rhythmBpm||120}
+let current=songs.find(s=>s.id==='river-flows-in-you')||songs[0],category='全部',query='',step=0,mode='guide',demoTimer=null;
 const STRUCTURE_REVIEW_IDS=new Set(['river-flows-in-you','merry-christmas-mr-lawrence','kikujiro-summer']);
 function rebuildCastleFromCanonicalTimeline(){
   const song=songs.find(s=>s.id==='castle-in-the-sky'); if(!song)return;
@@ -39,18 +44,31 @@ function rebuildCastleFromCanonicalTimeline(){
   song.description='基于完整节奏时间轴重建的主旋律跟练版；与音游模式共用同一结构。';
 }
 rebuildCastleFromCanonicalTimeline();
-let songEntries=[],sectionStarts=[],rhythmGame=null;
+let songEntries=[],sectionStarts=[],rhythmGame=null,rhythmChart=castleChart;
 const $=id=>document.getElementById(id);
 const appRoot=document.querySelector('.app');
-const isCastleSong=s=>!!s&&String(s.title||'').includes('天空之城');
+
+function chartForCurrent(){
+  if(current?.id==='castle-in-the-sky')return castleChart;
+  if(current?.id==='juebie-shu'&&!songEntries.length)return juebiePreviewChart;
+  return buildRhythmChart(current,songEntries);
+}
+function syncRhythmChart(){
+  rhythmChart=chartForCurrent();
+  const tag=rhythmChart.preview?'节奏试玩':'六键关卡';
+  if($('rhythmCaption'))$('rhythmCaption').textContent=`${current.title} · ${rhythmChart.bpm} BPM · ${rhythmChart.events.length} 音符 · ${tag}`;
+  if(rhythmGame)rhythmGame.setChart(rhythmChart);
+  return rhythmChart;
+}
 function ensureRhythmGame(){
   if(rhythmGame)return rhythmGame;
   rhythmGame=createRhythmGame({
     root:$('rhythmShell'),
-    chart:castleChart,
+    chart:rhythmChart,
     playNote,
-    onProgress:(pct,t)=>{
-      $('progress').textContent=`${Math.max(0,Math.floor(t))}s / ${Math.floor(castleChart.duration)}s`;
+    onProgress:(pct,t,chart)=>{
+      const duration=chart?.duration||rhythmChart.duration||0;
+      $('progress').textContent=`${Math.max(0,Math.floor(t))}s / ${Math.floor(duration)}s`;
       $('progressText').textContent=`音游 · ${Math.round(Math.max(0,pct)*100)}%`;
     },
     onModeMessage:msg=>{$('audioStatus').textContent=msg}
@@ -61,6 +79,7 @@ function categories(){return ['全部',...new Set(songs.map(s=>s.category))]}
 function filtered(){return songs.filter(s=>(category==='全部'||s.category===category)&&(!query||(s.title+s.composer).toLowerCase().includes(query.toLowerCase())))}
 function renderCats(){$('cats').innerHTML=categories().map(c=>`<button class="cat ${c===category?'active':''}" data-cat="${c}">${c}</button>`).join('');document.querySelectorAll('[data-cat]').forEach(b=>b.onclick=()=>{category=b.dataset.cat;renderCats();renderSongList()})}
 function songBadge(s){
+  if(s.rhythmOnly)return '<span class="badge simple">节奏试玩</span>';
   if(STRUCTURE_REVIEW_IDS.has(s.id))return '<span class="badge pending">结构复核</span>';
   if(s.id==='castle-in-the-sky')return '<span class="badge simple">完整主旋律</span>';
   if(s.id==='mariage-damour')return '<span class="badge simple">完整右手轨</span>';
@@ -72,8 +91,8 @@ function stopDemo(){if(demoTimer){clearTimeout(demoTimer);demoTimer=null}}
 function selectSong(id){
   stopDemo();
   const next=songs.find(s=>s.id===id)||current;
-  if(mode==='rhythm'&&!isCastleSong(next))setMode('guide');
   current=next;step=0;renderSongList();renderSong();
+  if(mode==='rhythm')syncRhythmChart();
 }
 function tokKey(x){return typeof x==='string'?x:(x&&x.k)||''}
 function tokNote(x){const k=tokKey(x);return typeof x==='object'&&x.n?x.n:(keyToNote[k]||'')}
@@ -97,18 +116,16 @@ function syncScoreState(forceScroll=false){const total=songEntries.length,entry=
 function setMode(m){
   stopDemo();
   if(m==='rhythm'){
-    const castle=songs.find(isCastleSong);
-    if(!castle)return;
-    if(current!==castle){current=castle;step=0;renderSongList();renderSong()}
     mode='rhythm';
     appRoot.classList.add('rhythm-mode');
     $('guideMode').classList.remove('active');$('rhythmMode').classList.add('active');
     $('modeText').textContent='音游模式';
-    document.querySelector('.kbd-help').textContent='固定六键 A S D / J K L · Perfect ±85ms · Good ±180ms';
-    $('progress').textContent=`0s / ${Math.floor(castleChart.duration)}s`;
-    $('progressText').textContent=`音游 · 0%`;
-    $('audioStatus').textContent=`天空之城 · ${castleChart.bpm} BPM · 点击开始`;
-    ensureRhythmGame().stop();
+    document.querySelector('.kbd-help').textContent='固定六键 A S D / J K L · Perfect ±85ms · Good ±180ms · 默认 1.15×';
+    const chart=syncRhythmChart();
+    $('progress').textContent=`0s / ${Math.floor(chart.duration||0)}s`;
+    $('progressText').textContent='音游 · 0%';
+    $('audioStatus').textContent=`${current.title} · ${chart.bpm} BPM · 点击开始`;
+    ensureRhythmGame().setChart(chart);
     syncScoreState(false);
     return;
   }
@@ -126,7 +143,8 @@ function pianoKey(key,down=true){const el=document.querySelector(`[data-key="${C
 function handleKey(key){
   key=key.toUpperCase();
   if(mode==='rhythm'){
-    const lane=castleChart.keys.indexOf(key);
+    const keys=ensureRhythmGame().getChart()?.keys||rhythmChart.keys;
+    const lane=keys.indexOf(key);
     if(lane>=0)ensureRhythmGame().inputLane(lane);
     return;
   }
@@ -145,7 +163,8 @@ window.addEventListener('keydown',e=>{
   if(e.target.matches('input,textarea,select')||e.repeat)return;
   const base=e.key.length===1?e.key.toUpperCase():'';
   if(mode==='rhythm'){
-    if(castleChart.keys.includes(base)){e.preventDefault();handleKey(base)}
+    const keys=ensureRhythmGame().getChart()?.keys||rhythmChart.keys;
+    if(keys.includes(base)){e.preventDefault();handleKey(base)}
     return;
   }
   const shifted=e.shiftKey&&'ASDFGHJKL'.includes(base)?'⇧'+base:'';
