@@ -119,22 +119,56 @@ function monophonicTopLine(track){
   return groups.map(g=>g.notes.sort((a,b)=>b.midi-a.midi||b.velocity-a.velocity)[0]);
 }
 
+function thinForRhythm(notes,bpm){
+  if(!notes.length)return [];
+  // 16th-note grid with adaptive candidate scoring. This keeps rapid melodic figures
+  // while collapsing dense accompaniment/arpeggios from single-track piano MIDI.
+  const grid=60/Math.max(50,bpm)/4;
+  const buckets=new Map();
+  for(const n of notes){
+    const q=Math.round(n.t/grid);
+    const arr=buckets.get(q)||[];
+    arr.push(n);buckets.set(q,arr);
+  }
+  const out=[];
+  let prev=null;
+  for(const [q,arr] of [...buckets.entries()].sort((a,b)=>a[0]-b[0])){
+    const target=q*grid;
+    const ranked=arr.map(n=>{
+      const contour=prev?Math.abs(n.midi-prev.midi):0;
+      const leapPenalty=prev&&contour>14?(contour-14)*1.8:0;
+      const score=n.midi*.72+n.velocity*.08-leapPenalty;
+      return {n,score};
+    }).sort((a,b)=>b.score-a.score);
+    const pick=ranked[0].n;
+    const normalized={...pick,t:target};
+    if(prev&&normalized.midi===prev.midi&&normalized.t-prev.t<grid*.9){
+      if(normalized.d>prev.d)prev.d=normalized.d;
+      continue;
+    }
+    out.push(normalized);prev=normalized;
+  }
+  return out;
+}
+
 export function rhythmChartFromMidi(arrayBuffer,{id='midi-level',title='MIDI Level',laneKeys=['A','S','D','J','K','L']}={}){
   const parsed=parseMidi(arrayBuffer);
   const melodyTrack=chooseMelodyTrack(parsed);
-  const melody=monophonicTopLine(melodyTrack);
+  const firstTempo=parsed.tempos[0]?.mpqn||500000;
+  const bpm=Math.round(60000000/firstTempo);
+  const rawMelody=monophonicTopLine(melodyTrack);
+  const melody=thinForRhythm(rawMelody,bpm);
   if(!melody.length)throw new Error('未识别到主旋律');
   const mids=melody.map(n=>n.midi),lo=Math.min(...mids),hi=Math.max(...mids);
   const events=melody.map((n,i)=>{
     const lane=hi===lo?Math.floor(laneKeys.length/2):clamp(Math.round((n.midi-lo)/(hi-lo)*(laneKeys.length-1)),0,laneKeys.length-1);
     return {t:Number(n.t.toFixed(3)),d:Number(clamp(n.d,.08,2.8).toFixed(3)),l:lane,n:n.name,m:n.midi,i};
   });
-  const firstTempo=parsed.tempos[0]?.mpqn||500000;
-  const bpm=Math.round(60000000/firstTempo);
   const duration=Number((Math.max(...events.map(e=>e.t+e.d))+1).toFixed(3));
   return {
     id,title,bpm,keys:laneKeys,duration,events,
     sourceTrack:{index:melodyTrack.index,name:melodyTrack.name||'',notes:melodyTrack.notes.length},
+    extraction:{rawTopLine:rawMelody.length,rhythmEvents:events.length,gridSeconds:Number((60/bpm/4).toFixed(4))},
     midiTracks:parsed.tracks.map(t=>({index:t.index,name:t.name||'',notes:t.notes.length}))
   };
 }
