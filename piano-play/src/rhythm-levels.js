@@ -85,15 +85,15 @@ export const juebieSong={
   composer:'邓垚',
   category:'现代钢琴',
   difficulty:2,
-  description:'120 BPM 六键节奏试玩关卡。当前为节奏训练编排，不冒充原曲完整钢琴谱。',
-  source:'音游试玩 · 120 BPM · 六键',
+  description:'96 BPM 六键节奏试玩关卡。正式版将优先读取校验后的 MIDI 主旋律轨；当前占位谱不冒充原曲完整钢琴谱。',
+  source:'音游试玩 · 96 BPM · 六键 · 等待正式 MIDI',
   sections:[],
   rhythmOnly:true,
-  rhythmBpm:120
+  rhythmBpm:96
 };
 
 function makeJuebiePracticeChart(){
-  const bpm=120,beat=60/bpm;
+  const bpm=96,beat=60/bpm;
   const notes=['F4','A4','C5','D5','F5','A5'];
   const phrases=[
     [0,1,2,3,2,4,3,1],
