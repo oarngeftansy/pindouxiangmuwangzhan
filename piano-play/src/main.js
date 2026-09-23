@@ -83,7 +83,9 @@ function saveLevelResult(result){
   };
   try{localStorage.setItem(LEVEL_RECORD_KEY,JSON.stringify(levelRecords))}catch(e){}
   renderSongList();
-  syncRhythmChart();
+  const rec=recordFor(current);
+  const tag=rhythmChart.preview?'节奏试玩':'六键关卡';
+  if($('rhythmCaption'))$('rhythmCaption').textContent=`${levelLabel(current)} · ${current.title} · ${rhythmChart.bpm} BPM · ${rhythmChart.events.length} 音符 · ${tag} · BEST ${Number(rec?.bestAccuracy||0).toFixed(1)}%`;
 }
 function nextRhythmLevel(){
   const levels=levelSongs();
@@ -92,9 +94,8 @@ function nextRhythmLevel(){
   const next=levels[(i+1+levels.length)%levels.length];
   current=next;step=0;
   renderSongList();renderSong();
-  const chart=syncRhythmChart();
+  syncRhythmChart();
   const game=ensureRhythmGame();
-  game.setChart(chart);
   setTimeout(()=>game.start(),120);
 }
 function chartForCurrent(){
